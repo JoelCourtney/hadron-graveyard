@@ -2,7 +2,6 @@ use regex::Regex;
 
 #[derive(Debug)]
 #[derive(PartialEq)]
-#[allow(dead_code)]
 pub enum Lexeme {
     Plus,
     Dash,
@@ -15,9 +14,9 @@ pub enum Lexeme {
     Hash,
     Bang,
     And,
-    Nand,
+    NAnd,
     Or,
-    Nor,
+    NOr,
     Xor,
     NXor,
     Not,
@@ -41,20 +40,11 @@ pub enum Lexeme {
     Colon,
     Separator,
     Comma,
-    SQuote,
-    DQuote,
     Backtick,
     Number(f64),
     Handle(String),
     StringLiteral(String),
-    Indent(i32),
 } 
-
-enum IndentTypes {
-    Tab,
-    Space,
-    Unknown,
-}
 
 pub fn lex(code: String) -> Vec<Lexeme> {
     let mut lexemes = Vec::new();
@@ -76,9 +66,9 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     "is" => Lexeme::Is,
                     "isnt" => Lexeme::Isnt,
                     "and" => Lexeme::And,
-                    "nand" => Lexeme::Nand,
+                    "nand" => Lexeme::NAnd,
                     "or" => Lexeme::Or,
-                    "nor" => Lexeme::Nor,
+                    "nor" => Lexeme::NOr,
                     "xor" => Lexeme::Xor,
                     "nxor" => Lexeme::NXor,
                     "not" => Lexeme::Not,
@@ -127,6 +117,7 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 ';' => Lexeme::Separator,
                 ',' => Lexeme::Comma,
                 '|' => Lexeme::Pipe,
+                '`' => Lexeme::Backtick,
                 _ => panic!("Unexpected character in code: {}", c),
             };
             lexemes.push(token);

@@ -8,6 +8,7 @@ use std::fs::File;
 use std::io::prelude::*;
 
 mod lexer;
+mod parser;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -19,6 +20,8 @@ fn main() {
     file.read_to_string(&mut code)
         .expect("error reading file");
 
-    let tokens = lexer::lex(code);
-    println!("{:?}",tokens);
+    let lexemes = lexer::lex(code);
+    println!("{:?}",lexemes);
+
+    let asts = parser::parse(lexemes);
 }
