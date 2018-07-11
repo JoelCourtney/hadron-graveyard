@@ -1,0 +1,56 @@
+1. Physics and Math
+2. Readability, from a physicist / mathemetician perspective
+3. uh
+This means use conventional notation when possible
+Use english otherwise
+Prioritize notational correctness over verbosity
+
+variables:
+x = 5 + y
+
+Constants:
+x := 5 + y
+
+Complex Numbers:
+1+1i, 4-3j, 7+3i+5j-5k
+
+Complex Matrices:
+Pretty self-explanatory
+
+Units:
+duh
+
+Cardinality:
+A = (1,2,5)
+#A // (3)
+B = (2,3; 4,5)
+#B // (2,3)
+
+Determinant:
+|A| = det(A)
+
+Norms:
+L2||a|| =
+	// L2 norm goes here
+default norm L2
+
+Inner Products:
+dot<a, b>
+UserDefinedInnerProduct<a,b>
+User will be responsible for ensuring properties of norms and inner prods
+
+Functions:
+function(a,b) -> {
+	x = a*b
+	<- 2 + x
+}
+
+Equations:
+f(x,y) = x^2 / y
+g(x) = {
+	x^2 if x > 0
+	0 otherwise
+}
+
+Algebra and calculus will only be considered if the function immediately evaluates without sideeffects. Piecewise is maybe. Accessing outside variables, or taking more than one step is not.
+

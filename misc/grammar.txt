@@ -1,0 +1,51 @@
+`char` -> Character
+`alpha` -> Letter
+`digit` -> 0-9
+`E` -> epsilon
+/.../ -> Exact string ...
+
+AddSubOp ::= + | -
+MultDivOp ::= * | /
+ExpOp ::= ^
+
+ArithStart ::= ArithUnaryLeft
+ArithUnaryLeft ::= /-/ArithUnaryLeft | /~/ArithUnaryLeft | ArithUnaryRight
+ArithUnaryRight ::= ArithUnaryRight/!/ | ArithUnaryMiddle
+ArithUnaryMiddle ::= /|/ArithBinaryAddSub/|/ | ArithBinaryAddSub
+ArithBinaryAddSub ::= ArithBinaryAddSub /+/ ArithBinaryMultDiv | ArithBinaryAddSub /-/ ArithBinaryMultDiv | ArithBinaryMultDiv
+ArithBinaryMultDiv ::= ArithBinaryMultDiv /*/ ArithBinaryExp | ArithBinaryMultDiv /// ArithBinaryExp | ArithBinaryExp
+ArithBinaryExp ::= ArithAtom /^/ ArithAtom | ArithAtom
+ArithAtom ::= Number | Matrix | /(/ ArithStart /)/
+
+UnitStringStart ::= UnitStringMultDiv
+UnitStringMultDiv ::= UnitStringMultDiv /*/ UnitStringExp | UnitStringExp
+UnitStringExp ::= UnitStringAtom /^/ ArithAtom | UnitStringAtom
+UnitStringAtom ::= VarString | (UnitStringStart)
+
+Unit ::= [UnitString]
+Quantity ::= [[UnitString]]
+
+VarString ::= VarString`char` | `alpha`
+
+Boolean::= true | false
+
+String::= "StringSequence"
+StringSequence ::= StringSequence`char` | `E`
+
+Integer ::= Natural | -Natural
+Natural ::= Natural`digit` | `digit`
+Decimal ::= Integer/./Integer | Integer
+
+Real ::= Decimal | Decimal/e/Decimal
+Imaginary ::= Real/i/ | Real/j/ | Real/k/
+Number ::= Real | Imaginary
+
+Matrix ::= /(/ VectorSequence /)/
+VectorSequence ::= VectorSequence /;/ Vector | Vector | `E`
+Vector ::= Vector /,/ Number | Number | `E`
+
+VarDecl ::= VarString /:/ Type /=/ Value | VarString /:/ Type /=/ Scope
+
+Type ::= Unit | /String/
+
+Value ::= ArithStart | StringStart
