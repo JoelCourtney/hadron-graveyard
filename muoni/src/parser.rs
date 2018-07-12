@@ -7,6 +7,7 @@ enum Token {
     Divide,
     Power,
     Modulo,
+    UnaryMinus,
     Factorial,
     Determinant,
     Norm,
@@ -25,7 +26,7 @@ enum Token {
     RightArrow,
     LeftArrow,
     Number(f64),
-    Variable(String),
+    Name(String),
     Unit(String),
     StringLiteral(String),
     Range(bool,bool,f64,f64,f64),
@@ -40,12 +41,8 @@ enum Token {
 }
 
 pub fn parse(lexemes: Vec<lexer::Lexeme>) -> i32 {
-    let tokens = tokenize(lexemes);
-    let tokens = prefix(tokens);
-    create_trees(tokens)
-}
-
-fn tokenize(lexemes: Vec<lexer::Lexeme>) -> Vec<Token> {
-    let mut tokens = Vec<Token>::new();
-
+//    let tokens = tokenize(lexemes);
+//    let tokens = prefix(tokens);
+//    create_trees(tokens)
+0
 }
