@@ -1,4 +1,6 @@
-pub enum Value<'a> {
+use super::ast;
+
+pub enum Value {
     Integer(i32),
     BigInteger(i32),
     Complex(f64,f64),
@@ -11,7 +13,8 @@ pub enum Value<'a> {
     StringLiteral(String),
     Boolean(bool),
     Range(bool,f64,f64,f64,bool),
-    List(Vec<&'a Value<'a>>),
+    List(Vec<Value>),
+    Function(Vec<String>,ast::Scope),
 }
 
 // fn do_unary, fn do_binary, etc. no impl necessary, or even viable.

@@ -1,97 +1,5 @@
 use regex::Regex;
-
-#[derive(Debug)]
-#[derive(PartialEq)]
-pub enum Lexeme {
-    BinaryOp(Binary),
-    UnaryOp(Unary),
-    Assign,
-    Let,
-    RightArrow,
-    LeftArrow,
-    Colon,
-    Comma,
-    Semicolon,
-    NewLine,
-    Dot,
-    Number(f64),
-    Handle(String),
-    StringLiteral(String),
-    If,
-    ElseIf,
-    Else,
-    While,
-    For,
-    As,
-    At,
-    OArgList,
-    OScope,
-    OMatrix,
-    ORangeIn,
-    ORangeEx,
-    OUnit,
-    OList,
-    CParen,
-    CBraket,
-    CBrace,
-    Print,
-    None,
-} 
-
-#[derive(Debug)]
-#[derive(PartialEq)]
-pub enum Binary {
-    Plus,
-    PlusEquals,
-    Minus,
-    MinusEquals,
-    Times,
-    TimesEquals,
-    DotTimes,
-    DotTimesEquals,
-    Divide,
-    DivideEquals,
-    DotDivide,
-    DotDivideEquals,
-    Power,
-    PowerEquals,
-    DotPower,
-    DotPowerEquals,
-    Mod,
-    ModEquals,
-    And,
-    AndEquals,
-    NAnd,
-    NAndEquals,
-    Or,
-    OrEquals,
-    NOr,
-    NOrEquals,
-    XOr,
-    XOrEquals,
-    Is,
-    IsEquals,
-    Isnt,
-    IsntEquals,
-    NotEquals,
-    Less,
-    LessOrEqual,
-    Greater,
-    GreaterOrEqual,
-}
-
-#[derive(Debug)]
-#[derive(PartialEq)]
-pub enum Unary {
-    Negate,
-    Factorial,
-    ONorm,
-    CNorm,
-    ODeterminant,
-    CDeterminant,
-    Cardinality,
-    Not,
-}
+use super::ast::{Lexeme,BOP,UOP};
 
 pub fn lex(code: String) -> Vec<Lexeme> {
     let mut lexemes = Vec::new();
@@ -115,9 +23,9 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     match next {
                         Some('=') => {
                             i += 1;
-                            Lexeme::BinaryOp(Binary::IsEquals)
+                            Lexeme::AssignOp(BOP::Is)
                         }
-                        _ => Lexeme::BinaryOp(Binary::Is)
+                        _ => Lexeme::BinaryOp(BOP::Is)
                     }
                 }
                 "isnt" => {
@@ -125,9 +33,9 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     match next {
                         Some('=') => {
                             i += 1;
-                            Lexeme::BinaryOp(Binary::IsntEquals)
+                            Lexeme::AssignOp(BOP::Isnt)
                         }
-                        _ => Lexeme::BinaryOp(Binary::Isnt)
+                        _ => Lexeme::BinaryOp(BOP::Isnt)
                     }
                 }
                 "and" => {
@@ -135,9 +43,9 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     match next {
                         Some('=') => {
                             i += 1;
-                            Lexeme::BinaryOp(Binary::AndEquals)
+                            Lexeme::AssignOp(BOP::And)
                         }
-                        _ => Lexeme::BinaryOp(Binary::And)
+                        _ => Lexeme::BinaryOp(BOP::And)
                     }
                 }
                 "nand" => {
@@ -145,9 +53,9 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     match next {
                         Some('=') => {
                             i += 1;
-                            Lexeme::BinaryOp(Binary::NAndEquals)
+                            Lexeme::AssignOp(BOP::NAnd)
                         }
-                        _ => Lexeme::BinaryOp(Binary::NAnd)
+                        _ => Lexeme::BinaryOp(BOP::NAnd)
                     }
                 }
                 "or" => {
@@ -155,9 +63,9 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     match next {
                         Some('=') => {
                             i += 1;
-                            Lexeme::BinaryOp(Binary::OrEquals)
+                            Lexeme::AssignOp(BOP::Or)
                         }
-                        _ => Lexeme::BinaryOp(Binary::Or)
+                        _ => Lexeme::BinaryOp(BOP::Or)
                     }
                 }
                 "nor" => {
@@ -165,9 +73,9 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     match next {
                         Some('=') => {
                             i += 1;
-                            Lexeme::BinaryOp(Binary::NOrEquals)
+                            Lexeme::AssignOp(BOP::NOr)
                         }
-                        _ => Lexeme::BinaryOp(Binary::NOr)
+                        _ => Lexeme::BinaryOp(BOP::NOr)
                     }
                 }
                 "xor" => {
@@ -175,29 +83,22 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     match next {
                         Some('=') => {
                             i += 1;
-                            Lexeme::BinaryOp(Binary::XOrEquals)
+                            Lexeme::AssignOp(BOP::XOr)
                         }
-                        _ => Lexeme::BinaryOp(Binary::XOr)
+                        _ => Lexeme::BinaryOp(BOP::XOr)
                     }
                 }
                 "not" => {
-                    let next = chars.get(i+1);
-                    match next {
-                        Some('=') => {
-                            i += 1;
-                            Lexeme::BinaryOp(Binary::NotEquals)
-                        }
-                        _ => Lexeme::UnaryOp(Unary::Not)
-                    }
+                    Lexeme::UnaryOp(UOP::Not)
                 }
                 "mod" => {
                     let next = chars.get(i+1);
                     match next {
                         Some('=') => {
                             i += 1;
-                            Lexeme::BinaryOp(Binary::ModEquals)
+                            Lexeme::AssignOp(BOP::Modulus)
                         }
-                        _ => Lexeme::BinaryOp(Binary::Mod)
+                        _ => Lexeme::BinaryOp(BOP::Modulus)
                     }
                 }
                 "if" => Lexeme::If,
@@ -228,11 +129,11 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     let next = chars.get(i+1);
                     match next {
                         Some('=') => {
-                            choice = Lexeme::BinaryOp(Binary::PlusEquals);
+                            choice = Lexeme::AssignOp(BOP::Plus);
                             i += 2;
                         }
                         _ => {
-                            choice = Lexeme::BinaryOp(Binary::Plus);
+                            choice = Lexeme::BinaryOp(BOP::Plus);
                             i += 1;
                         }
                     }
@@ -248,22 +149,22 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                                     i += 2;
                                 }
                                 Some('=') => {
-                                    choice = Lexeme::BinaryOp(Binary::MinusEquals);
+                                    choice = Lexeme::AssignOp(BOP::Minus);
                                     i += 2;
                                 }
                                 _ => {
-                                    choice = Lexeme::BinaryOp(Binary::Minus);
+                                    choice = Lexeme::BinaryOp(BOP::Minus);
                                     i += 1;
                                 }
                             }
                         }
                         Some(Lexeme::Number(_)) | Some(Lexeme::CBrace) 
                             | Some(Lexeme::CBraket) => {
-                                choice = Lexeme::BinaryOp(Binary::Minus);
+                                choice = Lexeme::BinaryOp(BOP::Minus);
                                 i += 1;
                             }
                         _ => {
-                            choice = Lexeme::UnaryOp(Unary::Negate);
+                            choice = Lexeme::UnaryOp(UOP::Negate);
                             i += 1;
                         }
                     }
@@ -272,11 +173,11 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     let next = chars.get(i+1);
                     match next {
                         Some('=') => {
-                            choice = Lexeme::BinaryOp(Binary::TimesEquals);
+                            choice = Lexeme::AssignOp(BOP::Times);
                             i += 2;
                         }
                         _ => {
-                            choice = Lexeme::BinaryOp(Binary::Times);
+                            choice = Lexeme::BinaryOp(BOP::Times);
                             i += 1;
                         }
                     }
@@ -291,11 +192,11 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                             }
                         }
                         Some('=') => {
-                            choice = Lexeme::BinaryOp(Binary::DivideEquals);
+                            choice = Lexeme::AssignOp(BOP::Divide);
                             i += 2;
                         }
                         _ => {
-                            choice = Lexeme::BinaryOp(Binary::Divide);
+                            choice = Lexeme::BinaryOp(BOP::Divide);
                             i += 1;
                         }
                     }
@@ -304,11 +205,11 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     let next = chars.get(i+1);
                     match next {
                         Some('=') => {
-                            choice = Lexeme::BinaryOp(Binary::PowerEquals);
+                            choice = Lexeme::AssignOp(BOP::Power);
                             i += 2;
                         }
                         _ => {
-                            choice = Lexeme::BinaryOp(Binary::Power);
+                            choice = Lexeme::BinaryOp(BOP::Power);
                             i += 1;
                         }
                     }
@@ -318,27 +219,27 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     let n2 = chars.get(i+2);
                     match (n1, n2) {
                         (Some('*'),Some('=')) => {
-                            choice = Lexeme::BinaryOp(Binary::DotTimesEquals);
+                            choice = Lexeme::AssignOp(BOP::ElemTimes);
                             i += 3;
                         }
                         (Some('*'),_) => {
-                            choice = Lexeme::BinaryOp(Binary::DotTimes);
+                            choice = Lexeme::BinaryOp(BOP::ElemTimes);
                             i += 2;
                         }
                         (Some('/'),Some('=')) => {
-                            choice = Lexeme::BinaryOp(Binary::DotDivideEquals);
+                            choice = Lexeme::AssignOp(BOP::ElemDivide);
                             i += 3;
                         }
                         (Some('/'),_) => {
-                            choice = Lexeme::BinaryOp(Binary::DotDivide);
+                            choice = Lexeme::BinaryOp(BOP::ElemDivide);
                             i += 2;
                         }
                         (Some('^'),Some('=')) => {
-                            choice = Lexeme::BinaryOp(Binary::DotPowerEquals);
+                            choice = Lexeme::AssignOp(BOP::ElemPower);
                             i += 3;
                         }
                         (Some('^'),_) => {
-                            choice = Lexeme::BinaryOp(Binary::DotPower);
+                            choice = Lexeme::BinaryOp(BOP::ElemPower);
                             i += 2;
                         }
                         (_,_) => {
@@ -348,11 +249,11 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     }
                 }
                 '#' => {
-                    choice = Lexeme::UnaryOp(Unary::Cardinality);
+                    choice = Lexeme::UnaryOp(UOP::Cardinality);
                     i += 1;
                 }
                 '!' => {
-                    choice = Lexeme::UnaryOp(Unary::Factorial);
+                    choice = Lexeme::UnaryOp(UOP::Factorial);
                     i += 1;
                 }
                 '=' => {
@@ -408,7 +309,7 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     let next = chars.get(i+1);
                     match next {
                         Some('=') => {
-                            choice = Lexeme::BinaryOp(Binary::LessOrEqual);
+                            choice = Lexeme::BinaryOp(BOP::LessOrEqual);
                             i += 2;
                         }
                         Some('-') => {
@@ -419,13 +320,13 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                                     i += 2;
                                 }
                                 _ => {
-                                    choice = Lexeme::BinaryOp(Binary::Less);
+                                    choice = Lexeme::BinaryOp(BOP::Less);
                                     i += 1;
                                 }
                             }
                         }
                         _ => {
-                            choice = Lexeme::BinaryOp(Binary::Less);
+                            choice = Lexeme::BinaryOp(BOP::Less);
                             i += 1;
                         }
                     }
@@ -434,11 +335,11 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     let next = chars.get(i+1);
                     match next {
                         Some('=') => {
-                            choice = Lexeme::BinaryOp(Binary::GreaterOrEqual);
+                            choice = Lexeme::BinaryOp(BOP::GreaterOrEqual);
                             i += 2;
                         }
                         _ => {
-                            choice = Lexeme::BinaryOp(Binary::Greater);
+                            choice = Lexeme::BinaryOp(BOP::Greater);
                             i += 1;
                         }
                     }
@@ -473,11 +374,11 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                             while cursor >= 0 {
                                 let prev = lexemes.get(cursor).unwrap();
                                 match prev {
-                                    Lexeme::UnaryOp(Unary::ONorm) => {
+                                    Lexeme::ONorm => {
                                         open = false;
                                         break;
                                     }
-                                    Lexeme::UnaryOp(Unary::CNorm) => {
+                                    Lexeme::CNorm => {
                                         break;
                                     }
                                     _ => {
@@ -486,26 +387,26 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                                 }
                             }
                             if open {
-                                choice = Lexeme::UnaryOp(Unary::ONorm);
+                                choice = Lexeme::ONorm;
                             } else {
-                                choice = Lexeme::UnaryOp(Unary::CNorm);
+                                choice = Lexeme::CNorm;
                             }
                             i += 2;
                         }
                         _ => {
                             let prev = lexemes.last();
                             match prev {
-                                Some(Lexeme::UnaryOp(Unary::CNorm)) | Some(Lexeme::UnaryOp(Unary::CDeterminant)) => {
-                                    choice = Lexeme::UnaryOp(Unary::CDeterminant);
+                                Some(Lexeme::CNorm) | Some(Lexeme::CDeterminant) => {
+                                    choice = Lexeme::CDeterminant;
                                     i += 1;
                                 }
                                 Some(Lexeme::UnaryOp(_)) | Some(Lexeme::BinaryOp(_))
                                     | Some(Lexeme::Assign) | Some(Lexeme::Let) => {
-                                        choice = Lexeme::UnaryOp(Unary::ODeterminant);
+                                        choice = Lexeme::ODeterminant;
                                         i += 1;
                                     }
                                 _ => {
-                                    choice = Lexeme::UnaryOp(Unary::CDeterminant);
+                                    choice = Lexeme::CDeterminant;
                                     i += 1;
                                 }
                             }

@@ -1,101 +1,162 @@
 use super::values;
 
-pub struct Scope<'a> {
-    pub statements: Vec<Control<'a>>,
+pub struct Scope {
+    pub statements: Vec<Box<Control>>,
 }
 
-pub enum Control<'a> {
+pub enum Control {
     AssignVariable {
         name: String,
-        e1: &'a Arith<'a>,
+        e1: Box<Arith>,
     },
     AssignVariableBOP {
         name: String,
         op: BOP,
-        e1: &'a Arith<'a>,
+        e1: Box<Arith>,
     },
     AssignConstant {
         name: String,
-        e1: &'a Arith<'a>,
+        e1: Box<Arith>,
     },
     StateValue {
-        e1: &'a Arith<'a>,
+        e1: Box<Arith>,
     },
     AssignFunction {
         name: String,
         args: Vec<String>,
-        body: &'a Scope<'a>,
+        body: Box<Arith>,
+    },
+    Return {
+        e1: Box<Arith>,
     },
     If {
-        condition: &'a Arith<'a>,
-        body: &'a Scope<'a>,
+        condition: Box<Arith>,
+        body: Box<Arith>,
     },
     IfElse {
-        condition: &'a Arith<'a>,
-        if_body: &'a Scope<'a>,
-        else_body: &'a Scope<'a>,
+        condition: Box<Arith>,
+        if_body: Box<Arith>,
+        else_body: Box<Arith>,
     },
     IfSeries {
-        conditions: Vec<Arith<'a>>,
-        bodies: Vec<Scope<'a>>,
+        conditions: Vec<Arith>,
+        bodies: Vec<Arith>,
     },
     IfSeriesElse {
-        conditions: Vec<Arith<'a>>,
-        if_bodies: Vec<Scope<'a>>,
-        else_body: &'a Scope<'a>,
+        conditions: Vec<Arith>,
+        if_bodies: Vec<Arith>,
+        else_body: Box<Arith>,
     },
     ForAs {
-        range: &'a Arith<'a>,
-        target: String,
-        body: &'a Scope<'a>,
+        range: Box<Arith>,
+        target: Box<Arith>,
+        body: Box<Arith>,
     },
     ForAsAt {
-        range: &'a Arith<'a>,
-        target: String,
-        index: String,
-        body: &'a Scope<'a>,
+        range: Box<Arith>,
+        target: Box<Arith>,
+        index: Box<Arith>,
+        body: Box<Arith>,
     },
     While {
-        condition: &'a Arith<'a>,
-        body: &'a Scope<'a>,
+        condition: Box<Arith>,
+        body: Box<Arith>,
+    },
+    Empty,
+}
+
+pub enum Decomposition {
+    Singular {
+        n: String,
+    },
+    Matrix {
     },
 }
 
-pub enum Arith<'a> {
+pub enum Arith {
     Binary {
         op: BOP,
-        e1: &'a Arith<'a>,
-        e2: &'a Arith<'a>,
+        e1: Box<Arith>,
+        e2: Box<Arith>,
     },
     Unary {
         op: UOP,
-        e1: &'a Arith<'a>,
+        e1: Box<Arith>,
     },
     Call {
         f: String,
-        args: Vec<Arith<'a>>,
+        args: Vec<Arith>,
     },
     Name {
         n: String,
     },
     Value {
-        v: values::Value<'a>,
+        v: values::Value,
     },
+    Scope {
+        s: Box<Scope>,
+    }
 }
 
+#[derive(Debug)]
+#[derive(PartialEq)]
+pub enum Lexeme {
+    BinaryOp(BOP),
+    UnaryOp(UOP),
+    Assign,
+    AssignOp(BOP),
+    Let,
+    RightArrow,
+    LeftArrow,
+    Colon,
+    Comma,
+    Semicolon,
+    NewLine,
+    Dot,
+    Number(f64),
+    Handle(String),
+    StringLiteral(String),
+    If,
+    ElseIf,
+    Else,
+    While,
+    For,
+    As,
+    At,
+    OArgList,
+    OScope,
+    OMatrix,
+    ORangeIn,
+    ORangeEx,
+    OUnit,
+    OList,
+    ONorm,
+    ODeterminant,
+    CParen,
+    CBraket,
+    CBrace,
+    CNorm,
+    CDeterminant,
+    Print,
+    None,
+}
+
+#[derive(Debug,PartialEq,Copy,Clone)]
 pub enum BOP {
     Plus,
     Minus,
     Times,
+    ElemTimes,
     Divide,
+    ElemDivide,
     Power,
+    ElemPower,
     Modulus,
     And,
     NAnd,
     Or,
     NOr,
-    Xor,
-    NXor,
+    XOr,
     Is,
     Isnt,
     Less,
@@ -104,6 +165,8 @@ pub enum BOP {
     GreaterOrEqual,
 }
 
+#[derive(Debug)]
+#[derive(PartialEq)]
 pub enum UOP {
     Negate,
     Factorial,
