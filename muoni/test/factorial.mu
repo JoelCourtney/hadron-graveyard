@@ -22,10 +22,11 @@ factorial(n) -> {
 	count = 0
 	for pieces as piece {
 		print "Multiplying piece: " + count
-		count++
+		count += 1
 		result *= piece
 	}
 	<- result
+}
 
 print factorial(10)
 
