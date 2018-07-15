@@ -1,6 +1,4 @@
-#! /usr/bin/env muoni
-
-grain := 10000
+grain := 1 + 10000
 
 factorial(n) -> {
 	pieces = ()

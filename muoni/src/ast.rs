@@ -47,15 +47,24 @@ pub enum Control {
         if_bodies: Vec<Arith>,
         else_body: Box<Arith>,
     },
+    For {
+        range: Box<Arith>,
+        body: Box<Arith>,
+    },
     ForAs {
         range: Box<Arith>,
-        target: Box<Arith>,
+        target: Box<Decomposition>,
+        body: Box<Arith>,
+    },
+    ForAt {
+        range: Box<Arith>,
+        index: Box<Decomposition>,
         body: Box<Arith>,
     },
     ForAsAt {
         range: Box<Arith>,
-        target: Box<Arith>,
-        index: Box<Arith>,
+        target: Box<Decomposition>,
+        index: Box<Decomposition>,
         body: Box<Arith>,
     },
     While {
@@ -66,11 +75,9 @@ pub enum Control {
 }
 
 pub enum Decomposition {
-    Singular {
-        n: String,
-    },
-    Matrix {
-    },
+    Singular(String),
+    Matrix(Vec<Vec<String>>),
+    List(Vec<Decomposition>),
 }
 
 pub enum Arith {
@@ -165,13 +172,10 @@ pub enum BOP {
     GreaterOrEqual,
 }
 
-#[derive(Debug)]
-#[derive(PartialEq)]
+#[derive(Debug,PartialEq,Copy,Clone)]
 pub enum UOP {
     Negate,
     Factorial,
-    Norm,
-    Determinant,
     Cardinality,
     Not,
 }
