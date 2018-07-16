@@ -5,94 +5,105 @@ pub struct Scope {
 }
 
 pub enum Control {
-    AssignVariable {
-        name: String,
-        e1: Box<Arith>,
-    },
-    AssignVariableBOP {
-        name: String,
-        op: BOP,
-        e1: Box<Arith>,
-    },
-    AssignConstant {
-        name: String,
-        e1: Box<Arith>,
-    },
-    StateValue {
-        e1: Box<Arith>,
-    },
-    AssignFunction {
-        name: String,
-        args: Vec<String>,
-        body: Box<Arith>,
-    },
-    Return {
-        e1: Box<Arith>,
-    },
+    State {
+        statement: Box<Statement>,
+    }
     If {
-        condition: Box<Arith>,
-        body: Box<Arith>,
+        condition: Box<RValue>,
+        body: Box<RValue>,
     },
     IfElse {
-        condition: Box<Arith>,
-        if_body: Box<Arith>,
-        else_body: Box<Arith>,
+        condition: Box<RValue>,
+        if_body: Box<RValue>,
+        else_body: Box<RValue>,
     },
     IfSeries {
-        conditions: Vec<Arith>,
-        bodies: Vec<Arith>,
+        conditions: Vec<RValue>,
+        bodies: Vec<RValue>,
     },
     IfSeriesElse {
-        conditions: Vec<Arith>,
-        if_bodies: Vec<Arith>,
-        else_body: Box<Arith>,
+        conditions: Vec<RValue>,
+        if_bodies: Vec<RValue>,
+        else_body: Box<RValue>,
     },
     For {
-        range: Box<Arith>,
-        body: Box<Arith>,
+        range: Box<RValue>,
+        body: Box<RValue>,
     },
     ForAs {
-        range: Box<Arith>,
+        range: Box<RValue>,
         target: Box<Decomposition>,
-        body: Box<Arith>,
+        body: Box<RValue>,
     },
     ForAt {
-        range: Box<Arith>,
+        range: Box<RValue>,
         index: Box<Decomposition>,
-        body: Box<Arith>,
+        body: Box<RValue>,
     },
     ForAsAt {
-        range: Box<Arith>,
+        range: Box<RValue>,
         target: Box<Decomposition>,
         index: Box<Decomposition>,
-        body: Box<Arith>,
+        body: Box<RValue>,
     },
     While {
-        condition: Box<Arith>,
-        body: Box<Arith>,
+        condition: Box<RValue>,
+        body: Box<RValue>,
     },
     Empty,
 }
 
-pub enum Decomposition {
-    Singular(String),
-    Matrix(Vec<Vec<String>>),
-    List(Vec<Decomposition>),
+pub enum Statement {
+    Assign {
+        name: Box<LValue>,
+        e1: Box<RValue>,
+    },
+    AssignBOP {
+        name: Box<LValue>,
+        op: BOP,
+        e1: Box<RValue>,
+    },
+    Let {
+        name: Box<LValue>,
+        e1: Box<RValue>,
+    },
+    LazyAssign {
+        name: Box<LValue>,
+        e1: Box<RValue>,
+    },
+    StateValue {
+        e1: Box<RValue>,
+    },
+    AssignFunction {
+        name: String,
+        args: Vec<String>,
+        body: Box<RValue>,
+    },
+    Return {
+        e1: Box<RValue>,
+    },
 }
 
-pub enum Arith {
+pub enum LValue {
+    Name(String),
+    MatrixDecomp(Vec<Vec<LValue>>),
+    ListDecomp(Vec<LValue>),
+    Subset(String,RValue),
+}
+
+pub enum RValue {
     Binary {
         op: BOP,
-        e1: Box<Arith>,
-        e2: Box<Arith>,
+        e1: Box<RValue>,
+        e2: Box<RValue>,
     },
     Unary {
         op: UOP,
-        e1: Box<Arith>,
+        e1: Box<RValue>,
     },
     Call {
         f: String,
-        args: Vec<Arith>,
+        args: Vec<RValue>,
     },
     Name {
         n: String,

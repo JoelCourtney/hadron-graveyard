@@ -3,7 +3,7 @@
 as_df = - 98e3
 _asdf = 9
 y
-a = (3,[3:5:6),89)
+a = [3,[3:5:6),89]
 function(x,y) -> {
 	while x < y {
 		x *= 2

@@ -1,3 +1,9 @@
+// parse_statment
+// parse_lvalue
+// parse_rvalue
+// parse_control
+// parse_scope
+
 use super::ast::*;
 use super::values::*;
 
@@ -27,143 +33,9 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
         start = lexemes.get(i);
     }
     match start {
-        Some(Lexeme::Handle(s)) => {
-            let name = s.clone();
-            let next = lexemes.get(i+1);
-            match next {
-                Some(Lexeme::Assign) => {
-                    i += 2;
-                    let (e1,length) = parse_arith(&lexemes[i..]);
-                    i += length;
-                    (
-                        Box::new(Control::AssignVariable {
-                            name,
-                            e1,
-                        }),
-                        i,
-                    )
-                }
-                Some(Lexeme::AssignOp(op)) => {
-                    i += 2;
-                    let (e1,length) = parse_arith(&lexemes[i..]);
-                    i += length;
-                    (
-                        Box::new(Control::AssignVariableBOP {
-                            name,
-                            op: *op,
-                            e1,
-                        }),
-                        i,
-                    )
-                }
-                Some(Lexeme::Let) => {
-                    i += 2;
-                    let (e1,length) = parse_arith(&lexemes[i..]);
-                    i += length;
-                    (
-                        Box::new(Control::AssignConstant {
-                            name,
-                            e1,
-                        }),
-                        i,
-                    )
-                }
-                Some(Lexeme::OArgList) => {
-                    let mut definition = false;
-                    let mut cursor = i + 2;
-                    let mut args = Vec::new();
-                    loop {
-                        let lexeme = lexemes.get(cursor);
-                        match lexeme {
-                            Some(Lexeme::Handle(s)) => {
-                                args.push(s.clone());
-                                let comma = lexemes.get(cursor+1);
-                                match comma {
-                                    Some(Lexeme::Comma) => {
-                                        cursor += 2;
-                                    }
-                                    Some(Lexeme::CParen) => {
-                                        let arrow = lexemes.get(cursor+2);
-                                        match arrow {
-                                            Some(Lexeme::RightArrow) => {
-                                                definition = true;
-                                                i = cursor + 3;
-                                            }
-                                            _ => {}
-                                        }
-                                        break;
-                                    }
-                                    _ => {
-                                        break;
-                                    }
-                                }
-                            }
-                            Some(Lexeme::CParen) => {
-                                let arrow = lexemes.get(cursor+1);
-                                match arrow {
-                                    Some(Lexeme::RightArrow) => {
-                                        definition = true;
-                                        i = cursor + 2;
-                                    }
-                                    _ => {}
-                                }
-                                break;
-                            }
-                            _ => {
-                                break;
-                            }
-                        }
-                    }
-                    if definition {
-                        let (body,length) = parse_arith(&lexemes[i..]);
-                        i += length;
-                        (
-                            Box::new(Control::AssignFunction {
-                                name,
-                                args,
-                                body,
-                            }),
-                            i,
-                        )
-                    } else {
-                        let (e1,length) = parse_arith(&lexemes[i..]);
-                        i += length;
-                        (
-                            Box::new(Control::StateValue {
-                                e1,
-                            }),
-                            i,
-                        )
-                    }
-                }
-                Some(Lexeme::RightArrow) => {
-                    i += 2;
-                    let (body,length) = parse_arith(&lexemes[i..]);
-                    i += length;
-                    (
-                        Box::new(Control::AssignFunction {
-                            name,
-                            args: Vec::new(),
-                            body,
-                        }),
-                        i,
-                    )
-                }
-                _ => {
-                    let (e1,length) = parse_arith(&lexemes[i..]);
-                    i += length;
-                    (
-                        Box::new(Control::StateValue {
-                            e1,
-                        }),
-                        i,
-                    )
-                }
-            }
-        }
         Some(Lexeme::For) => {
             i += 1;
-            let (range,length) = parse_arith(&lexemes[i..]);
+            let (range,length) = parse_rvalue(&lexemes[i..]);
             i += length;
             let key1 = lexemes.get(i);
             match key1 {
@@ -177,7 +49,7 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                             i += 1;
                             let (index,length) = parse_decomposition(&lexemes[i..]);
                             i += length;
-                            let (body,length) = parse_arith(&lexemes[i..]);
+                            let (body,length) = parse_rvalue(&lexemes[i..]);
                             i += length;
                             (
                                 Box::new(Control::ForAsAt {
@@ -190,7 +62,7 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                             )
                         }
                         Some(_) => {
-                            let (body,length) = parse_arith(&lexemes[i..]);
+                            let (body,length) = parse_rvalue(&lexemes[i..]);
                             i += length;
                             (
                                 Box::new(Control::ForAs {
@@ -214,7 +86,7 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                             i += 1;
                             let (target,length) = parse_decomposition(&lexemes[i..]);
                             i += length;
-                            let (body,length) = parse_arith(&lexemes[i..]);
+                            let (body,length) = parse_rvalue(&lexemes[i..]);
                             i += length;
                             (
                                 Box::new(Control::ForAsAt {
@@ -227,7 +99,7 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                             )
                         }
                         Some(_) => {
-                            let (body,length) = parse_arith(&lexemes[i..]);
+                            let (body,length) = parse_rvalue(&lexemes[i..]);
                             i += length;
                             (
                                 Box::new(Control::ForAt {
@@ -242,7 +114,7 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                     }
                 }
                 Some(_) => {
-                    let (body,length) = parse_arith(&lexemes[i..]);
+                    let (body,length) = parse_rvalue(&lexemes[i..]);
                     i += length;
                     (
                         Box::new(Control::For {
@@ -264,11 +136,11 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
             unimplemented!();
         }
         Some(_) => {
-            let (e1,length) = parse_arith(&lexemes[i..]);
+            let (statement,length) = parse_statement(&lexemes[i..]);
             i += length;
             (
-                Box::new(Control::StateValue {
-                    e1,
+                Box::new(Control::State {
+                    statement,
                 }),
                 i,
             )
@@ -277,42 +149,47 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
     }
 }
 
-fn parse_decomposition(lexemes: &[Lexeme]) -> (Box<Decomposition>,usize) {
-    unimplemented!();
-}
-
-fn parse_arith(lexemes: &[Lexeme]) -> (Box<Arith>,usize) {
+fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
     let mut complete = false;
     let mut level = 0;
     let mut i = 0;
+    let mut assignmentLoc = -1;
     loop {
         let lexeme = lexemes.get(i);
         match lexeme {
             Some(lex) if OPENERS.contains(lex) => {
-                level += 1;
-                complete = false;
+                level += traverse_atom(&lexemes[i..]);
+                complete = true;
             }
             Some(lex) if CLOSERS.contains(lex) => {
-                level -= 1;
-                if level == 0 {
-                    complete = true;
+                panic!("unexpected closing character");
+            }
+            Some(Lexeme::Assign) | Some(Lexeme::AssignOp(_)) | Some(Lexeme::Let) => {
+                complete = false;
+                if assignmentLoc == -1 {
+                    assignmentLoc = i;
                 }
+                i += 1;
             }
             Some(Lexeme::BinaryOp(_)) => {
                 complete = false;
+                i += 1;
             }
             Some(Lexeme::UnaryOp(o)) if o != &UOP::Factorial => {
                 complete = false;
+                i += 1;
             }
             Some(Lexeme::Handle(_)) | Some(Lexeme::Number(_)) | Some(Lexeme::StringLiteral(_)) => {
                 if level == 0 {
                     complete = true;
                 }
+                i += 1;
             }
             Some(Lexeme::Semicolon) | Some(Lexeme::NewLine) => {
                 if complete {
                     break;
                 }
+                i += 1;
             }
             Some(_) => {}               
             None => {
@@ -323,13 +200,19 @@ fn parse_arith(lexemes: &[Lexeme]) -> (Box<Arith>,usize) {
                 }
             }
         }
-        i += 1;
     }
-    let arith = parse_arith_contained(&lexemes[..i],0);
-    (
-        arith,
-        i,
-    )
+    if assignmentLoc != -1 {
+        let lvalue = parse_lvalue(&lexemes[..assignmentLoc]);
+        let rvalue = parse_rvalue(&lexemes[assignmentLoc+1 .. i]);
+        let assign = lexemes.get(i);
+        match assign {
+            Some(Lexeme::Assign) => {
+                (
+                    Box::new( Statement::
+}
+
+fn parse_lvalue(lexemes: &[Lexeme]) -> (Box<Decomposition>,usize) {
+    unimplemented!();
 }
 
 lazy_static! {
@@ -363,7 +246,7 @@ lazy_static! {
     ];
 }
 
-fn parse_arith_contained(lexemes: &[Lexeme], level: usize) -> Box<Arith> {
+fn parse_rvalue(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
     let l = lexemes.len();
     if level < 8 {
         let mut i = 0;
@@ -372,9 +255,9 @@ fn parse_arith_contained(lexemes: &[Lexeme], level: usize) -> Box<Arith> {
             match lexeme {
                 Lexeme::BinaryOp(bop) => {
                     if PRECEDENCE[level].contains(bop) {
-                        let e1 = parse_arith_contained(&lexemes[..i], level + 1);
-                        let e2 = parse_arith_contained(&lexemes[i+1..], level);
-                        return Box::new( Arith::Binary {
+                        let e1 = parse_rvalue(&lexemes[..i], level + 1);
+                        let e2 = parse_rvalue(&lexemes[i+1..], level);
+                        return Box::new( RValue::Binary {
                             op: *bop,
                             e1,
                             e2,
@@ -394,14 +277,14 @@ fn parse_arith_contained(lexemes: &[Lexeme], level: usize) -> Box<Arith> {
         let lexeme = lexemes.get(0).unwrap();
         match lexeme {
             Lexeme::UnaryOp(uop) => {
-                let e1 = parse_arith_contained(&lexemes[1..], level);
-                return Box::new( Arith::Unary {
+                let e1 = parse_rvalue(&lexemes[1..], level);
+                return Box::new( RValue::Unary {
                     op: *uop,
                     e1,
                 });
             }
             _ => {
-                return parse_arith_contained(&lexemes[..], level + 1);
+                return parse_rvalue(&lexemes[..], level + 1);
             }
         }
     } else if level == 9 {
@@ -446,7 +329,7 @@ fn parse_arith_contained(lexemes: &[Lexeme], level: usize) -> Box<Arith> {
             _ => {}
         }
     }
-    parse_arith_contained(lexemes, level + 1)
+    parse_rvalue(lexemes, level + 1)
 }
 
 fn traverse_atom(lexemes: &[Lexeme]) -> usize {

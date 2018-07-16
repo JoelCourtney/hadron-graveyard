@@ -8,14 +8,14 @@ factorial(n) -> {
 		for (i-grain:1:i] as j {
 			partial *= j
 		}
-		pieces = (pieces,partial)
+		pieces = [pieces,partial]
 	}
 	partial = 1
 	print "Calculating piece: " + n
 	for (n - (n mod grain):1:n] as i {
 		partial *= i
 	}
-	pieces = (pieces,partial)
+	pieces = [pieces,partial]
 	result = 1
 	count = 0
 	for pieces as piece {
