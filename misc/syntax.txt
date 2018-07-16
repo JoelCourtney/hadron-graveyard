@@ -1,45 +1,48 @@
 assignment:
 a = 5
-b = 5[kg]
+b = 5:kg
 e = b/c
 
+y = 6:[m/s]
+
 if statement:
-if expr:
+if expr {
 	indented stuff
-elseif expr:
+} elseif expr {
 	indented stuff
-else:
+} else {
 	moar indented stuff
+}
 
 switch statement:
-switch x:
-	case asdf:
+switch x {
+	case asdf {
 		stuff
 		stuff
 		continue
-	case jkl:
+	}
+	case jkl {
 		stuff
 		stuff
 		fallthrough
-	case moar:
+	}
+	case moar {
 		stuff
 		stuff
-	default:
+	}
+	default {
 		stuff
 		stuff
-
-developemental philsophy sidenote:
-all numbers are matrices. all vectors are matrices. numbers are 1x1 matrices. all elements of a matrix have the same unit, and must a number
+	}
+}
 
 matrices:
-(1)
-(1 2)
-(1,2)
-(1 2).T
-(1; 2)
+[1]
+[1,2]
+[1,2].T
+[1; 2]
 
-x[m] := x_0[m] + v_0[m/s] * t[s] + a[m/s^2] * t^2 / 2
-x'(t)
+x(x_0[m], v_0[m/s], t[s], a[m/s^2]) [m] -> x_0 + v_0 * t + a * t^2 / 2
 
 ranges:
 (s:e)

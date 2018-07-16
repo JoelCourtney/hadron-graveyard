@@ -1,5 +1,6 @@
-make lexer recognize arglists of anonymous functions
+/make lexer recognize arglists of anonymous functions
 redesgin ast to support lvalues, decompositions, etc
+redesign parser recognition of control structures
 implement big numbers, matrices, complex numbers, etc...
 ... so we can use THE SAME STRUCTURES in the ast as will be in the environment.
 booleans
