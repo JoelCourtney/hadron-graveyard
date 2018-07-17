@@ -154,4 +154,12 @@ Complex Numbers:
 5*i + j - k
 5+1i-3j // if i and j have been shadowed
 
+Symbolics:
+sym x // mayyyybe
 
+Interoperability:
+python |x| filename.py
+javascript |y| {
+	actual_js_code_holy_shite()
+}
+// matlab, R, javascript, python, ruby?
