@@ -249,7 +249,11 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     }
                 }
                 '#' => {
-                    choice = Lexeme::UnaryOp(UOP::Cardinality);
+                    choice = Lexeme::UnaryOp(UOP::Shape);
+                    i += 1;
+                }
+                '$' => {
+                    choice = Lexeme::UnaryOp(UOP::Size);
                     i += 1;
                 }
                 '!' => {
@@ -261,27 +265,31 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     i += 1;
                 }
                 '(' => {
-                    let prev = lexemes.last();
-                    match prev {
-                        Some(Lexeme::Handle(_)) => {
-                            choice = Lexeme::OArgList;
-                            i += 1;
-                        }
-                        _ => {
-                            if is_range(&chars, i) {
-                                choice = Lexeme::ORangeEx;
-                            } else {
-                                choice = Lexeme::OMatrix;
-                            }
-                            i += 1;
-                        }
+                    if is_range(&chars, i) {
+                        choice = Lexeme::ORange(false);
+                    } else {
+                        choice = Lexeme::OParen;
                     }
+                    i += 1;
                 }
                 '[' => {
                     if is_range(&chars, i) {
-                        choice = Lexeme::ORangeIn;
+                        choice = Lexeme::ORange(true);
                     } else {
-                        choice = Lexeme::OUnit;
+                        let prev = lexemes.last();
+                        match prev {
+                            Some(Lexeme::Number(_))
+                                | Some(Lexeme::CBraket)
+                                | Some(Lexeme::BinaryOp(BOP::StripUnit))
+                                | Some(Lexeme::BinaryOp(BOP::ConcatUnit))
+                                | Some(Lexeme::BinaryOp(BOP::Convert))
+                                | Some(Lexeme::BinaryOp(BOP::Guard)) => {
+                                choice = Lexeme::OUnit;
+                            }
+                            _ => {
+                                choice = Lexeme::OMatrix;
+                            }
+                        }
                     }
                     i += 1;
                 }
@@ -365,53 +373,17 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     choice = Lexeme::Semicolon;
                     i += 1;
                 }
-                '|' => {
-                    let next = chars.get(i+1);
-                    match next {
-                        Some('|') => {
-                            let mut cursor = lexemes.len()-1;
-                            let mut open = true;
-                            while cursor >= 0 {
-                                let prev = lexemes.get(cursor).unwrap();
-                                match prev {
-                                    Lexeme::ONorm => {
-                                        open = false;
-                                        break;
-                                    }
-                                    Lexeme::CNorm => {
-                                        break;
-                                    }
-                                    _ => {
-                                        cursor -= 1;
-                                    }
-                                }
-                            }
-                            if open {
-                                choice = Lexeme::ONorm;
-                            } else {
-                                choice = Lexeme::CNorm;
-                            }
-                            i += 2;
-                        }
-                        _ => {
-                            let prev = lexemes.last();
-                            match prev {
-                                Some(Lexeme::CNorm) | Some(Lexeme::CDeterminant) => {
-                                    choice = Lexeme::CDeterminant;
-                                    i += 1;
-                                }
-                                Some(Lexeme::UnaryOp(_)) | Some(Lexeme::BinaryOp(_))
-                                    | Some(Lexeme::Assign) | Some(Lexeme::Let) => {
-                                        choice = Lexeme::ODeterminant;
-                                        i += 1;
-                                    }
-                                _ => {
-                                    choice = Lexeme::CDeterminant;
-                                    i += 1;
-                                }
-                            }
-                        }
-                    }
+                '&' => {
+                    choice = Lexeme::BinaryOp(BOP::ConcatUnit);
+                    i += 1;
+                }
+                '@' => {
+                    choice = Lexeme::BinaryOp(BOP::StripUnit);
+                    i += 1;
+                }
+                '~' => {
+                    choice = Lexeme::BinaryOp(BOP::Convert);
+                    i += 1;
                 }
                 _ => {
                     panic!("Unexpected character in code: {}", c);

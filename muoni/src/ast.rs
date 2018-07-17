@@ -7,7 +7,7 @@ pub struct Scope {
 pub enum Control {
     State {
         statement: Box<Statement>,
-    }
+    },
     If {
         condition: Box<RValue>,
         body: Box<RValue>,
@@ -32,18 +32,18 @@ pub enum Control {
     },
     ForAs {
         range: Box<RValue>,
-        target: Box<Decomposition>,
+        target: Box<LValue>,
         body: Box<RValue>,
     },
     ForAt {
         range: Box<RValue>,
-        index: Box<Decomposition>,
+        index: Box<LValue>,
         body: Box<RValue>,
     },
     ForAsAt {
         range: Box<RValue>,
-        target: Box<Decomposition>,
-        index: Box<Decomposition>,
+        target: Box<LValue>,
+        index: Box<LValue>,
         body: Box<RValue>,
     },
     While {
@@ -111,6 +111,9 @@ pub enum RValue {
     Value {
         v: values::Value,
     },
+    Unit {
+        u: values::Unit,
+    },
     Scope {
         s: Box<Scope>,
     }
@@ -141,20 +144,15 @@ pub enum Lexeme {
     For,
     As,
     At,
-    OArgList,
+    OParen,
     OScope,
     OMatrix,
-    ORangeIn,
-    ORangeEx,
+    ORange(bool),
     OUnit,
     OList,
-    ONorm,
-    ODeterminant,
     CParen,
     CBraket,
     CBrace,
-    CNorm,
-    CDeterminant,
     Print,
     None,
 }
@@ -181,12 +179,17 @@ pub enum BOP {
     LessOrEqual,
     Greater,
     GreaterOrEqual,
+    StripUnit,
+    ConcatUnit,
+    Convert,
+    Guard,
 }
 
 #[derive(Debug,PartialEq,Copy,Clone)]
 pub enum UOP {
     Negate,
     Factorial,
-    Cardinality,
+    Shape,
+    Size,
     Not,
 }

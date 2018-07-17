@@ -10,7 +10,7 @@ use std::io::prelude::*;
 mod ast;
 mod values;
 mod lexer;
-mod parser;
+//mod parser;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -25,5 +25,5 @@ fn main() {
     let lexemes = lexer::lex(code);
     println!("{:?}",lexemes);
 
-    let asts = parser::parse(lexemes);
+//    let asts = parser::parse(lexemes);
 }

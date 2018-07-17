@@ -17,4 +17,9 @@ pub enum Value {
     Function(Vec<String>,ast::Scope),
 }
 
+pub struct Unit {
+    num: Vec<String>,
+    den: Vec<String>,
+}
+
 // fn do_unary, fn do_binary, etc. no impl necessary, or even viable.
