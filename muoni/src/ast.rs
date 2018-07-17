@@ -54,6 +54,10 @@ pub enum Control {
 }
 
 pub enum Statement {
+    Var {
+        name: Box<LValue>,
+        e1: Box<RValue>,
+    },
     Assign {
         name: Box<LValue>,
         e1: Box<RValue>,
@@ -63,7 +67,7 @@ pub enum Statement {
         op: BOP,
         e1: Box<RValue>,
     },
-    Let {
+    Val {
         name: Box<LValue>,
         e1: Box<RValue>,
     },
@@ -188,7 +192,6 @@ pub enum BOP {
 #[derive(Debug,PartialEq,Copy,Clone)]
 pub enum UOP {
     Negate,
-    Factorial,
     Shape,
     Size,
     Not,

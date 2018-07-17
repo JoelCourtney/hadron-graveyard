@@ -1,70 +1,72 @@
-//a a = [1,2] // basic matrix
-//a b = [a, 3] // [1, 2, 3]
-//a b = [a; 3, 4] // [1,2;3,4]
-//a c = a&[m] // convert a to meters
-//a d = c&[s] // d is now in [m*s]
+var a = [1,2] // basic matrix
+var b = [a, 3] // [1, 2, 3]
+b = [a; 3, 4] // [1,2;3,4]
+var c = a&[m] // convert a to meters
+var d = c&[s] // d is now in [m*s]
 
-//a f = d * 1[m/ft] // useless
+val f = d * 1[m/ft] // useless
 
-//a print f@[m] // strips units basically. under the hood it is just division
-//a print f~[ft*hr] // converts before printing
-//a print f&[m] // multiplies by 1[m] basically. opposite of @
+print f@[m] // strips units basically. under the hood it is just division
+print f~[ft*hr] // converts before printing
+print f&[m] // multiplies by 1[m] basically. opposite of @
 
-//a print f@[m]~[hr] // strips m and converts to hr
+print f@[m]~[hr] // strips m and converts to hr
 
-//a g = [3;4][AU] // yep
+val g = [3;4][AU] // yep
 
-//a print #b // [2,2]
-//a print prod(#b) // 4
-//a print $b
+print $b // [2,2]
+print prod($b) // 4
+print #b
 
 print norm(g) // should be 5[AU]
 print norm(g)~[km] // the implication is that we need to treat ~,@,and & as operators
 
-b = {"hello", a} // List
-c = {b, true} // {{"hello",[1,2]},true}
+b = "hello" :: a // List
+c = b :: true // {{"hello",[1,2]},true}
 
-c.append("asdf") // {{"hello",[1,2]},true,"asdf"}
+c :::= "asdf" // {{"hello",[1,2]},true,"asdf"}
 
 // insert, pop, prepend, etc
 
-//a b = "true"~Bool // ~ is basically the convert/cast operator
+b = "true"~Bool // ~ is basically the convert/cast operator
 
 // types: [units], Num, Str, Bool, [w,h][units], List
 
-//a [x,y] = [1,2] // matrix decomposition
-//a {x,y} = {1,2} // list decomposition
+var [x,y] = [1,2] // matrix decomposition
+x :: y = 1 :: 2 // list decomposition
 
-//a [w,h] = #[1,2;3,4]
+[w,h] = #[1,2;3,4]
 
-//a a[1] // first element of a
-//a c{ -1 } = 7 // last element of c set to 7
+a[1] // first element of a
+c(-1) = 7 // last element of c set to 7
 
 a[3] = 5
 a[4][5] = 3
 a[3:6)[1:5) = 2
 a[2:3,4:6] = 1
-//a a[a > 0] = 4 // matrix subset assignment
+a[a > 0] = 4 // matrix subset assignment
 
-//a squareSum1(v) -> {
-//a 	n = norm(v)
-//a 	<- n^2
-//a }
-//a squareSum2(v) -> sum(v .^ 2)
-//a squareSum3(v) -> {
-//a 	m = prefill(0, #v)
-//a 	for [1:$v] as i { // $v = prod(#v)
-//a 		m = v[i]^2
-//a 	}
-//a 	<- sum(m)
-//a }
+fn squareSum1(v) -> {
+	val n = norm(v)
+	<- n^2
+}
+fn squareSum2(v) -> sum(v .^ 2)
+fn squareSum3(v) -> {
+	<- sum( {
+		m = prefill(0, $v)
+		for [1:$v] as i { // $v = prod(#v)
+			m = v[i]^2
+		}
+		<- m
+	} )
+}
 
-//a foldLeft(v,acc,f) -> {
-//a 	for [1:$v] as i {
-//a 		acc = f(v[i],acc)
-//a 	}
-//a 	<- acc
-//a }
-//a v := [1,2,3]
-//a acc = 1
-//a print foldLeft(v,acc,(z,acc)->z^2 + acc) // square sum 4
+fn foldLeft(v,acc,f) -> {
+	for [1:#v] as i {
+		acc = f(v[i],acc)
+	}
+	<- acc
+}
+val v := [1,2,3]
+val acc = 1
+print foldLeft(v,acc,(z,acc)->z^2 + acc) // square sum 4
