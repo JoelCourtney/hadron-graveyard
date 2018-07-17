@@ -11,7 +11,10 @@ pub fn lex(code: String) -> Vec<Lexeme> {
         let c = chars.get(i).unwrap();
         if c.is_whitespace() {
             if c == &'\n' {
-                choice = Lexeme::NewLine;
+                let prev = lexemes.last();
+                if prev != Some(&Lexeme::NewLine) {
+                    choice = Lexeme::NewLine;
+                }
             }
             i += 1;
         } else if c.is_alphabetic() || c == &'_' {
@@ -294,11 +297,7 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     i += 1;
                 }
                 '{' => {
-                    if is_list(&chars, i) {
-                        choice = Lexeme::OList;
-                    } else {
-                        choice = Lexeme::OScope;
-                    }
+                    choice = Lexeme::OScope;
                     i += 1;
                 }
                 ')' => {
@@ -488,10 +487,11 @@ fn is_range(chars: &(Vec<char>), i: usize) -> bool {
     range
 }
 
-fn is_list(chars: &(Vec<char>), i: usize) -> bool {
+fn is_list(chars: &(Vec<char>), i: usize) -> (bool,usize) {
     let mut level = 1;
     let mut cursor: usize = i;
     let mut list = false;
+    let mut complete = false;
     while level > 0 {
         cursor += 1;
         let c = chars.get(cursor);
@@ -502,6 +502,12 @@ fn is_list(chars: &(Vec<char>), i: usize) -> bool {
             Some(')') | Some(']') | Some('}') => {
                 level -= 1;
             }
+            Some('<') => {
+                let c2 = chars.get(cursor+1);
+                match c2 {
+                    Some('=') => {}
+                    Some(_) => {
+
             Some(',') => {
                 if level == 1 {
                     list = true;
