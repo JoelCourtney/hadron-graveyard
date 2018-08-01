@@ -41,13 +41,13 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
             match key1 {
                 Some(Lexeme::As) => {
                     i += 1;
-                    let (target,length) = parse_decomposition(&lexemes[i..]);
+                    let (target,length) = parse_lvalue(&lexemes[i..]);
                     i += length;
                     let key2 = lexemes.get(i);
                     match key2 {
                         Some(Lexeme::At) => {
                             i += 1;
-                            let (index,length) = parse_decomposition(&lexemes[i..]);
+                            let (index,length) = parse_lvalue(&lexemes[i..]);
                             i += length;
                             let (body,length) = parse_rvalue(&lexemes[i..]);
                             i += length;
@@ -78,13 +78,13 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                 }
                 Some(Lexeme::At) => {
                     i += 1;
-                    let (index,length) = parse_decomposition(&lexemes[i..]);
+                    let (index,length) = parse_lvalue(&lexemes[i..]);
                     i += length;
                     let key2 = lexemes.get(i);
                     match key2 {
                         Some(Lexeme::As) => {
                             i += 1;
-                            let (target,length) = parse_decomposition(&lexemes[i..]);
+                            let (target,length) = parse_lvalue(&lexemes[i..]);
                             i += length;
                             let (body,length) = parse_rvalue(&lexemes[i..]);
                             i += length;
@@ -154,9 +154,28 @@ fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
     let mut level = 0;
     let mut i = 0;
     let mut assignmentLoc = -1;
+    let mut decl = -1;
     loop {
         let lexeme = lexemes.get(i);
         match lexeme {
+            Some(Lexeme::Var) => {
+                if decl == -1 {
+                    decl = 0;
+                }
+                complete = false;
+            }
+            Some(Lexeme::Val) => {
+                if decl == -1 {
+                    decl = 1;
+                }
+                complete = false;
+            }
+            Some(Lexeme::Sym) => {
+                if decl == -1 {
+                    decl = 2;
+                }
+                complete = false;
+            }
             Some(lex) if OPENERS.contains(lex) => {
                 level += traverse_atom(&lexemes[i..]);
                 complete = true;
@@ -175,7 +194,7 @@ fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
                 complete = false;
                 i += 1;
             }
-            Some(Lexeme::UnaryOp(o)) if o != &UOP::Factorial => {
+            Some(Lexeme::UnaryOp(o)) => {
                 complete = false;
                 i += 1;
             }
@@ -201,14 +220,9 @@ fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
             }
         }
     }
-    if assignmentLoc != -1 {
-        let lvalue = parse_lvalue(&lexemes[..assignmentLoc]);
-        let rvalue = parse_rvalue(&lexemes[assignmentLoc+1 .. i]);
-        let assign = lexemes.get(i);
-        match assign {
-            Some(Lexeme::Assign) => {
-                (
-                    Box::new( Statement::
+    unimplemented!();
+        //let lvalue = parse_lvalue(&lexemes[..assignmentLoc]);
+        //let rvalue = parse_rvalue(&lexemes[assignmentLoc+1 .. i]);
 }
 
 fn parse_lvalue(lexemes: &[Lexeme]) -> (Box<Decomposition>,usize) {
@@ -226,23 +240,19 @@ lazy_static! {
         vec![BOP::Times, BOP::ElemTimes, BOP::Divide, BOP::ElemDivide, BOP::Modulus],
         vec![BOP::Power, BOP::ElemPower]
     ];
-    static ref OPENERS: [Lexeme; 9] = [
+    static ref OPENERS: [Lexeme; 7] = [
         Lexeme::OArgList,
         Lexeme::OScope,
         Lexeme::OMatrix,
-        Lexeme::ORangeIn,
-        Lexeme::ORangeEx,
+        Lexeme::ORange(true),
+        Lexeme::ORange(false),
         Lexeme::OUnit,
         Lexeme::OList,
-        Lexeme::ONorm,
-        Lexeme::ODeterminant
     ];
-    static ref CLOSERS: [Lexeme; 5] = [
+    static ref CLOSERS: [Lexeme; 3] = [
         Lexeme::CParen,
         Lexeme::CBraket,
         Lexeme::CBrace,
-        Lexeme::CNorm,
-        Lexeme::CDeterminant,
     ];
 }
 
@@ -311,19 +321,13 @@ fn parse_rvalue(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
             Lexeme::OMatrix => {
                 unimplemented!();
             }
-            Lexeme::ORangeIn => {
-                unimplemented!();
-            }
-            Lexeme::ORangeEx => {
+            Lexeme::ORange(inc) => {
                 unimplemented!();
             }
             Lexeme::OUnit => {
                 unimplemented!();
             }
             Lexeme::OList => {
-                unimplemented!();
-            }
-            Lexeme::ODeterminant => {
                 unimplemented!();
             }
             _ => {}

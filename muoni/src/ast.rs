@@ -130,7 +130,6 @@ pub enum Lexeme {
     UnaryOp(UOP),
     Assign,
     AssignOp(BOP),
-    Let,
     RightArrow,
     LeftArrow,
     Colon,
@@ -148,15 +147,21 @@ pub enum Lexeme {
     For,
     As,
     At,
+    Var,
+    Val,
+    Sym,
+    Func,
     OParen,
+    OArgList,
+    OList,
     OScope,
     OMatrix,
     ORange(bool),
     OUnit,
-    OList,
     CParen,
     CBraket,
     CBrace,
+    Pipe,
     Print,
     None,
 }
@@ -186,7 +191,6 @@ pub enum BOP {
     StripUnit,
     ConcatUnit,
     Convert,
-    Guard,
 }
 
 #[derive(Debug,PartialEq,Copy,Clone)]

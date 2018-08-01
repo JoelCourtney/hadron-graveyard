@@ -112,6 +112,10 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 "at" => Lexeme::At,
                 "while" => Lexeme::While,
                 "print" => Lexeme::Print,
+                "var" => Lexeme::Var,
+                "val" => Lexeme::Val,
+                "sym" => Lexeme::Sym,
+                "fn" => Lexeme::Func,
                 _ => Lexeme::Handle(String::from(string))
             }
         } else if c.is_numeric() {
@@ -252,15 +256,11 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     }
                 }
                 '#' => {
-                    choice = Lexeme::UnaryOp(UOP::Shape);
-                    i += 1;
-                }
-                '$' => {
                     choice = Lexeme::UnaryOp(UOP::Size);
                     i += 1;
                 }
-                '!' => {
-                    choice = Lexeme::UnaryOp(UOP::Factorial);
+                '$' => {
+                    choice = Lexeme::UnaryOp(UOP::Shape);
                     i += 1;
                 }
                 '=' => {
@@ -271,7 +271,22 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     if is_range(&chars, i) {
                         choice = Lexeme::ORange(false);
                     } else {
-                        choice = Lexeme::OParen;
+                        let prev = lexemes.last();
+                        match prev {
+                            Some(Lexeme::Func)
+                                | Some(Lexeme::Handle(_))
+                                | Some(Lexeme::CParen)
+                                | Some(Lexeme::CBrace) => {
+                                choice = Lexeme::OArgList;
+                            }
+                            _ => {
+                                if is_list(&chars, i) {
+                                    choice = Lexeme::OMatrix;
+                                } else {
+                                    choice = Lexeme::OParen;
+                                }
+                            }
+                        }
                     }
                     i += 1;
                 }
@@ -282,15 +297,15 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                         let prev = lexemes.last();
                         match prev {
                             Some(Lexeme::Number(_))
-                                | Some(Lexeme::CBraket)
+                                | Some(Lexeme::CParen)
                                 | Some(Lexeme::BinaryOp(BOP::StripUnit))
                                 | Some(Lexeme::BinaryOp(BOP::ConcatUnit))
                                 | Some(Lexeme::BinaryOp(BOP::Convert))
-                                | Some(Lexeme::BinaryOp(BOP::Guard)) => {
+                                | Some(Lexeme::Colon) => {
                                 choice = Lexeme::OUnit;
                             }
                             _ => {
-                                choice = Lexeme::OMatrix;
+                                choice = Lexeme::OList;
                             }
                         }
                     }
@@ -352,17 +367,8 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     }
                 }
                 ':' => {
-                    let next = chars.get(i+1);
-                    match next {
-                        Some('=') => {
-                            choice = Lexeme::Let;
-                            i += 2;
-                        }
-                        _ => {
-                            choice = Lexeme::Colon;
-                            i += 1;
-                        }
-                    }
+                    choice = Lexeme::Colon;
+                    i += 1;
                 }
                 ',' => {
                     choice = Lexeme::Comma;
@@ -382,6 +388,10 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 }
                 '~' => {
                     choice = Lexeme::BinaryOp(BOP::Convert);
+                    i += 1;
+                }
+                '|' => {
+                    choice = Lexeme::Pipe;
                     i += 1;
                 }
                 _ => {
@@ -487,11 +497,10 @@ fn is_range(chars: &(Vec<char>), i: usize) -> bool {
     range
 }
 
-fn is_list(chars: &(Vec<char>), i: usize) -> (bool,usize) {
+fn is_list(chars: &(Vec<char>), i: usize) -> bool {
     let mut level = 1;
     let mut cursor: usize = i;
     let mut list = false;
-    let mut complete = false;
     while level > 0 {
         cursor += 1;
         let c = chars.get(cursor);
@@ -502,12 +511,6 @@ fn is_list(chars: &(Vec<char>), i: usize) -> (bool,usize) {
             Some(')') | Some(']') | Some('}') => {
                 level -= 1;
             }
-            Some('<') => {
-                let c2 = chars.get(cursor+1);
-                match c2 {
-                    Some('=') => {}
-                    Some(_) => {
-
             Some(',') => {
                 if level == 1 {
                     list = true;
