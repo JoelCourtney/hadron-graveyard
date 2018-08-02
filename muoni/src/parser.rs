@@ -309,7 +309,50 @@ fn delimit_statement(lexemes: &[Lexeme]) -> (usize,i32) {
         let cursor = lexemes.get(i);
         match cursor {
             Some(lexeme) if OPENERS.contains(lexeme) => {
-
+                i += traverse_atom(&lexemes[i..]);
+                complete = true;
+            }
+            Some(Lexeme::BinaryOp(_))
+                | Some(Lexeme::UnaryOp(_))
+                | Some(Lexeme::Dot)
+                | Some(Lexeme::Colon) => {
+                complete = false;
+                i += 1;
+            }
+            Some(Lexeme::Assign)
+                | Some(Lexeme::AssignOp(_))
+                | Some(Lexeme::RightArrow) => {
+                complete = false;
+                if s == -1 {
+                    s = i as i32;
+                } else {
+                    panic!("invalid second assignment");
+                }
+                i += 1;
+            }
+            Some(Lexeme::Handle(_))
+                | Some(Lexeme::Number(_))
+                | Some(Lexeme::StringLiteral(_)) => {
+                complete = true;
+                i += 1;
+            }
+            Some(Lexeme::Var)
+                | Some(Lexeme::Val)
+                | Some(Lexeme::Sym) => {
+                complete = false;
+                i += 1;
+            }
+            None | Some(Lexeme::NewLine)
+                | Some(Lexeme::Semicolon) => {
+                if complete {
+                    return (i,s);
+                } else {
+                    panic!("unexpected end of input");
+                }
+            }
+            Some(l) => panic!("unexpected lexeme: {:?}",l),
+        }
+    }
 }
 
 fn delimit_lvalue(lexemes: &[Lexeme]) -> usize {
@@ -327,7 +370,74 @@ fn parse_lvalue(lexemes: &[Lexeme]) -> (Box<LValue>,usize) {
 
 
 fn parse_lvalue_contained(lexemes: &[Lexeme]) -> Box<LValue> {
-    unimplemented!();
+    let mut i = 0;
+    let first = lexemes.get(0);
+    match first {
+        Some(Lexeme::Handle(s)) => {
+            match s.as_ref() {
+                "_" => {
+                    Box::new(LValue::Discard)
+                }
+                _ => {
+                    if lexemes.len() > 1 {
+                        unimplemented!();
+                    } else {
+                        Box::new(LValue::Name(s.clone()))
+                    }
+                }
+            }
+        }
+        Some(Lexeme::OList) => {
+            let mut vec = Vec::new();
+            i += 1;
+            loop {
+                let (lv,length) = parse_lvalue(&lexemes[i..]);
+                i += length;
+                vec.push(*lv);
+                match lexemes.get(i) {
+                    Some(Lexeme::Comma) => {
+                        i += 1;
+                    }
+                    Some(Lexeme::CBraket) => {
+                        return Box::new(LValue::ListDecomp(vec));
+                    }
+                    _ => panic!("invalid list decomposition"),
+                }
+            }
+        }
+        Some(Lexeme::OMatrix) => {
+            let mut outer_vec = Vec::new();
+            let mut inner_vec = Vec::new();
+            i += 1;
+            loop {
+                let (lv,length) = parse_lvalue(&lexemes[i..]);
+                i += length;
+                inner_vec.push(*lv);
+                match lexemes.get(i) {
+                    Some(Lexeme::Comma) => {
+                        i += 1;
+                    }
+                    Some(Lexeme::Semicolon) => {
+                        outer_vec.push(inner_vec);
+                        inner_vec = Vec::new();
+                        i += 1;
+                    }
+                    Some(Lexeme::CParen) => {
+                        let l = inner_vec.len();
+                        for v in &outer_vec {
+                            if v.len() != l {
+                                panic!("non-rectangular matrix decomposition");
+                            }
+                        }
+                        outer_vec.push(inner_vec);
+                        return Box::new(LValue::MatrixDecomp(outer_vec));
+                    }
+                    _ => panic!("invalid matrix decomposition"),
+                }
+            }
+        }
+        _ => panic!("expected lvalue"),
+    }
 }
 
 lazy_static! {

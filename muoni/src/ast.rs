@@ -50,6 +50,14 @@ pub enum Control {
         condition: Box<RValue>,
         body: Box<RValue>,
     },
+    Print {
+        e1: Box<RValue>,
+    },
+    Break,
+    BreakCount(i32),
+    Continue,
+    ContinueCount(i32),
+    Fallthrough,
     Empty,
 }
 
@@ -103,6 +111,7 @@ pub enum LValue {
     MatrixDecomp(Vec<Vec<LValue>>),
     ListDecomp(Vec<LValue>),
     Subset(String,RValue),
+    Discard,
 }
 
 pub enum RValue {
@@ -122,9 +131,11 @@ pub enum RValue {
     Name {
         n: String,
     },
-    Value {
-        v: values::Value,
-    },
+    Number(f64),
+    List(Vec<RValue),
+    Matrix(Vec<Vec<RValue>>),
+    Bool(bool),
+    Range(bool,f64,f64,f64,bool),
     Unit {
         u: values::Unit,
     },
