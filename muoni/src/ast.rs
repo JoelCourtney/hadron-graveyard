@@ -54,38 +54,48 @@ pub enum Control {
 }
 
 pub enum Statement {
-    Var {
+    VarDecl {
         name: Box<LValue>,
+    },
+    VarAssign {
+        name: Box<LValue>,
+        op: Assign,
         e1: Box<RValue>,
     },
     Assign {
         name: Box<LValue>,
+        op: Assign,
         e1: Box<RValue>,
     },
-    AssignBOP {
+    ValDecl {
         name: Box<LValue>,
-        op: BOP,
+    },
+    ValAssign {
+        name: Box<LValue>,
+        op: Assign,
         e1: Box<RValue>,
     },
-    Val {
+    Sym {
         name: Box<LValue>,
-        e1: Box<RValue>,
-    },
-    LazyAssign {
-        name: Box<LValue>,
-        e1: Box<RValue>,
     },
     StateValue {
         e1: Box<RValue>,
     },
     AssignFunction {
         name: String,
+        caps: Vec<String>,
         args: Vec<String>,
         body: Box<RValue>,
     },
     Return {
         e1: Box<RValue>,
     },
+}
+
+pub enum Assign {
+    Equal,
+    Lazy,
+    OpEqual(BOP),
 }
 
 pub enum LValue {

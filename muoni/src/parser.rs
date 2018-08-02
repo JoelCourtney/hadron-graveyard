@@ -149,83 +149,184 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
     }
 }
 
+const DECL_VAL:i32 = 0;
+const DECL_VAR:i32 = 1;
+const DECL_SYM:i32 = 2;
+const DECL_FUN:i32 = 3;
+const DECL_RET:i32 = 4;
+const NO_DECL:i32 = 5;
+
 fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
     let mut complete = false;
     let mut level = 0;
-    let mut i = 0;
-    let mut assignmentLoc = -1;
-    let mut decl = -1;
-    loop {
-        let lexeme = lexemes.get(i);
-        match lexeme {
-            Some(Lexeme::Var) => {
-                if decl == -1 {
-                    decl = 0;
-                }
-                complete = false;
-            }
-            Some(Lexeme::Val) => {
-                if decl == -1 {
-                    decl = 1;
-                }
-                complete = false;
-            }
-            Some(Lexeme::Sym) => {
-                if decl == -1 {
-                    decl = 2;
-                }
-                complete = false;
-            }
-            Some(lex) if OPENERS.contains(lex) => {
-                level += traverse_atom(&lexemes[i..]);
-                complete = true;
-            }
-            Some(lex) if CLOSERS.contains(lex) => {
-                panic!("unexpected closing character");
-            }
-            Some(Lexeme::Assign) | Some(Lexeme::AssignOp(_)) | Some(Lexeme::Let) => {
-                complete = false;
-                if assignmentLoc == -1 {
-                    assignmentLoc = i;
-                }
-                i += 1;
-            }
-            Some(Lexeme::BinaryOp(_)) => {
-                complete = false;
-                i += 1;
-            }
-            Some(Lexeme::UnaryOp(o)) => {
-                complete = false;
-                i += 1;
-            }
-            Some(Lexeme::Handle(_)) | Some(Lexeme::Number(_)) | Some(Lexeme::StringLiteral(_)) => {
-                if level == 0 {
-                    complete = true;
-                }
-                i += 1;
-            }
-            Some(Lexeme::Semicolon) | Some(Lexeme::NewLine) => {
-                if complete {
-                    break;
-                }
-                i += 1;
-            }
-            Some(_) => {}               
-            None => {
-                if complete {
-                    break;
-                } else {
-                    panic!("Unexpected end of input.");
-                }
+    let decl = match lexemes.get(0) {
+        Some(Lexeme::Val) => {
+            DECL_VAL
+        }
+        Some(Lexeme::Var) => {
+            DECL_VAR
+        }
+        Some(Lexeme::Sym) => {
+            DECL_SYM
+        }
+        Some(Lexeme::Func) => {
+            DECL_FUN
+        }
+        Some(Lexeme::LeftArrow) => {
+            DECL_RET
+        }
+        Some(_) => {
+            NO_DECL
+        }
+        None => {
+            panic!("expected statement");
+        }
+    };
+    
+    match decl {
+        DECL_VAR => {
+            let (length,assign) = delimit_statement(&lexemes);
+            if assign != -1 {
+                let assign = assign as usize;
+                let op = match lexemes.get(assign) {
+                    Some(Lexeme::Assign) => Assign::Equal,
+                    Some(Lexeme::RightArrow) => Assign::Lazy,
+                    Some(Lexeme::AssignOp(o)) => Assign::OpEqual(*o),
+                    _ => panic!("illegal assignment"),
+                };
+                let name = parse_lvalue_contained(&lexemes[1..assign]);
+                let e1 = parse_rvalue_contained(&lexemes[assign+1 .. length]);
+                (
+                    Box::new(Statement::VarAssign {
+                        name,
+                        op,
+                        e1,
+                    }),
+                    length + 1,
+                )
+            } else {
+                let name = parse_lvalue_contained(&lexemes[1..length]);
+                (
+                    Box::new(Statement::VarDecl {
+                        name,
+                    }),
+                    length,
+                )
             }
         }
+        DECL_VAL => {
+            let (length,assign) = delimit_statement(&lexemes);
+            if assign != -1 {
+                let assign = assign as usize;
+                let op = match lexemes.get(assign) {
+                    Some(Lexeme::Assign) => Assign::Equal,
+                    Some(Lexeme::RightArrow) => Assign::Lazy,
+                    Some(Lexeme::AssignOp(o)) => Assign::OpEqual(*o),
+                    _ => panic!("illegal assignment"),
+                };
+                let name = parse_lvalue_contained(&lexemes[1..assign]);
+                let e1 = parse_rvalue_contained(&lexemes[assign+1 .. length]);
+                (
+                    Box::new(Statement::ValAssign {
+                        name,
+                        op,
+                        e1,
+                    }),
+                    length + 1,
+                )
+            } else {
+                let name = parse_lvalue_contained(&lexemes[1..length]);
+                (
+                    Box::new(Statement::ValDecl {
+                        name,
+                    }),
+                    length,
+                )
+            }
+        }
+        DECL_SYM => {
+            let (length,_) = delimit_statement(&lexemes);
+            let name = parse_lvalue_contained(&lexemes[1..length]);
+            (
+                Box::new(Statement::Sym {
+                    name,
+                }),
+                length,
+            )
+        }
+        DECL_FUN => {
+            unimplemented!();
+        }
+        DECL_RET => {
+            let (length,_) = delimit_statement(&lexemes);
+            let e1 = parse_rvalue_contained(&lexemes[1..length]);
+            (
+                Box::new(Statement::Return {
+                    e1,
+                }),
+                length,
+            )
+        }
+        NO_DECL => {
+            let (length,assign) = delimit_statement(&lexemes);
+            if assign != -1 {
+                let assign = assign as usize;
+                let op = match lexemes.get(assign) {
+                    Some(Lexeme::Assign) => Assign::Equal,
+                    Some(Lexeme::RightArrow) => Assign::Lazy,
+                    Some(Lexeme::AssignOp(o)) => Assign::OpEqual(*o),
+                    _ => panic!("illegal assignment"),
+                };
+                let name = parse_lvalue_contained(&lexemes[..assign]);
+                let e1 = parse_rvalue_contained(&lexemes[assign+1 .. length]);
+                (
+                    Box::new(Statement::Assign {
+                        name,
+                        op,
+                        e1,
+                    }),
+                    length + 1,
+                )
+            } else {
+                let e1 = parse_rvalue_contained(&lexemes[..length]);
+                (
+                    Box::new(Statement::StateValue {
+                        e1,
+                    }),
+                    length,
+                )
+            }
+        }
+        _ => {panic!("howd you even mess that up")}
     }
-    unimplemented!();
-        //let lvalue = parse_lvalue(&lexemes[..assignmentLoc]);
-        //let rvalue = parse_rvalue(&lexemes[assignmentLoc+1 .. i]);
 }
 
-fn parse_lvalue(lexemes: &[Lexeme]) -> (Box<Decomposition>,usize) {
+fn delimit_statement(lexemes: &[Lexeme]) -> (usize,i32) {
+    let mut complete = false;
+    let mut i = 0;
+    let mut s = -1;
+    loop {
+        let cursor = lexemes.get(i);
+        match cursor {
+            Some(lexeme) if OPENERS.contains(lexeme) => {
+
+}
+
+fn delimit_lvalue(lexemes: &[Lexeme]) -> usize {
+    unimplemented!();
+}
+
+fn delimit_rvalue(lexemes: &[Lexeme]) -> usize {
+    unimplemented!();
+}
+
+fn parse_lvalue(lexemes: &[Lexeme]) -> (Box<LValue>,usize) {
+    let length = delimit_lvalue(&lexemes);
+    (parse_lvalue_contained(&lexemes[..length]),length)
+}
+
+
+fn parse_lvalue_contained(lexemes: &[Lexeme]) -> Box<LValue> {
     unimplemented!();
 }
 
@@ -256,7 +357,16 @@ lazy_static! {
     ];
 }
 
-fn parse_rvalue(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
+fn parse_rvalue(lexemes: &[Lexeme]) -> (Box<RValue>, usize) {
+    let length = delimit_rvalue(&lexemes);
+    (parse_rvalue_search(&lexemes[..length], 0),length)
+}
+
+fn parse_rvalue_contained(lexemes: &[Lexeme]) -> Box<RValue> {
+    parse_rvalue_search(lexemes, 0)
+}
+
+fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
     let l = lexemes.len();
     if level < 8 {
         let mut i = 0;
@@ -265,8 +375,8 @@ fn parse_rvalue(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
             match lexeme {
                 Lexeme::BinaryOp(bop) => {
                     if PRECEDENCE[level].contains(bop) {
-                        let e1 = parse_rvalue(&lexemes[..i], level + 1);
-                        let e2 = parse_rvalue(&lexemes[i+1..], level);
+                        let e1 = parse_rvalue_search(&lexemes[..i], level + 1);
+                        let e2 = parse_rvalue_search(&lexemes[i+1..], level);
                         return Box::new( RValue::Binary {
                             op: *bop,
                             e1,
@@ -287,14 +397,14 @@ fn parse_rvalue(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
         let lexeme = lexemes.get(0).unwrap();
         match lexeme {
             Lexeme::UnaryOp(uop) => {
-                let e1 = parse_rvalue(&lexemes[1..], level);
+                let e1 = parse_rvalue_search(&lexemes[1..], level);
                 return Box::new( RValue::Unary {
                     op: *uop,
                     e1,
                 });
             }
             _ => {
-                return parse_rvalue(&lexemes[..], level + 1);
+                return parse_rvalue_search(&lexemes[..], level + 1);
             }
         }
     } else if level == 9 {
@@ -333,7 +443,7 @@ fn parse_rvalue(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
             _ => {}
         }
     }
-    parse_rvalue(lexemes, level + 1)
+    parse_rvalue_search(lexemes, level + 1)
 }
 
 fn traverse_atom(lexemes: &[Lexeme]) -> usize {
