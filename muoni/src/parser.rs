@@ -514,7 +514,7 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                 });
             }
             _ => {
-                return parse_rvalue_search(&lexemes[..], level + 1);
+                return parse_rvalue_search(&lexemes, level + 1);
             }
         }
     } else if level == 9 {
@@ -539,7 +539,28 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                 unimplemented!();
             }
             Lexeme::OMatrix => {
-                unimplemented!();
+                let mut i = 1;
+                let outer_vec = Vec::new();
+                match lexemes.get(1) {
+                    Some(Lexeme::CParen) => {
+                        return Box::new(RValue::Matrix(outer_vec));
+                    }
+                }
+                let inner_vec = Vec::new();
+                while i < l {
+                    let (rv,length) = parse_rvalue(&lexemes[i..]);
+                    inner_vec.push(*rv);
+                    i += length;
+                    match lexemes.get(i) {
+                        Some(Lexeme::Comma) => {
+                            i += 1;
+                        }
+                        Some(Lexeme::Semicolon) => {
+                            i += 1;
+                            outer_vec.push(inner_vec);
+                            inner_vec = Vec::new();
+                        }
+                        Some(
             }
             Lexeme::ORange(inc) => {
                 unimplemented!();

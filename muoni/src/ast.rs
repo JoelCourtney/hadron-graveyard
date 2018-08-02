@@ -132,7 +132,7 @@ pub enum RValue {
         n: String,
     },
     Number(f64),
-    List(Vec<RValue),
+    List(Vec<RValue>),
     Matrix(Vec<Vec<RValue>>),
     Bool(bool),
     Range(bool,f64,f64,f64,bool),
