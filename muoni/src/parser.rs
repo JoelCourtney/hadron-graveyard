@@ -13,6 +13,7 @@ pub fn parse(lexemes: Vec<Lexeme>) -> Box<Scope> {
     let mut i = 0;
     while i < l {
         let (control,length) = parse_control(&lexemes[i..]);
+        println!("{:?}",control);
         statements.push(control);
         i += length;
     }
@@ -134,6 +135,17 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
         }
         Some(Lexeme::While) => {
             unimplemented!();
+        }
+        Some(Lexeme::Print) => {
+            i += 1;
+            let (e1, length) = parse_rvalue(&lexemes[i..]);
+            i += length;
+            (
+                Box::new(Control::Print {
+                    e1,
+                }),
+                i,
+            )
         }
         Some(_) => {
             let (statement,length) = parse_statement(&lexemes[i..]);
@@ -342,12 +354,18 @@ fn delimit_statement(lexemes: &[Lexeme]) -> (usize,i32) {
                 complete = false;
                 i += 1;
             }
-            None | Some(Lexeme::NewLine)
-                | Some(Lexeme::Semicolon) => {
+            None | Some(Lexeme::Semicolon) => {
                 if complete {
                     return (i,s);
                 } else {
                     panic!("unexpected end of input");
+                }
+            }
+            Some(Lexeme::NewLine) => {
+                if complete {
+                    return (i,s);
+                } else {
+                    i += 1;
                 }
             }
             Some(l) => panic!("unexpected lexeme: {:?}",l),
@@ -360,7 +378,54 @@ fn delimit_lvalue(lexemes: &[Lexeme]) -> usize {
 }
 
 fn delimit_rvalue(lexemes: &[Lexeme]) -> usize {
-    unimplemented!();
+    let mut complete = false;
+    let mut i = 0;
+    loop {
+        match lexemes.get(i) {
+            Some(l) if OPENERS.contains(l) => {
+                i += traverse_atom(&lexemes[i..]);
+                complete = true;
+            }
+            Some(Lexeme::BinaryOp(_))
+                | Some(Lexeme::UnaryOp(_))
+                | Some(Lexeme::Dot) => {
+                complete = false;
+                i += 1;
+            }
+            Some(Lexeme::Handle(_))
+                | Some(Lexeme::Number(_))
+                | Some(Lexeme::StringLiteral(_)) => {
+                complete = true;
+                i += 1;
+            }
+            Some(Lexeme::Semicolon)
+                | Some(Lexeme::Comma)
+                | None => {
+                if complete {
+                    return i;
+                } else {
+                    panic!("unexpected end of rvalue");
+                }
+            }
+            Some(l) if CLOSERS.contains(l) => {
+                if complete {
+                    return i;
+                } else {
+                    panic!("unexpected end of rvalue");
+                }
+            }
+            Some(Lexeme::NewLine) => {
+                if complete {
+                    return i;
+                } else {
+                    i += 1;
+                }
+            }
+            _ => {
+                panic!("unexpected character in rvalue");
+            }
+        }
+    }
 }
 
 fn parse_lvalue(lexemes: &[Lexeme]) -> (Box<LValue>,usize) {
@@ -449,7 +514,12 @@ lazy_static! {
         vec![BOP::Less, BOP::LessOrEqual, BOP::Greater, BOP::GreaterOrEqual],
         vec![BOP::Plus, BOP::Minus],
         vec![BOP::Times, BOP::ElemTimes, BOP::Divide, BOP::ElemDivide, BOP::Modulus],
-        vec![BOP::Power, BOP::ElemPower]
+        vec![BOP::Power, BOP::ElemPower],
+    ];
+    static ref REVERSE_PRECEDENCE: [BOP; 3] = [
+        BOP::StripUnit,
+        BOP::ConcatUnit,
+        BOP::Convert,
     ];
     static ref OPENERS: [Lexeme; 7] = [
         Lexeme::OArgList,
@@ -487,13 +557,9 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                     if PRECEDENCE[level].contains(bop) {
                         let e1 = parse_rvalue_search(&lexemes[..i], level + 1);
                         let e2 = parse_rvalue_search(&lexemes[i+1..], level);
-                        return Box::new( RValue::Binary {
-                            op: *bop,
-                            e1,
-                            e2,
-                        });
+                        return Box::new(RValue::Binary(*bop,e1,e2));
                     }
-                    break;
+                    i += 1;
                 }
                 _ if OPENERS.contains(lexeme) => {
                     i += traverse_atom(&lexemes[i..]);
@@ -504,30 +570,68 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
             }
         }
     } else if level == 8 {
+        let mut i = l-1;
+        while i > 0 {
+            let lexeme = lexemes.get(i).unwrap();
+            match lexeme {
+                Lexeme::BinaryOp(bop) if REVERSE_PRECEDENCE.contains(bop) => {
+                    let e1 = parse_rvalue_search(&lexemes[..i],level);
+                    let e2 = parse_rvalue_search(&lexemes[i+1..],level+1);
+                    return Box::new(RValue::Binary(*bop,e1,e2));
+                }
+                _ if CLOSERS.contains(lexeme) => {
+                    i -= traverse_atom_reverse(&lexemes[..=i]);
+                }
+                _ => {
+                    i -= 1;
+                }
+            }
+        }
+        match lexemes.get(0) {
+            Some(Lexeme::BinaryOp(_)) => {
+                panic!("expected something before operator");
+            }
+            _ => {}
+        }
+    } else if level == 9 {
         let lexeme = lexemes.get(0).unwrap();
         match lexeme {
             Lexeme::UnaryOp(uop) => {
                 let e1 = parse_rvalue_search(&lexemes[1..], level);
-                return Box::new( RValue::Unary {
-                    op: *uop,
-                    e1,
-                });
+                return Box::new(RValue::Unary(*uop,e1));
             }
             _ => {
                 return parse_rvalue_search(&lexemes, level + 1);
             }
         }
-    } else if level == 9 {
+    } else if level == 10 {
         let start = lexemes.get(0).unwrap();
         match start {
             Lexeme::Handle(s) => {
                 if lexemes.len() == 1 {
-                    unimplemented!();
-                }
-                unimplemented!();
+                    return Box::new(RValue::Name(s.clone()));
+                } else {
+                    let i = lexemes.len() - 1;
+                    while i > 0 {
+                        match lexemes.get(i)
             }
             Lexeme::Number(n) => {
-                unimplemented!();
+                if lexemes.len() == 1 {
+                    return Box::new(RValue::Number(*n));
+                } else {
+                    match lexemes.get(1) {
+                        Some(Lexeme::OUnit) => {
+                            let u = parse_rvalue_contained(&lexemes[2..lexemes.len()-1]);
+                            return Box::new(
+                                RValue::UnitTag(
+                                    Box::new(RValue::Number(*n)),
+                                    u
+                                )
+                            );
+                        }
+                        _ => panic!("unexpected character in rvalue"),
+                    }
+                }
             }
             Lexeme::StringLiteral(s) => {
                 unimplemented!();
@@ -540,13 +644,14 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
             }
             Lexeme::OMatrix => {
                 let mut i = 1;
-                let outer_vec = Vec::new();
+                let mut outer_vec = Vec::new();
                 match lexemes.get(1) {
                     Some(Lexeme::CParen) => {
                         return Box::new(RValue::Matrix(outer_vec));
                     }
+                    _ => {}
                 }
-                let inner_vec = Vec::new();
+                let mut inner_vec = Vec::new();
                 while i < l {
                     let (rv,length) = parse_rvalue(&lexemes[i..]);
                     inner_vec.push(*rv);
@@ -560,13 +665,39 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                             outer_vec.push(inner_vec);
                             inner_vec = Vec::new();
                         }
-                        Some(
+                        Some(Lexeme::CParen) => {
+                            outer_vec.push(inner_vec);
+                            i += 1;
+                            break;
+                        }
+                        None => panic!("matrix incomplete"),
+                        _ => {
+                            panic!("invalid matrix structure");
+                        }
+                    }
+                }
+                if i == l {
+                    return Box::new(RValue::Matrix(outer_vec));
+                } else {
+                    match lexemes.get(i) {
+                        Some(Lexeme::OUnit) => {
+                            let u = parse_rvalue_contained(&lexemes[i+1..lexemes.len()-1]);
+                            return Box::new(
+                                RValue::UnitTag(
+                                    Box::new(RValue::Matrix(outer_vec)),
+                                    u
+                                )
+                            );
+                        }
+                        _ => panic!("expected unit annotation"),
+                    }
+                }
             }
             Lexeme::ORange(inc) => {
-                unimplemented!();
-            }
+                unimplemented!(); }
             Lexeme::OUnit => {
-                unimplemented!();
+                let contents = parse_rvalue_contained(&lexemes[1..lexemes.len()-1]);
+                return Box::new(RValue::Unit(contents));
             }
             Lexeme::OList => {
                 unimplemented!();
@@ -589,6 +720,23 @@ fn traverse_atom(lexemes: &[Lexeme]) -> usize {
             level -= 1;
             if level == 0 {
                 return i + 1;
+            }
+        }
+    }
+}
+
+fn traverse_atom_reverse(lexemes: &[Lexeme]) -> usize {
+    let mut i = lexemes.len() - 1;
+    let mut level = 1;
+    loop {
+        i -= 1;
+        let lexeme = lexemes.get(i).unwrap();
+        if CLOSERS.contains(lexeme) {
+            level += 1;
+        } else if OPENERS.contains(lexeme) {
+            level -= 1;
+            if level == 0 {
+                return lexemes.len() - i - 1;
             }
         }
     }

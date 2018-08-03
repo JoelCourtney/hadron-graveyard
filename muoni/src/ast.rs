@@ -1,9 +1,11 @@
 use super::values;
 
+#[derive(Debug,PartialEq)]
 pub struct Scope {
     pub statements: Vec<Box<Control>>,
 }
 
+#[derive(Debug,PartialEq)]
 pub enum Control {
     State {
         statement: Box<Statement>,
@@ -61,6 +63,7 @@ pub enum Control {
     Empty,
 }
 
+#[derive(Debug,PartialEq)]
 pub enum Statement {
     VarDecl {
         name: Box<LValue>,
@@ -100,12 +103,14 @@ pub enum Statement {
     },
 }
 
+#[derive(Debug,PartialEq)]
 pub enum Assign {
     Equal,
     Lazy,
     OpEqual(BOP),
 }
 
+#[derive(Debug,PartialEq)]
 pub enum LValue {
     Name(String),
     MatrixDecomp(Vec<Vec<LValue>>),
@@ -114,38 +119,25 @@ pub enum LValue {
     Discard,
 }
 
+#[derive(Debug,PartialEq)]
 pub enum RValue {
-    Binary {
-        op: BOP,
-        e1: Box<RValue>,
-        e2: Box<RValue>,
-    },
-    Unary {
-        op: UOP,
-        e1: Box<RValue>,
-    },
-    Call {
-        f: String,
-        args: Vec<RValue>,
-    },
-    Name {
-        n: String,
-    },
+    Binary(BOP,Box<RValue>,Box<RValue>),
+    Unary(op: UOP,Box<RValue>),
+    Call(Box<RValue>,Vec<RValue>),
+    Access(Box<RValue>,String),
+    Name(String),
     Number(f64),
     List(Vec<RValue>),
     Matrix(Vec<Vec<RValue>>),
     Bool(bool),
     Range(bool,f64,f64,f64,bool),
-    Unit {
-        u: values::Unit,
-    },
-    Scope {
-        s: Box<Scope>,
-    }
+    RangeList(Vec<(i32,i32)>),
+    Unit(Box<RValue>),
+    UnitTag(Box<RValue>,Box<RValue>),
+    Scope(Box<Scope>),
 }
 
-#[derive(Debug)]
-#[derive(PartialEq)]
+#[derive(Debug,PartialEq)]
 pub enum Lexeme {
     BinaryOp(BOP),
     UnaryOp(UOP),

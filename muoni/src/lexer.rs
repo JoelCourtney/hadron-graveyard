@@ -511,7 +511,7 @@ fn is_list(chars: &(Vec<char>), i: usize) -> bool {
             Some(')') | Some(']') | Some('}') => {
                 level -= 1;
             }
-            Some(',') => {
+            Some(',') | Some(';') => {
                 if level == 1 {
                     list = true;
                 }

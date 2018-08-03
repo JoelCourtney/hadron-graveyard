@@ -1,5 +1,5 @@
 var a = (1,2) // basic matrix
-var b = (a, 3) // (1, 2, 3)
+var b = (a, 3)[s] // (1, 2, 3)
 b = (a; 3, 4) // (1,2;3,4)
 var c = a&[m] // convert a to meters
 var d = c&[s] // d is now in [m*s]
@@ -42,7 +42,7 @@ c[-1] = 7 // last element of c set to 7
 
 a[3] = 5
 a[4,5] = 3
-a[3:6)[1:5) = 2
+a[[3:6),[1:5)] = 2
 a[2:3,4:6] = 1
 a[a > 0] = 4 // matrix subset assignment
 
