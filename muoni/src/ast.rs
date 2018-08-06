@@ -94,8 +94,8 @@ pub enum Statement {
     },
     AssignFunction {
         name: String,
-        caps: Vec<String>,
-        args: Vec<String>,
+        args: Vec<LValue>,
+        caps: Vec<LValue>,
         body: Box<RValue>,
     },
     Return {
@@ -106,34 +106,36 @@ pub enum Statement {
 #[derive(Debug,PartialEq)]
 pub enum Assign {
     Equal,
-    Lazy,
     OpEqual(BOP),
 }
 
 #[derive(Debug,PartialEq)]
 pub enum LValue {
     Name(String),
+    Lazy(Box<LValue>),
     MatrixDecomp(Vec<Vec<LValue>>),
     ListDecomp(Vec<LValue>),
-    Subset(String,RValue),
+    Subset(Box<RValue>),
     Discard,
 }
 
 #[derive(Debug,PartialEq)]
 pub enum RValue {
     Binary(BOP,Box<RValue>,Box<RValue>),
-    Unary(op: UOP,Box<RValue>),
-    Call(Box<RValue>,Vec<RValue>),
+    Unary(UOP,Box<RValue>),
+    Call(Box<RValue>,Box<RValue>),
     Access(Box<RValue>,String),
     Name(String),
     Number(f64),
+    StringLiteral(String),
     List(Vec<RValue>),
     Matrix(Vec<Vec<RValue>>),
+    ArgList(Vec<RValue>),
     Bool(bool),
-    Range(bool,f64,f64,f64,bool),
-    RangeList(Vec<(i32,i32)>),
+    Range(Box<RValue>,Box<RValue>,Box<RValue>),
     Unit(Box<RValue>),
     UnitTag(Box<RValue>,Box<RValue>),
+    CaptureScope(Vec<LValue>,Box<Scope>),
     Scope(Box<Scope>),
 }
 
@@ -145,7 +147,6 @@ pub enum Lexeme {
     AssignOp(BOP),
     RightArrow,
     LeftArrow,
-    Colon,
     Comma,
     Semicolon,
     NewLine,
@@ -164,12 +165,12 @@ pub enum Lexeme {
     Val,
     Sym,
     Func,
+    Question,
     OParen,
     OArgList,
     OList,
     OScope,
     OMatrix,
-    ORange(bool),
     OUnit,
     CParen,
     CBraket,
@@ -204,6 +205,7 @@ pub enum BOP {
     StripUnit,
     ConcatUnit,
     Convert,
+    Range,
 }
 
 #[derive(Debug,PartialEq,Copy,Clone)]

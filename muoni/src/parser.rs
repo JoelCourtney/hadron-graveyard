@@ -267,7 +267,28 @@ fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
             )
         }
         DECL_FUN => {
-            unimplemented!();
+            let name;
+            match lexemes.get(1) {
+                Some(Lexeme::Handle(s)) => {
+                    name = s.clone();
+                }
+                _ => panic!("expected function name"),
+            }
+            let mut i = 2;
+            let args;
+            match lexemes.get(i) {
+                Some(Lexeme::OArgList) => {
+                    let length = delimit_lvalue(&lexemes[i..]);
+                    args = parse_lvalue_list(&lexemes[i..i+length]);
+                    i + length;
+                }
+                _ => {}
+            }
+            match lexemes.get(i) {
+                Some(Lexeme::RightArrow) => {
+                    i += 1;
+                }
+                Some(Lexeme::
         }
         DECL_RET => {
             let (length,_) = delimit_statement(&lexemes);
@@ -326,8 +347,7 @@ fn delimit_statement(lexemes: &[Lexeme]) -> (usize,i32) {
             }
             Some(Lexeme::BinaryOp(_))
                 | Some(Lexeme::UnaryOp(_))
-                | Some(Lexeme::Dot)
-                | Some(Lexeme::Colon) => {
+                | Some(Lexeme::Dot) => {
                 complete = false;
                 i += 1;
             }
@@ -374,7 +394,49 @@ fn delimit_statement(lexemes: &[Lexeme]) -> (usize,i32) {
 }
 
 fn delimit_lvalue(lexemes: &[Lexeme]) -> usize {
-    unimplemented!();
+    let mut complete = false;
+    let mut i = 0;
+    loop {
+        match lexemes.get(i) {
+            Some(l) if OPENERS.contains(l) => {
+                i += traverse_atom(&lexemes[i..]);
+                complete = true;
+            }
+            Some(Lexeme::BinaryOp(_))
+                | Some(Lexeme::UnaryOp(_)) => {
+                panic!("unexpected operation in lvalue");
+            }
+            Some(Lexeme::Dot) => {
+                i += 1;
+                complete = false;
+            }
+            Some(Lexeme::Handle(_))
+                | Some(Lexeme::Question) => {
+                complete = true;
+                i += 1;
+            }
+            Some(Lexeme::Comma)
+                | Some(Lexeme::Semicolon)
+                | Some(Lexeme::NewLine)
+                | None => {
+                if complete {
+                    return i;
+                } else {
+                    panic!("unexpected end of lvalue");
+                }
+            }
+            Some(l) if CLOSERS.contains(l) => {
+                if complete {
+                    return i;
+                } else {
+                    panic!("unexted end of lvalue");
+                }
+            }
+            Some(_) => {
+                panic!("unexpected term in lvalue");
+            }
+        }
+    }
 }
 
 fn delimit_rvalue(lexemes: &[Lexeme]) -> usize {
@@ -444,8 +506,19 @@ fn parse_lvalue_contained(lexemes: &[Lexeme]) -> Box<LValue> {
                     Box::new(LValue::Discard)
                 }
                 _ => {
-                    if lexemes.len() > 1 {
-                        unimplemented!();
+                    if lexemes.len() == 2 {
+                        match lexemes.get(1) {
+                            Some(Lexeme::Question) => {
+                                let n = parse_lvalue_contained(&lexemes[0]);
+                                return Box::new(LValue::Lazy(n));
+                            }
+                            _ => {
+                                panic!("unexpected end of lvalue");
+                            }
+                        }
+                    } else if lexemes.len() > 1 {
+                        let lv = parse_rvalue_search(&lexemes,11);
+                        return Box::new(LValue::Subset(lv));
                     } else {
                         Box::new(LValue::Name(s.clone()))
                     }
@@ -505,6 +578,50 @@ fn parse_lvalue_contained(lexemes: &[Lexeme]) -> Box<LValue> {
     }
 }
 
+fn parse_lvalue_list(lexemes: &[Lexeme]) -> Vec<LValue> {
+    let l = lexemes.len();
+    match (lexemes.get(0),lexemes.get(l-1)) {
+        (Some(Lexeme::OList),Some(c)) if c != &Lexeme::CBraket => {
+            panic!("expected close braket");
+        }
+        (Some(Lexeme::OArgList),Some(c)) if c != &Lexeme::CParen => {
+            panic!("expected close paren");
+        }
+        (Some(Lexeme::Pipe),Some(c)) if c != &Lexeme::Pipe => {
+            panic!("expected pipe");
+        }
+        (Some(c),_) if c != Lexeme::OList && c != Lexeme::OArgList && c != Lexeme::Pipe => {
+            panic!("expected one of (, [, |");
+        }
+        (_,_) => {}
+    }
+    match lexemes.get(1) {
+        Some(Lexeme::CBraket)
+            | Some(Lexeme::CParen)
+            | Some(Lexeme::Pipe) => {
+            return Vec::new();
+        }
+        _ => {}
+    }
+    let mut i = 1;
+    while i < l {
+        let (lv,length) = parse_lvalue(&lexemes[i..]);
+        i += length;
+        vec.push(*lv);
+        match lexemes.get(i) {
+            Some(Lexeme::Comma) => {
+                i += 1;
+            }
+            Some(Lexeme::CBraket)
+                | Some(Lexeme::CParen)
+                | Some(Lexeme::Pipe) => {
+                return vec;
+            }
+            _ => panic!("invalid list structure"),
+        }
+    }
+}
+
 lazy_static! {
     static ref PRECEDENCE: Vec<Vec<BOP>> = vec![
         vec![BOP::Or, BOP::NOr],
@@ -512,6 +629,7 @@ lazy_static! {
         vec![BOP::And, BOP::NAnd],
         vec![BOP::Is, BOP::Isnt],
         vec![BOP::Less, BOP::LessOrEqual, BOP::Greater, BOP::GreaterOrEqual],
+        vec![BOP::Range],
         vec![BOP::Plus, BOP::Minus],
         vec![BOP::Times, BOP::ElemTimes, BOP::Divide, BOP::ElemDivide, BOP::Modulus],
         vec![BOP::Power, BOP::ElemPower],
@@ -521,12 +639,10 @@ lazy_static! {
         BOP::ConcatUnit,
         BOP::Convert,
     ];
-    static ref OPENERS: [Lexeme; 7] = [
+    static ref OPENERS: [Lexeme; 5] = [
         Lexeme::OArgList,
         Lexeme::OScope,
         Lexeme::OMatrix,
-        Lexeme::ORange(true),
-        Lexeme::ORange(false),
         Lexeme::OUnit,
         Lexeme::OList,
     ];
@@ -548,7 +664,7 @@ fn parse_rvalue_contained(lexemes: &[Lexeme]) -> Box<RValue> {
 
 fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
     let l = lexemes.len();
-    if level < 8 {
+    if level < 9 {
         let mut i = 0;
         while i < l {
             let lexeme = lexemes.get(i).unwrap();
@@ -569,7 +685,7 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                 }
             }
         }
-    } else if level == 8 {
+    } else if level == 9 {
         let mut i = l-1;
         while i > 0 {
             let lexeme = lexemes.get(i).unwrap();
@@ -593,7 +709,7 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
             }
             _ => {}
         }
-    } else if level == 9 {
+    } else if level == 10 {
         let lexeme = lexemes.get(0).unwrap();
         match lexeme {
             Lexeme::UnaryOp(uop) => {
@@ -604,16 +720,48 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                 return parse_rvalue_search(&lexemes, level + 1);
             }
         }
-    } else if level == 10 {
+    } else if level == 11 {
         let start = lexemes.get(0).unwrap();
         match start {
             Lexeme::Handle(s) => {
                 if lexemes.len() == 1 {
                     return Box::new(RValue::Name(s.clone()));
                 } else {
-                    let i = lexemes.len() - 1;
+                    let mut i = lexemes.len() - 1;
                     while i > 0 {
-                        match lexemes.get(i)
+                        let lex = lexemes.get(i);
+                        match lex {
+                            Some(Lexeme::Handle(s)) => {
+                                match lexemes.get(i-1) {
+                                    Some(Lexeme::Dot) => {
+                                        let obj = parse_rvalue_search(&lexemes[..i-1],11);
+                                        return Box::new(RValue::Access(
+                                            obj,
+                                            s.clone(),
+                                        ));
+                                    }
+                                    _ => panic!("expected dot"),
+                                }
+                            }
+                            Some(l) if CLOSERS.contains(l) => {
+                                i -= traverse_atom_reverse(&lexemes[..i+1]);
+                            }
+                            Some(Lexeme::OArgList)
+                                | Some(Lexeme::OList) => {
+                                let func = parse_rvalue_search(&lexemes[..i],11);
+                                let call = parse_rvalue_search(&lexemes[i..],11);
+                                return Box::new(RValue::Call(
+                                    func,
+                                    call,
+                                ));
+                            }
+                            Some(_) => {
+                                i -= 1;
+                            }
+                            None => panic!("something has gone horribly wrong"),
+                        }
+                    }
+                }
             }
             Lexeme::Number(n) => {
                 if lexemes.len() == 1 {
@@ -634,12 +782,17 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                 }
             }
             Lexeme::StringLiteral(s) => {
-                unimplemented!();
+                return Box::new(RValue::StringLiteral(s.clone()));
             }
             Lexeme::OArgList => {
-                unimplemented!();
+                return Box::new(RValue::ArgList(
+                    parse_list(&lexemes)
+                ))
             }
             Lexeme::OScope => {
+                unimplemented!();
+            }
+            Lexeme::Pipe => {
                 unimplemented!();
             }
             Lexeme::OMatrix => {
@@ -693,14 +846,14 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                     }
                 }
             }
-            Lexeme::ORange(inc) => {
-                unimplemented!(); }
             Lexeme::OUnit => {
                 let contents = parse_rvalue_contained(&lexemes[1..lexemes.len()-1]);
                 return Box::new(RValue::Unit(contents));
             }
             Lexeme::OList => {
-                unimplemented!();
+                return Box::new(RValue::List(
+                    parse_list(&lexemes)
+                ))
             }
             _ => {}
         }
@@ -708,9 +861,52 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
     parse_rvalue_search(lexemes, level + 1)
 }
 
+fn parse_list(lexemes: &[Lexeme]) -> Vec<RValue> {
+    let l = lexemes.len();
+    match lexemes.get(0) {
+        Some(Lexeme::OArgList) => {
+            if lexemes.get(l-1) != Some(&Lexeme::CParen) {
+                panic!("expected close paren");
+            }
+        }
+        Some(Lexeme::OList) => {
+            if lexemes.get(l-1) != Some(&Lexeme::CBraket) {
+                panic!("expected close braket");
+            }
+        }
+        _ => {
+            panic!("expected ( or [");
+        }
+    }
+    let mut vec = Vec::new();
+    match lexemes.get(1) {
+        Some(Lexeme::CParen) | Some(Lexeme::CBraket) => {
+            return vec;
+        }
+        _ => {}
+    }
+    let mut i = 1;
+    while i < l {
+        let (rv,length) = parse_rvalue(&lexemes[i..]);
+        vec.push(*rv);
+        i += length;
+        match lexemes.get(i) {
+            Some(Lexeme::Comma) => {
+                i += 1;
+            }
+            Some(Lexeme::CParen) | Some(Lexeme::CBraket) => {
+                return vec;
+            }
+            _ => panic!("expected , ) or ]"),
+        }
+    }
+    panic!("list was not closed");
+}
+
 fn traverse_atom(lexemes: &[Lexeme]) -> usize {
     let mut i = 0;
     let mut level = 1;
+    let mut in_cap = false;
     loop {
         i += 1;
         let lexeme = lexemes.get(i).unwrap();
@@ -718,9 +914,11 @@ fn traverse_atom(lexemes: &[Lexeme]) -> usize {
             level += 1;
         } else if CLOSERS.contains(lexeme) {
             level -= 1;
-            if level == 0 {
+            if in_cap && level == 0 {
                 return i + 1;
             }
+        } else if lexeme == &Lexeme::Pipe {
+            in_cap = !in_cap;
         }
     }
 }
@@ -728,6 +926,7 @@ fn traverse_atom(lexemes: &[Lexeme]) -> usize {
 fn traverse_atom_reverse(lexemes: &[Lexeme]) -> usize {
     let mut i = lexemes.len() - 1;
     let mut level = 1;
+    let mut in_cap = false;
     loop {
         i -= 1;
         let lexeme = lexemes.get(i).unwrap();
@@ -735,9 +934,11 @@ fn traverse_atom_reverse(lexemes: &[Lexeme]) -> usize {
             level += 1;
         } else if OPENERS.contains(lexeme) {
             level -= 1;
-            if level == 0 {
+            if in_cap && level == 0 {
                 return lexemes.len() - i - 1;
             }
+        } else if lexeme == &Lexeme::Pipe {
+            in_cap = !in_cap;
         }
     }
 }

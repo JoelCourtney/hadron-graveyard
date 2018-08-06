@@ -268,45 +268,36 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     i += 1;
                 }
                 '(' => {
-                    if is_range(&chars, i) {
-                        choice = Lexeme::ORange(false);
-                    } else {
-                        let prev = lexemes.last();
-                        match prev {
-                            Some(Lexeme::Func)
-                                | Some(Lexeme::Handle(_))
-                                | Some(Lexeme::CParen)
-                                | Some(Lexeme::CBrace) => {
+                    let prev = lexemes.last();
+                    match prev {
+                        Some(Lexeme::Func)
+                            | Some(Lexeme::Handle(_))
+                            | Some(Lexeme::CParen)
+                            | Some(Lexeme::CBrace) => {
                                 choice = Lexeme::OArgList;
                             }
-                            _ => {
-                                if is_list(&chars, i) {
-                                    choice = Lexeme::OMatrix;
-                                } else {
-                                    choice = Lexeme::OParen;
-                                }
+                        _ => {
+                            if is_list(&chars, i) {
+                                choice = Lexeme::OMatrix;
+                            } else {
+                                choice = Lexeme::OParen;
                             }
                         }
                     }
                     i += 1;
                 }
                 '[' => {
-                    if is_range(&chars, i) {
-                        choice = Lexeme::ORange(true);
-                    } else {
-                        let prev = lexemes.last();
-                        match prev {
-                            Some(Lexeme::Number(_))
-                                | Some(Lexeme::CParen)
-                                | Some(Lexeme::BinaryOp(BOP::StripUnit))
-                                | Some(Lexeme::BinaryOp(BOP::ConcatUnit))
-                                | Some(Lexeme::BinaryOp(BOP::Convert))
-                                | Some(Lexeme::Colon) => {
+                    let prev = lexemes.last();
+                    match prev {
+                        Some(Lexeme::Number(_))
+                            | Some(Lexeme::CParen)
+                            | Some(Lexeme::BinaryOp(BOP::StripUnit))
+                            | Some(Lexeme::BinaryOp(BOP::ConcatUnit))
+                            | Some(Lexeme::BinaryOp(BOP::Convert)) => {
                                 choice = Lexeme::OUnit;
                             }
-                            _ => {
-                                choice = Lexeme::OList;
-                            }
+                        _ => {
+                            choice = Lexeme::OList;
                         }
                     }
                     i += 1;
@@ -367,7 +358,7 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     }
                 }
                 ':' => {
-                    choice = Lexeme::Colon;
+                    choice = Lexeme::BinaryOp(BOP::Range);
                     i += 1;
                 }
                 ',' => {
@@ -392,6 +383,10 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 }
                 '|' => {
                     choice = Lexeme::Pipe;
+                    i += 1;
+                }
+                '?' => {
+                    choice = Lexeme::Question;
                     i += 1;
                 }
                 _ => {
@@ -470,31 +465,6 @@ fn get_string_dquote(state: &str) -> &str {
 fn get_string_squote(state: &str) -> &str {
     let loc = state.find('\'').unwrap();
     &state[..loc]
-}
-
-fn is_range(chars: &(Vec<char>), i: usize) -> bool {
-    let mut level = 1;
-    let mut cursor: usize = i;
-    let mut range = false;
-    while level > 0 {
-        cursor += 1;
-        let c = chars.get(cursor);
-        match c {
-            Some('(') | Some('[') | Some('{') => {
-                level += 1;
-            }
-            Some(')') | Some(']') | Some('}') => {
-                level -= 1;
-            }
-            Some(':') => {
-                if level == 1 {
-                    range = true;
-                }
-            }
-            _ => {}
-        }
-    }
-    range
 }
 
 fn is_list(chars: &(Vec<char>), i: usize) -> bool {

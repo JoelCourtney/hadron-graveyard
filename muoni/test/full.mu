@@ -1,3 +1,5 @@
+var r = 4:6
+var r2 = 0:2:30
 var a = (1,2) // basic matrix
 var b = (a, 3)[s] // (1, 2, 3)
 b = (a; 3, 4) // (1,2;3,4)
@@ -17,6 +19,7 @@ val g = (3;4)[AU] // yep
 print $b // (2,2)
 print prod($b) // 4
 print #b
+print multiargfunc(1,2,4+56)
 
 print norm(g) // should be 5[AU]
 print norm(g)~[km] // the implication is that we need to treat ~,@,and & as operators
@@ -42,7 +45,6 @@ c[-1] = 7 // last element of c set to 7
 
 a[3] = 5
 a[4,5] = 3
-a[[3:6),[1:5)] = 2
 a[2:3,4:6] = 1
 a[a > 0] = 4 // matrix subset assignment
 
@@ -54,7 +56,7 @@ fn squareSum2(v) -> sum(v .^ 2)
 fn squareSum3(v) -> {
 	<- sum( {
 		m = prefill(0, $v)
-		for [1:#v] as i { // $v = prod(#v)
+		for 1:#v as i { // $v = prod(#v)
 			m = v[i]^2
 		}
 		<- m
@@ -62,7 +64,7 @@ fn squareSum3(v) -> {
 }
 
 fn foldLeft(v,acc,f) -> {
-	for [1:#v] as i {
+	for 1:#v as i {
 		acc = f(v[i],acc)
 	}
 	<- acc
@@ -71,4 +73,16 @@ val v = [1,2,3]
 val acc = 1
 print foldLeft(v,acc,fn (z,acc)->z^2 + acc) // square sum 4
 
-fn nomnom(acc) ->|v| acc * v + a // accesses a, captures v, passes acc
+fn nomnom(acc) |v| -> acc * v + a // accesses a, captures v, passes acc
+
+val x? = {
+	print "evaluating x"
+	<- 1+2
+}
+
+fn lazyFunc(x?) -> {
+	2*x
+	collapse x
+	<- 2*x
+}
+
