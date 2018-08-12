@@ -1,65 +1,69 @@
 use super::values;
 
 #[derive(Debug,PartialEq)]
-pub struct Scope {
-    pub statements: Vec<Box<Control>>,
-}
-
-#[derive(Debug,PartialEq)]
 pub enum Control {
     State {
         statement: Box<Statement>,
     },
     If {
         condition: Box<RValue>,
-        body: Box<RValue>,
+        body: Box<Statement>,
     },
     IfElse {
         condition: Box<RValue>,
-        if_body: Box<RValue>,
-        else_body: Box<RValue>,
+        if_body: Box<Statement>,
+        else_body: Box<Statement>,
     },
     IfSeries {
         conditions: Vec<RValue>,
-        bodies: Vec<RValue>,
+        bodies: Vec<Statement>,
     },
     IfSeriesElse {
         conditions: Vec<RValue>,
-        if_bodies: Vec<RValue>,
-        else_body: Box<RValue>,
+        if_bodies: Vec<Statement>,
+        else_body: Box<Statement>,
     },
     For {
         range: Box<RValue>,
-        body: Box<RValue>,
+        body: Box<Statement>,
     },
     ForAs {
         range: Box<RValue>,
         target: Box<LValue>,
-        body: Box<RValue>,
+        body: Box<Statement>,
     },
     ForAt {
         range: Box<RValue>,
         index: Box<LValue>,
-        body: Box<RValue>,
+        body: Box<Statement>,
     },
     ForAsAt {
         range: Box<RValue>,
         target: Box<LValue>,
         index: Box<LValue>,
-        body: Box<RValue>,
+        body: Box<Statement>,
     },
     While {
         condition: Box<RValue>,
-        body: Box<RValue>,
+        body: Box<Statement>,
     },
     Print {
         e1: Box<RValue>,
     },
-    Break,
-    BreakCount(i32),
-    Continue,
-    ContinueCount(i32),
-    Fallthrough,
+    Return {
+        e1: Box<RValue>,
+    },
+    ReturnEmpty,
+    Break {
+        series: Vec<Break>,
+        e1: Box<RValue>
+    },
+    BreakEmpty {
+        series: Vec<Break>
+    },
+    Collapse {
+        name: Box<LValue>,
+    },
     Empty,
 }
 
@@ -96,10 +100,7 @@ pub enum Statement {
         name: String,
         args: Vec<LValue>,
         caps: Vec<LValue>,
-        body: Box<RValue>,
-    },
-    Return {
-        e1: Box<RValue>,
+        body: Box<Statement>,
     },
 }
 
@@ -135,8 +136,10 @@ pub enum RValue {
     Range(Box<RValue>,Box<RValue>,Box<RValue>),
     Unit(Box<RValue>),
     UnitTag(Box<RValue>,Box<RValue>),
-    CaptureScope(Vec<LValue>,Box<Scope>),
-    Scope(Box<Scope>),
+    CaptureScope(Vec<LValue>,Vec<Control>),
+    Scope(Vec<Control>),
+    Function(String,Vec<LValue>,Vec<LValue>,Box<Statement>),
+    AnonFunction(Vec<LValue>,Vec<LValue>,Box<Statement>),
 }
 
 #[derive(Debug,PartialEq)]
@@ -146,7 +149,8 @@ pub enum Lexeme {
     Assign,
     AssignOp(BOP),
     RightArrow,
-    LeftArrow,
+    Return,
+    BreakSeries(Vec<Break>),
     Comma,
     Semicolon,
     NewLine,
@@ -177,6 +181,7 @@ pub enum Lexeme {
     CBrace,
     Pipe,
     Print,
+    Collapse,
     None,
 }
 
@@ -214,4 +219,10 @@ pub enum UOP {
     Shape,
     Size,
     Not,
+}
+
+#[derive(Debug,PartialEq,Copy,Clone)]
+pub enum Break {
+    Dash,
+    Tilde,
 }

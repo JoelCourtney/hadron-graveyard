@@ -1,5 +1,5 @@
 use regex::Regex;
-use super::ast::{Lexeme,BOP,UOP};
+use super::ast::{Lexeme,BOP,UOP,Break};
 
 pub fn lex(code: String) -> Vec<Lexeme> {
     let mut lexemes = Vec::new();
@@ -116,6 +116,7 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 "val" => Lexeme::Val,
                 "sym" => Lexeme::Sym,
                 "fn" => Lexeme::Func,
+                "collapse" => Lexeme::Collapse,
                 _ => Lexeme::Handle(String::from(string))
             }
         } else if c.is_numeric() {
@@ -148,13 +149,13 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 '-' => {
                     let prev = lexemes.last();
                     match prev {
-                        Some(Lexeme::Handle(_)) | Some(Lexeme::CParen) => {
+                        Some(Lexeme::Handle(_))
+                            | Some(Lexeme::CParen)
+                            | Some(Lexeme::Number(_))
+                            | Some(Lexeme::CBrace)
+                            | Some(Lexeme::CBraket) => {
                             let next = chars.get(i+1);
                             match next {
-                                Some('>') => {
-                                    choice = Lexeme::RightArrow;
-                                    i += 2;
-                                }
                                 Some('=') => {
                                     choice = Lexeme::AssignOp(BOP::Minus);
                                     i += 2;
@@ -165,11 +166,6 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                                 }
                             }
                         }
-                        Some(Lexeme::Number(_)) | Some(Lexeme::CBrace) 
-                            | Some(Lexeme::CBraket) => {
-                                choice = Lexeme::BinaryOp(BOP::Minus);
-                                i += 1;
-                            }
                         _ => {
                             choice = Lexeme::UnaryOp(UOP::Negate);
                             i += 1;
@@ -264,8 +260,16 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     i += 1;
                 }
                 '=' => {
-                    choice = Lexeme::Assign;
-                    i += 1;
+                    match chars.get(i+1) {
+                        Some('>') => {
+                            choice = Lexeme::RightArrow;
+                            i += 2;
+                        }
+                        _ => {
+                            choice = Lexeme::Assign;
+                            i += 1;
+                        }
+                    }
                 }
                 '(' => {
                     let prev = lexemes.last();
@@ -277,10 +281,25 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                                 choice = Lexeme::OArgList;
                             }
                         _ => {
-                            if is_list(&chars, i) {
+                            if is_list(&chars[i..]) {
                                 choice = Lexeme::OMatrix;
                             } else {
-                                choice = Lexeme::OParen;
+                                let mut cursor = i + 1;
+                                loop {
+                                    match chars.get(cursor) {
+                                        Some(c) if c.is_whitespace() => {
+                                            cursor += 1;
+                                        }
+                                        Some(')') => {
+                                            choice = Lexeme::OMatrix;
+                                            break;
+                                        }
+                                        _ => {
+                                            choice = Lexeme::OParen;
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -322,15 +341,24 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     let next = chars.get(i+1);
                     match next {
                         Some('=') => {
-                            choice = Lexeme::BinaryOp(BOP::LessOrEqual);
+                            match lexemes.last() {
+                                Some(Lexeme::NewLine) | Some(Lexeme::Semicolon) => {
+                                    choice = Lexeme::Return;
+                                }
+                                _ => {
+                                    choice = Lexeme::BinaryOp(BOP::LessOrEqual);
+                                }
+                            }
                             i += 2;
                         }
-                        Some('-') => {
+                        Some('-') | Some('~') => {
                             let prev = lexemes.last();
                             match prev {
                                 Some(Lexeme::NewLine) | Some(Lexeme::Semicolon) => {
-                                    choice = Lexeme::LeftArrow;
-                                    i += 2;
+                                    i += 1;
+                                    let series = get_break_series(&chars[i..]);
+                                    i += series.len();
+                                    choice = Lexeme::BreakSeries(series);
                                 }
                                 _ => {
                                     choice = Lexeme::BinaryOp(BOP::Less);
@@ -467,9 +495,9 @@ fn get_string_squote(state: &str) -> &str {
     &state[..loc]
 }
 
-fn is_list(chars: &(Vec<char>), i: usize) -> bool {
+fn is_list(chars: &[char]) -> bool {
     let mut level = 1;
-    let mut cursor: usize = i;
+    let mut cursor: usize = 0;
     let mut list = false;
     while level > 0 {
         cursor += 1;
@@ -486,8 +514,28 @@ fn is_list(chars: &(Vec<char>), i: usize) -> bool {
                     list = true;
                 }
             }
-            _ => {}
+            Some(_) => {}
+            None => panic!("expected close paren"),
         }
     }
     list
+}
+
+fn get_break_series(chars: &[char]) -> Vec<Break> {
+    let mut series = Vec::new();
+    let mut i = 0;
+    loop {
+        match chars.get(i) {
+            Some('-') => {
+                series.push(Break::Dash);
+            }
+            Some('~') => {
+                series.push(Break::Tilde);
+            }
+            _ => {
+                return series;
+            }
+        }
+        i += 1;
+    }
 }

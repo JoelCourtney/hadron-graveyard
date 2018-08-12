@@ -48,12 +48,16 @@ a[4,5] = 3
 a[2:3,4:6] = 1
 a[a > 0] = 4 // matrix subset assignment
 
-fn squareSum1(v) -> {
-	val n = norm(v)
+for 1:5 as i {
+	print i
+}
+
+fn squareSum1(v) => {
+	n = norm(v)
 	<- n^2
 }
-fn squareSum2(v) -> sum(v .^ 2)
-fn squareSum3(v) -> {
+fn squareSum2(v) => sum(v .^ 2)
+fn squareSum3(v) => {
 	<- sum( {
 		m = prefill(0, $v)
 		for 1:#v as i { // $v = prod(#v)
@@ -63,7 +67,7 @@ fn squareSum3(v) -> {
 	} )
 }
 
-fn foldLeft(v,acc,f) -> {
+fn foldLeft(v,acc,f) => {
 	for 1:#v as i {
 		acc = f(v[i],acc)
 	}
@@ -71,18 +75,19 @@ fn foldLeft(v,acc,f) -> {
 }
 val v = [1,2,3]
 val acc = 1
-print foldLeft(v,acc,fn (z,acc)->z^2 + acc) // square sum 4
+print foldLeft(v,acc,fn (z,acc)=>z^2 + acc) // square sum 4
 
-fn nomnom(acc) |v| -> acc * v + a // accesses a, captures v, passes acc
+fn nomnom(acc) |v| => acc * v + a // accesses a, captures v, passes acc
+
+hello.world = 5
 
 val x? = {
 	print "evaluating x"
 	<- 1+2
 }
 
-fn lazyFunc(x?) -> {
+fn lazyFunc(x?) => {
 	2*x
 	collapse x
 	<- 2*x
 }
-

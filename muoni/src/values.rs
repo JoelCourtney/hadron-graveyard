@@ -14,7 +14,7 @@ pub enum Value {
     Boolean(bool),
     Range(bool,f64,f64,f64,bool),
     List(Vec<Value>),
-    Function(Vec<String>,ast::Scope),
+    Function(Vec<String>,Vec<ast::Control>),
 }
 
 pub struct Unit {

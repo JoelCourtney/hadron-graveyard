@@ -7,23 +7,62 @@
 use super::ast::*;
 use super::values::*;
 
-pub fn parse(lexemes: Vec<Lexeme>) -> Box<Scope> {
-    let mut statements = Vec::new();
+pub fn parse(lexemes: Vec<Lexeme>) -> Vec<Control> {
+    let mut controls = Vec::new();
     let l = lexemes.len();
     let mut i = 0;
-    while i < l {
+    while i < l-1 {
         let (control,length) = parse_control(&lexemes[i..]);
+        match *control {
+            Control::Empty => {
+                println!("{},{}",i,l);
+            }
+            _ => {}
+        }
         println!("{:?}",control);
-        statements.push(control);
+        controls.push(*control);
         i += length;
     }
-    Box::new(Scope {
-        statements
-    })
+    controls
 }
 
-fn parse_scope(lexemes: &[Lexeme]) -> (Box<Scope>,usize) {
-    unimplemented!();
+fn parse_scope(lexemes: &[Lexeme]) -> (Vec<Control>,usize) {
+    let mut controls = Vec::new();
+    let l = lexemes.len();
+    let mut i = 0;
+    match lexemes.get(0) {
+        Some(Lexeme::OScope) => {
+            i = 1;
+        }
+        _ => panic!("expected {"),
+    }
+    while i < l {
+        let (control,length) = parse_control(&lexemes[i..]);
+        controls.push(*control);
+        i += length;
+        match lexemes.get(i) {
+            Some(Lexeme::CBrace) => {
+                return (
+                    controls,
+                    i+1
+                )
+            }
+            Some(Lexeme::NewLine) => {
+                i += 1;
+                match lexemes.get(i) {
+                    Some(Lexeme::CBrace) => {
+                        return (
+                            controls,
+                            i+1
+                        )
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
+        }
+    }
+    panic!("something has gone horribly wrong");
 }
 
 fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
@@ -50,7 +89,7 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                             i += 1;
                             let (index,length) = parse_lvalue(&lexemes[i..]);
                             i += length;
-                            let (body,length) = parse_rvalue(&lexemes[i..]);
+                            let (body,length) = parse_statement(&lexemes[i..]);
                             i += length;
                             (
                                 Box::new(Control::ForAsAt {
@@ -63,7 +102,7 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                             )
                         }
                         Some(_) => {
-                            let (body,length) = parse_rvalue(&lexemes[i..]);
+                            let (body,length) = parse_statement(&lexemes[i..]);
                             i += length;
                             (
                                 Box::new(Control::ForAs {
@@ -87,7 +126,7 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                             i += 1;
                             let (target,length) = parse_lvalue(&lexemes[i..]);
                             i += length;
-                            let (body,length) = parse_rvalue(&lexemes[i..]);
+                            let (body,length) = parse_statement(&lexemes[i..]);
                             i += length;
                             (
                                 Box::new(Control::ForAsAt {
@@ -100,7 +139,7 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                             )
                         }
                         Some(_) => {
-                            let (body,length) = parse_rvalue(&lexemes[i..]);
+                            let (body,length) = parse_statement(&lexemes[i..]);
                             i += length;
                             (
                                 Box::new(Control::ForAt {
@@ -115,7 +154,7 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                     }
                 }
                 Some(_) => {
-                    let (body,length) = parse_rvalue(&lexemes[i..]);
+                    let (body,length) = parse_statement(&lexemes[i..]);
                     i += length;
                     (
                         Box::new(Control::For {
@@ -147,6 +186,56 @@ fn parse_control(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                 i,
             )
         }
+        Some(Lexeme::Return) => {
+            let length = delimit_rvalue(&lexemes[i..]);
+            if length > 1 {
+                let e1 = parse_rvalue_contained(&lexemes[i+1..i+length]);
+                i += length;
+                (
+                    Box::new(Control::Return {
+                        e1,
+                    }),
+                    i,
+                )
+            } else {
+                (
+                    Box::new(Control::ReturnEmpty),
+                    i,
+                )
+            }
+        }
+        Some(Lexeme::BreakSeries(series)) => {
+            let length = delimit_rvalue(&lexemes[i..]);
+            if length > 1 {
+                let e1 = parse_rvalue_contained(&lexemes[i+1..i+length]);
+                i += length;
+                (
+                    Box::new(Control::Break {
+                        series: (*series).clone(),
+                        e1,
+                    }),
+                    i,
+                )
+            } else {
+                (
+                    Box::new(Control::BreakEmpty {
+                        series: (*series).clone(),
+                    }),
+                    i,
+                )
+            }
+        }
+        Some(Lexeme::Collapse) => {
+            i += 1;
+            let (name,length) = parse_lvalue(&lexemes[i..]);
+            i += length;
+            (
+                Box::new(Control::Collapse {
+                    name,
+                }),
+                i,
+            )
+        }
         Some(_) => {
             let (statement,length) = parse_statement(&lexemes[i..]);
             i += length;
@@ -165,7 +254,6 @@ const DECL_VAL:i32 = 0;
 const DECL_VAR:i32 = 1;
 const DECL_SYM:i32 = 2;
 const DECL_FUN:i32 = 3;
-const DECL_RET:i32 = 4;
 const NO_DECL:i32 = 5;
 
 fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
@@ -184,9 +272,6 @@ fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
         Some(Lexeme::Func) => {
             DECL_FUN
         }
-        Some(Lexeme::LeftArrow) => {
-            DECL_RET
-        }
         Some(_) => {
             NO_DECL
         }
@@ -202,7 +287,6 @@ fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
                 let assign = assign as usize;
                 let op = match lexemes.get(assign) {
                     Some(Lexeme::Assign) => Assign::Equal,
-                    Some(Lexeme::RightArrow) => Assign::Lazy,
                     Some(Lexeme::AssignOp(o)) => Assign::OpEqual(*o),
                     _ => panic!("illegal assignment"),
                 };
@@ -232,7 +316,6 @@ fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
                 let assign = assign as usize;
                 let op = match lexemes.get(assign) {
                     Some(Lexeme::Assign) => Assign::Equal,
-                    Some(Lexeme::RightArrow) => Assign::Lazy,
                     Some(Lexeme::AssignOp(o)) => Assign::OpEqual(*o),
                     _ => panic!("illegal assignment"),
                 };
@@ -280,24 +363,38 @@ fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
                 Some(Lexeme::OArgList) => {
                     let length = delimit_lvalue(&lexemes[i..]);
                     args = parse_lvalue_list(&lexemes[i..i+length]);
-                    i + length;
+                    i += length;
                 }
-                _ => {}
+                _ => panic!("expected arg list"),
             }
+            let caps;
             match lexemes.get(i) {
                 Some(Lexeme::RightArrow) => {
+                    caps = Vec::new();
                     i += 1;
                 }
-                Some(Lexeme::
-        }
-        DECL_RET => {
-            let (length,_) = delimit_statement(&lexemes);
-            let e1 = parse_rvalue_contained(&lexemes[1..length]);
+                Some(Lexeme::Pipe) => {
+                    let length = delimit_lvalue(&lexemes[i..]);
+                    caps = parse_lvalue_list(&lexemes[i..i+length]);
+                    i += length;
+                    match lexemes.get(i) {
+                        Some(Lexeme::RightArrow) => {
+                            i += 1;
+                        }
+                        l => panic!("expected right arrow, got {:?}",l),
+                    }
+                }
+                l => panic!("expected -> or capture block: {:?}",l),
+            }
+            let (body,length) = parse_statement(&lexemes[i..]);
             (
-                Box::new(Statement::Return {
-                    e1,
+                Box::new(Statement::AssignFunction {
+                    name,
+                    args,
+                    caps,
+                    body,
                 }),
-                length,
+                i + length,
             )
         }
         NO_DECL => {
@@ -306,7 +403,6 @@ fn parse_statement(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
                 let assign = assign as usize;
                 let op = match lexemes.get(assign) {
                     Some(Lexeme::Assign) => Assign::Equal,
-                    Some(Lexeme::RightArrow) => Assign::Lazy,
                     Some(Lexeme::AssignOp(o)) => Assign::OpEqual(*o),
                     _ => panic!("illegal assignment"),
                 };
@@ -364,7 +460,10 @@ fn delimit_statement(lexemes: &[Lexeme]) -> (usize,i32) {
             }
             Some(Lexeme::Handle(_))
                 | Some(Lexeme::Number(_))
-                | Some(Lexeme::StringLiteral(_)) => {
+                | Some(Lexeme::Return)
+                | Some(Lexeme::BreakSeries(_))
+                | Some(Lexeme::StringLiteral(_))
+                | Some(Lexeme::Question) => {
                 complete = true;
                 i += 1;
             }
@@ -388,7 +487,7 @@ fn delimit_statement(lexemes: &[Lexeme]) -> (usize,i32) {
                     i += 1;
                 }
             }
-            Some(l) => panic!("unexpected lexeme: {:?}",l),
+            Some(l) => panic!("unexpected lexeme: {:?},{:?}",i,l),
         }
     }
 }
@@ -396,8 +495,35 @@ fn delimit_statement(lexemes: &[Lexeme]) -> (usize,i32) {
 fn delimit_lvalue(lexemes: &[Lexeme]) -> usize {
     let mut complete = false;
     let mut i = 0;
+    let starts_with_pipe = lexemes.get(0) == Some(&Lexeme::Pipe);
     loop {
         match lexemes.get(i) {
+            Some(Lexeme::Comma)
+                | Some(Lexeme::Semicolon)
+                | Some(Lexeme::NewLine)
+                | Some(Lexeme::RightArrow)
+                | Some(Lexeme::Assign)
+                | Some(Lexeme::AssignOp(_))
+                | Some(Lexeme::OScope)
+                | Some(Lexeme::As)
+                | Some(Lexeme::At)
+                | None => {
+                if complete {
+                    return i;
+                } else {
+                    panic!("unexpected end of lvalue");
+                }
+            }
+            Some(Lexeme::Pipe) => {
+                if starts_with_pipe {
+                    i += traverse_atom(&lexemes[i..]);
+                    return i;
+                } else if complete {
+                    return i;
+                } else {
+                    panic!("unexpected pipe in lvalue");
+                }
+            }
             Some(l) if OPENERS.contains(l) => {
                 i += traverse_atom(&lexemes[i..]);
                 complete = true;
@@ -415,25 +541,15 @@ fn delimit_lvalue(lexemes: &[Lexeme]) -> usize {
                 complete = true;
                 i += 1;
             }
-            Some(Lexeme::Comma)
-                | Some(Lexeme::Semicolon)
-                | Some(Lexeme::NewLine)
-                | None => {
+            Some(l) if CLOSERS.contains(l) => {
                 if complete {
                     return i;
                 } else {
                     panic!("unexpected end of lvalue");
                 }
             }
-            Some(l) if CLOSERS.contains(l) => {
-                if complete {
-                    return i;
-                } else {
-                    panic!("unexted end of lvalue");
-                }
-            }
-            Some(_) => {
-                panic!("unexpected term in lvalue");
+            Some(l) => {
+                panic!("unexpected term in lvalue: {:?}",l);
             }
         }
     }
@@ -450,13 +566,17 @@ fn delimit_rvalue(lexemes: &[Lexeme]) -> usize {
             }
             Some(Lexeme::BinaryOp(_))
                 | Some(Lexeme::UnaryOp(_))
+                | Some(Lexeme::Func)
+                | Some(Lexeme::RightArrow)
                 | Some(Lexeme::Dot) => {
                 complete = false;
                 i += 1;
             }
             Some(Lexeme::Handle(_))
                 | Some(Lexeme::Number(_))
-                | Some(Lexeme::StringLiteral(_)) => {
+                | Some(Lexeme::StringLiteral(_))
+                | Some(Lexeme::Return)
+                | Some(Lexeme::BreakSeries(_)) => {
                 complete = true;
                 i += 1;
             }
@@ -476,15 +596,17 @@ fn delimit_rvalue(lexemes: &[Lexeme]) -> usize {
                     panic!("unexpected end of rvalue");
                 }
             }
-            Some(Lexeme::NewLine) => {
+            Some(Lexeme::NewLine)
+                | Some(Lexeme::As)
+                | Some(Lexeme::At) => {
                 if complete {
                     return i;
                 } else {
                     i += 1;
                 }
             }
-            _ => {
-                panic!("unexpected character in rvalue");
+            l => {
+                panic!("unexpected character in rvalue: {:?}",l);
             }
         }
     }
@@ -498,6 +620,12 @@ fn parse_lvalue(lexemes: &[Lexeme]) -> (Box<LValue>,usize) {
 
 fn parse_lvalue_contained(lexemes: &[Lexeme]) -> Box<LValue> {
     let mut i = 0;
+    match lexemes.last() {
+        Some(Lexeme::Question) => {
+            return Box::new(LValue::Lazy(parse_lvalue_contained(&lexemes[..lexemes.len()-1])));
+        }
+        _ => {}
+    }
     let first = lexemes.get(0);
     match first {
         Some(Lexeme::Handle(s)) => {
@@ -506,17 +634,7 @@ fn parse_lvalue_contained(lexemes: &[Lexeme]) -> Box<LValue> {
                     Box::new(LValue::Discard)
                 }
                 _ => {
-                    if lexemes.len() == 2 {
-                        match lexemes.get(1) {
-                            Some(Lexeme::Question) => {
-                                let n = parse_lvalue_contained(&lexemes[0]);
-                                return Box::new(LValue::Lazy(n));
-                            }
-                            _ => {
-                                panic!("unexpected end of lvalue");
-                            }
-                        }
-                    } else if lexemes.len() > 1 {
+                    if lexemes.len() > 1 {
                         let lv = parse_rvalue_search(&lexemes,11);
                         return Box::new(LValue::Subset(lv));
                     } else {
@@ -590,7 +708,7 @@ fn parse_lvalue_list(lexemes: &[Lexeme]) -> Vec<LValue> {
         (Some(Lexeme::Pipe),Some(c)) if c != &Lexeme::Pipe => {
             panic!("expected pipe");
         }
-        (Some(c),_) if c != Lexeme::OList && c != Lexeme::OArgList && c != Lexeme::Pipe => {
+        (Some(c),_) if *c != Lexeme::OList && *c != Lexeme::OArgList && *c != Lexeme::Pipe => {
             panic!("expected one of (, [, |");
         }
         (_,_) => {}
@@ -604,6 +722,7 @@ fn parse_lvalue_list(lexemes: &[Lexeme]) -> Vec<LValue> {
         _ => {}
     }
     let mut i = 1;
+    let mut vec = Vec::new();
     while i < l {
         let (lv,length) = parse_lvalue(&lexemes[i..]);
         i += length;
@@ -620,6 +739,7 @@ fn parse_lvalue_list(lexemes: &[Lexeme]) -> Vec<LValue> {
             _ => panic!("invalid list structure"),
         }
     }
+    panic!("invalid list structure");
 }
 
 lazy_static! {
@@ -639,12 +759,13 @@ lazy_static! {
         BOP::ConcatUnit,
         BOP::Convert,
     ];
-    static ref OPENERS: [Lexeme; 5] = [
+    static ref OPENERS: [Lexeme; 6] = [
         Lexeme::OArgList,
         Lexeme::OScope,
         Lexeme::OMatrix,
         Lexeme::OUnit,
         Lexeme::OList,
+        Lexeme::OParen,
     ];
     static ref CLOSERS: [Lexeme; 3] = [
         Lexeme::CParen,
@@ -664,6 +785,65 @@ fn parse_rvalue_contained(lexemes: &[Lexeme]) -> Box<RValue> {
 
 fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
     let l = lexemes.len();
+    match lexemes.get(0) {
+        Some(Lexeme::Func) => {
+            let mut i = 1;
+            let name;
+            match lexemes.get(1) {
+                Some(Lexeme::Handle(s)) => {
+                    name = s.clone();
+                    i += 1;
+                }
+                _ => {
+                    name = String::from("");
+                }
+            }
+            let args;
+            match lexemes.get(i) {
+                Some(Lexeme::OArgList) => {
+                    let length = delimit_lvalue(&lexemes[i..]);
+                    args = parse_lvalue_list(&lexemes[i..i+length]);
+                    i += length;
+                }
+                _ => panic!("expected arg list"),
+            }
+            let caps;
+            match lexemes.get(i) {
+                Some(Lexeme::RightArrow) => {
+                    caps = Vec::new();
+                    i += 1;
+                }
+                Some(Lexeme::Pipe) => {
+                    let length = delimit_lvalue(&lexemes[i..]);
+                    caps = parse_lvalue_list(&lexemes[i..i+length]);
+                    i += length;
+                    match lexemes.get(i) {
+                        Some(Lexeme::RightArrow) => {
+                            i += 1;
+                        }
+                        _ => panic!("expected right arrow"),
+                    }
+                }
+                l => panic!("expected -> or capture block: {:?}",l),
+            }
+            let (body,length) = parse_statement(&lexemes[i..]);
+            if name.len() == 0 {
+                return Box::new(RValue::AnonFunction(
+                    args,
+                    caps,
+                    body,
+                ))
+            } else {
+                return Box::new(RValue::Function(
+                    name,
+                    args,
+                    caps,
+                    body,
+                ))
+            }
+        }
+        _ => {}
+    }
     if level < 9 {
         let mut i = 0;
         while i < l {
@@ -748,13 +928,13 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                             }
                             Some(Lexeme::OArgList)
                                 | Some(Lexeme::OList) => {
-                                let func = parse_rvalue_search(&lexemes[..i],11);
-                                let call = parse_rvalue_search(&lexemes[i..],11);
-                                return Box::new(RValue::Call(
-                                    func,
-                                    call,
-                                ));
-                            }
+                                    let func = parse_rvalue_search(&lexemes[..i],11);
+                                    let call = parse_rvalue_search(&lexemes[i..],11);
+                                    return Box::new(RValue::Call(
+                                        func,
+                                        call,
+                                    ));
+                                }
                             Some(_) => {
                                 i -= 1;
                             }
@@ -790,7 +970,13 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                 ))
             }
             Lexeme::OScope => {
-                unimplemented!();
+                let (scope,length) = parse_scope(lexemes);
+                if length != lexemes.len() {
+                    panic!("how why what: {} {}",length,lexemes.len());
+                }
+                return Box::new(
+                    RValue::Scope(scope)
+                )
             }
             Lexeme::Pipe => {
                 unimplemented!();
@@ -855,8 +1041,14 @@ fn parse_rvalue_search(lexemes: &[Lexeme], level: usize) -> Box<RValue> {
                     parse_list(&lexemes)
                 ))
             }
+            Lexeme::OParen => {
+                return parse_rvalue_contained(&lexemes[1..lexemes.len()-1]);
+            }
             _ => {}
         }
+    }
+    if level == 11 {
+        panic!("rvalue search reached level 12");
     }
     parse_rvalue_search(lexemes, level + 1)
 }
@@ -905,21 +1097,24 @@ fn parse_list(lexemes: &[Lexeme]) -> Vec<RValue> {
 
 fn traverse_atom(lexemes: &[Lexeme]) -> usize {
     let mut i = 0;
-    let mut level = 1;
+    let mut level = 0;
     let mut in_cap = false;
     loop {
-        i += 1;
         let lexeme = lexemes.get(i).unwrap();
         if OPENERS.contains(lexeme) {
             level += 1;
         } else if CLOSERS.contains(lexeme) {
             level -= 1;
-            if in_cap && level == 0 {
+            if !in_cap && level == 0 {
                 return i + 1;
             }
         } else if lexeme == &Lexeme::Pipe {
             in_cap = !in_cap;
+            if !in_cap && level == 0 {
+                return i + 1;
+            }
         }
+        i += 1;
     }
 }
 
@@ -934,7 +1129,7 @@ fn traverse_atom_reverse(lexemes: &[Lexeme]) -> usize {
             level += 1;
         } else if OPENERS.contains(lexeme) {
             level -= 1;
-            if in_cap && level == 0 {
+            if !in_cap && level == 0 {
                 return lexemes.len() - i - 1;
             }
         } else if lexeme == &Lexeme::Pipe {
