@@ -47,22 +47,8 @@ pub enum Control {
         condition: Box<RValue>,
         body: Box<Statement>,
     },
-    Print {
-        e1: Box<RValue>,
-    },
-    Return {
-        e1: Box<RValue>,
-    },
-    ReturnEmpty,
-    Break {
-        series: Vec<Break>,
-        e1: Box<RValue>
-    },
-    BreakEmpty {
-        series: Vec<Break>
-    },
-    Collapse {
-        name: Box<LValue>,
+    Loop {
+        body: Box<Statement>,
     },
     Empty,
 }
@@ -101,6 +87,23 @@ pub enum Statement {
         args: Vec<LValue>,
         caps: Vec<LValue>,
         body: Box<Statement>,
+    },
+    Print {
+        e1: Box<RValue>,
+    },
+    Return {
+        e1: Box<RValue>,
+    },
+    ReturnEmpty,
+    Break {
+        series: Vec<Break>,
+        e1: Box<RValue>
+    },
+    BreakEmpty {
+        series: Vec<Break>
+    },
+    Collapse {
+        name: Box<LValue>,
     },
 }
 
@@ -162,6 +165,7 @@ pub enum Lexeme {
     ElseIf,
     Else,
     While,
+    Loop,
     For,
     As,
     At,

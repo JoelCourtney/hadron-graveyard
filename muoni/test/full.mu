@@ -1,4 +1,4 @@
-var r = 4:6
+var r = 4:6; print 7
 var r2 = 0:2:30
 var a = (1,2) // basic matrix
 var b = (a, 3)[s] // (1, 2, 3)
@@ -43,7 +43,7 @@ var [x,y] = [1,2] // list decomposition
 a[1] // first element of a
 c[-1] = 7 // last element of c set to 7
 
-a[3] = 5
+a[3] = 5;
 a[4,5] = 3
 a[2:3,4:6] = 1
 a[a > 0] = 4 // matrix subset assignment
@@ -51,6 +51,16 @@ a[a > 0] = 4 // matrix subset assignment
 for 1:5 as i {
 	print i
 }
+
+var x = 10
+
+while x {
+	x -= (x-5)/2
+	print x
+}
+
+while x
+	5+6
 
 fn squareSum1(v) => {
 	n = norm(v)
@@ -90,4 +100,57 @@ fn lazyFunc(x?) => {
 	2*x
 	collapse x
 	<- 2*x
+}
+
+if x is 87 {
+	print "woo"
+}
+
+if y xor false {
+	asdf
+} else {
+	print "wut"
+}
+
+if y xor false; asdf else print "wut"
+
+if y xor false
+	asdf
+else
+	print "wut"
+
+if y xor false {
+	thing
+} elseif x isnt 5 {
+	another_thing
+} elseif third_cond is 3 {
+	print "hello"
+}
+
+if y xor false
+	thing
+elseif x isnt 5
+	another_thing
+elseif third_cond is 3
+	print "hello"
+
+if y xor false; thing elseif x isnt 5; another_thing elseif third_cond is 3; print "hello"
+
+if final_if_test {
+	print "yay"
+} else {
+	print "aw"
+}
+
+if final_if_test
+	print "yay"
+else
+	print "aw"
+
+val x? = |y| {
+	print y
+}
+
+|y| {
+	print y
 }

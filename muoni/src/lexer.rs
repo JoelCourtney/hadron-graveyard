@@ -111,6 +111,7 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 "as" => Lexeme::As,
                 "at" => Lexeme::At,
                 "while" => Lexeme::While,
+                "loop" => Lexeme::Loop,
                 "print" => Lexeme::Print,
                 "var" => Lexeme::Var,
                 "val" => Lexeme::Val,

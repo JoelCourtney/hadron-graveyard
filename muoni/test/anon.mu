@@ -1,10 +1,9 @@
-hello(x) -> {
-	this = isa + test
+fn hello(x) => {
+	val this = isa + test
 	<- test
 }
 
-world = _(x,y,z) -> {
-	this := is_a + _nother ^ test
-	<- this
-}
-
+val world = (fn (x,y,z) => {
+	val this = is_a + _nother ^ test
+	this
+})
