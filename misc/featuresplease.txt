@@ -21,23 +21,13 @@ Units:
 duh
 
 Cardinality:
-A = (1,2,5)
-#A // (3)
-B = (2,3; 4,5)
-#B // (2,3)
-
-Determinant:
-|A| = det(A)
-
-Norms:
-L2||a|| =
-	// L2 norm goes here
-default norm L2
+A = <1,2,5>
+#A // <3>
+B = <2,3; 4,5>
+#B // <2,3>
 
 Inner Products:
-dot<a, b>
-UserDefinedInnerProduct<a,b>
-User will be responsible for ensuring properties of norms and inner prods
+<a | b>
 
 Functions:
 function(a,b) -> {
@@ -48,8 +38,10 @@ function(a,b) -> {
 Equations:
 f(x,y) = x^2 / y
 g(x) = {
-	x^2 if x > 0
-	0 otherwise
+	if x < 0
+		<- 0
+	else
+		<- x^2
 }
 
 Algebra and calculus will only be considered if the function immediately evaluates without sideeffects. Piecewise is maybe. Accessing outside variables, or taking more than one step is not.

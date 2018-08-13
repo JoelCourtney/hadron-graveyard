@@ -1,33 +1,29 @@
-#! /usr/bin/env muoni
+val grain = 1 + 10000
 
-grain := 10000
-
-factorial(n) -> {
-	pieces = ()
-	for [grain:grain:n) at index as i {
+fn factorial(n) -> {
+	var pieces = ()
+	for grain:grain:n-1 at index as i {
 		print "Calculating piece: " + i
-		partial = 1
-		for (i-grain:1:i] as j {
+		var partial = 1
+		for i-grain+1:1:i as j {
 			partial *= j
 		}
 		pieces = (pieces,partial)
 	}
-	partial = 1
+	var partial = 1
 	print "Calculating piece: " + n
-	for (n - (n mod grain):1:n] as i {
+	for n - (n mod grain)+1:1:n as i {
 		partial *= i
 	}
 	pieces = (pieces,partial)
-	result = 1
-	count = 0
+	var result = 1
+	var count = 0
 	for pieces as piece {
 		print "Multiplying piece: " + count
-		count++
+		count += 1
 		result *= piece
 	}
-	<- result
+	result
+}
 
 print factorial(10)
-
-// Alternatively...
-print 10!

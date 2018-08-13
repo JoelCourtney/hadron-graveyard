@@ -1,0 +1,27 @@
+function(x,y,z) -> {
+	sutff herers
+}
+
+(x,y,z) -> {
+	asdf
+}
+
+x = {
+	stuff herees
+}
+
+y = (a,b,c) -> {
+	hello world
+}
+
+y(x) -> x^2
+
+x -> 5*6 // perfectly valid.
+x -> 4 * {
+	<- 5 + 6
+} // Also valid
+
+Arrow means lazy evaluation.
+every ArgList definition must be followed by an arrow.
+equal sign means eager evaluation
+if there is ever an arg list definition followed by =, it will throw if it is a named list. If not, it will evaluate the scope. If it is a vector of exactly that length, it will decompose the vector. If it cannot, error.
