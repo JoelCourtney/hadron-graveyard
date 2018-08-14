@@ -1,10 +1,8 @@
-use super::{OPENERS,CLOSERS,traverse,rvalue,lvalue};
+use super::{OPENERS,traverse,rvalue,lvalue};
 use ast::{Statement,Lexeme,Assign};
 
 pub fn parse(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
     let mut i = traverse::separators(lexemes);
-    let mut complete = false;
-    let mut level = 0;
     match lexemes.get(i) {
         Some(Lexeme::Var) | Some(Lexeme::Val) => {
             let tag = lexemes.get(i).unwrap();

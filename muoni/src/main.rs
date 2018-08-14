@@ -8,9 +8,9 @@ use std::fs::File;
 use std::io::prelude::*;
 
 mod ast;
-mod values;
 mod lexer;
 mod parser;
+mod interpreter;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -23,7 +23,12 @@ fn main() {
         .expect("error reading file");
 
     let lexemes = lexer::lex(code);
-    println!("{:?}",lexemes);
 
-    let asts = parser::parse(lexemes);
+    let controls = parser::parse(lexemes);
+
+    let mut test = ast::RValue::Number(5.);
+    let asdf = interpreter::value::Value::from(&test);
+    test = ast::RValue::Number(6.);
+    println!("{:?}",asdf);
+    println!("{:?}",test);
 }

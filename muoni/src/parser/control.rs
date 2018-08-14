@@ -189,6 +189,17 @@ pub fn parse(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                 i,
                 )
         }
+        Some(Lexeme::Loop) => {
+            i +=1;
+            let (body,length) = statement::parse(&lexemes[i..]);
+            i += length;
+            (
+                Box::new(Control::Loop {
+                    body,
+                }),
+                i,
+            )
+        }
         Some(_) => {
             let (statement,length) = statement::parse(&lexemes[i..]);
             i += length;

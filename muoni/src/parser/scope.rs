@@ -4,7 +4,7 @@ use super::control;
 pub fn parse(lexemes: &[Lexeme]) -> (Vec<Control>,usize) {
     let mut controls = Vec::new();
     let l = lexemes.len();
-    let mut i = 0;
+    let mut i;
     match lexemes.get(0) {
         Some(Lexeme::OScope) => {
             i = 1;

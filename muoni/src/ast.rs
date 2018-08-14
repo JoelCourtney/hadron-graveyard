@@ -1,6 +1,4 @@
-use super::values;
-
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone)]
 pub enum Control {
     State {
         statement: Box<Statement>,
@@ -53,7 +51,7 @@ pub enum Control {
     Empty,
 }
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone)]
 pub enum Statement {
     VarDecl {
         name: Box<LValue>,
@@ -107,13 +105,13 @@ pub enum Statement {
     },
 }
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone)]
 pub enum Assign {
     Equal,
     OpEqual(BOP),
 }
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone)]
 pub enum LValue {
     Name(String),
     Lazy(Box<LValue>),
@@ -123,7 +121,7 @@ pub enum LValue {
     Discard,
 }
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone)]
 pub enum RValue {
     Binary(BOP,Box<RValue>,Box<RValue>),
     Unary(UOP,Box<RValue>),
@@ -136,7 +134,6 @@ pub enum RValue {
     Matrix(Vec<Vec<RValue>>),
     ArgList(Vec<RValue>),
     Bool(bool),
-    Range(Box<RValue>,Box<RValue>,Box<RValue>),
     Unit(Box<RValue>),
     UnitTag(Box<RValue>,Box<RValue>),
     CaptureScope(Vec<LValue>,Vec<Control>),
@@ -161,6 +158,7 @@ pub enum Lexeme {
     Number(f64),
     Handle(String),
     StringLiteral(String),
+    Bool(bool),
     If,
     ElseIf,
     Else,

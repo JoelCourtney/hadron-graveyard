@@ -156,3 +156,6 @@ val x? = |y| {
 |y| {
 	print y
 }
+
+loop
+	print "hello world"

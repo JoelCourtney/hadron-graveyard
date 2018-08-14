@@ -24,6 +24,7 @@ pub fn delimit(lexemes: &[Lexeme]) -> usize {
             Some(Lexeme::Handle(_))
                 | Some(Lexeme::Number(_))
                 | Some(Lexeme::StringLiteral(_))
+                | Some(Lexeme::Bool(_))
                 | Some(Lexeme::Return)
                 | Some(Lexeme::BreakSeries(_)) => {
                     complete = true;
@@ -212,8 +213,6 @@ pub fn parse_atom(lexemes: &[Lexeme]) -> Box<RValue> {
         }
         Lexeme::Pipe => {
             let length = lvalue::delimit(lexemes);
-            println!("{:?}",lexemes);
-            println!("{},{:?}",length,lexemes.get(length));
             let caps = lvalue::parse_list(&lexemes[..length]);
             match lexemes.get(length) {
                 Some(Lexeme::OScope) => {
@@ -291,6 +290,9 @@ pub fn parse_atom(lexemes: &[Lexeme]) -> Box<RValue> {
         Lexeme::OParen => {
             return parse_contained(&lexemes[1..l-1]);
         }
+        Lexeme::Bool(b) => {
+            return Box::new(RValue::Bool(*b));
+        }
         _ => {
             panic!("unable to parse rvalue");
         }
@@ -299,7 +301,6 @@ pub fn parse_atom(lexemes: &[Lexeme]) -> Box<RValue> {
 }
 
 fn parse_function(lexemes: &[Lexeme]) -> Box<RValue> {
-    let l = lexemes.len();
     let mut i = 1;
     let name;
     match lexemes.get(1) {
@@ -340,6 +341,10 @@ fn parse_function(lexemes: &[Lexeme]) -> Box<RValue> {
         l => panic!("expected -> or capture block: {:?}",l),
     }
     let (body,length) = statement::parse(&lexemes[i..]);
+    i += length;
+    if i != lexemes.len() {
+        panic!("unexpected code after function: {},{}",i,lexemes.len());
+    }
     if name.len() == 0 {
         return Box::new(RValue::AnonFunction(
                 args,

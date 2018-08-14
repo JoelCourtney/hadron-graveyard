@@ -118,6 +118,8 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 "sym" => Lexeme::Sym,
                 "fn" => Lexeme::Func,
                 "collapse" => Lexeme::Collapse,
+                "true" => Lexeme::Bool(true),
+                "false" => Lexeme::Bool(false),
                 _ => Lexeme::Handle(String::from(string))
             }
         } else if c.is_numeric() {

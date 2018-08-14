@@ -5,7 +5,6 @@
 // parse_scope
 
 use ast::*;
-use values::*;
 
 mod traverse;
 mod rvalue;
@@ -20,13 +19,7 @@ pub fn parse(lexemes: Vec<Lexeme>) -> Vec<Control> {
     let mut i = 0;
     while i < l-1 {
         let (control,length) = control::parse(&lexemes[i..]);
-        match *control {
-            Control::Empty => {
-                println!("{},{}",i,l);
-            }
-            _ => {}
-        }
-        println!("{:?}",control);
+        //println!("{:?}",control);
         controls.push(*control);
         i += length;
     }
