@@ -44,11 +44,7 @@ lazy_static! {
         vec![BOP::Plus, BOP::Minus],
         vec![BOP::Times, BOP::ElemTimes, BOP::Divide, BOP::ElemDivide, BOP::Modulus],
         vec![BOP::Power, BOP::ElemPower],
-    ];
-    static ref REVERSE_PRECEDENCE: [BOP; 3] = [
-        BOP::StripUnit,
-        BOP::ConcatUnit,
-        BOP::Convert,
+        vec![BOP::StripUnit, BOP::ConcatUnit, BOP::Convert],
     ];
     static ref OPENERS: [Lexeme; 6] = [
         Lexeme::OArgList,

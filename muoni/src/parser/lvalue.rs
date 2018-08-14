@@ -86,7 +86,7 @@ pub fn parse_contained(lexemes: &[Lexeme]) -> Box<LValue> {
                 }
                 _ => {
                     if lexemes.len() > 1 {
-                        let lv = rvalue::parse_search(&lexemes,11);
+                        let lv = rvalue::parse_atom(&lexemes);
                         return Box::new(LValue::Subset(lv));
                     } else {
                         Box::new(LValue::Name(s.clone()))
