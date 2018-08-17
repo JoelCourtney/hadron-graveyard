@@ -16,7 +16,6 @@ mod lexer;
 mod parser;
 mod interpreter;
 
-use interpreter::value::{Number::*,Value::*,Unit};
 use interpreter::value;
 
 fn main() {
@@ -33,17 +32,6 @@ fn main() {
 
     let controls = parser::parse(lexemes);
 
-    let mut test = ast::RValue::Number(5.);
-    let asdf = value::Value::from(&test);
-    test = ast::RValue::Number(6.);
-    println!("{:?}",asdf);
+    let test = value::V::<_>::from(&ast::RValue::Bool(true));
     println!("{:?}",test);
-    let test2 = N(RI(i64::max_value()));
-    let test3 = N(RI(5));
-    let asdf2 = value::add(&test2,&test3);
-    println!("{:?}",test2);
-    println!("{:?}",test3);
-    println!("{:?}",asdf2);
-    println!("{:?}",value::add(&(N(RF(5.))),&asdf2));
-    println!("{:?}",na::DMatrix::from_element(2,3,5));
 }
