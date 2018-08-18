@@ -16,7 +16,7 @@ mod lexer;
 mod parser;
 mod interpreter;
 
-use interpreter::value;
+use interpreter::value::*;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -32,6 +32,8 @@ fn main() {
 
     let controls = parser::parse(lexemes);
 
-    let test = value::V::<_>::from(&ast::RValue::Bool(true));
-    println!("{:?}",test);
+    let test = V::from(&ast::RValue::Bool(true));
+    let test2 = V::new(String::from("asdf"));
+    println!("{:?}",test2+test);
+    println!("{:?}",V::new(true) + V::new(5));
 }

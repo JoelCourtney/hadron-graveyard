@@ -22,9 +22,51 @@ pub struct ValType {
     pub boolean: bool,
 }
 
+#[derive(Debug,PartialEq,Copy,Clone)]
+pub enum ValEnum {
+    L,
+    S,
+    B,
+    Z,
+    RI,
+    RF,
+    RB,
+    RM,
+    CI,
+    CF,
+    CB,
+    CM,
+}
+
 impl ValType {
-    pub fn add_priority(&self, o: ValType) {
-        unimplemented!();
+    pub fn add_type(&self, with: ValType) -> ValEnum {
+        if self.list || with.list {
+            ValEnum::L
+        } else if self.string || with.string {
+            ValEnum::S
+        } else if self.complex || with.complex {
+            if self.matrix.0 || with.matrix.0 {
+                ValEnum::CM
+            } else {
+                match (self.precision,with.precision) {
+                    (Precision::Float,_) | (_,Precision::Float) => ValEnum::CF,
+                    (Precision::Big,_) | (_,Precision::Big) => ValEnum::CB,
+                    _ => ValEnum::CI,
+                }
+            }
+        } else if !self.boolean && !with.boolean {
+            if self.matrix.0 || with.matrix.0 {
+                ValEnum::RM
+            } else {
+                match (self.precision,with.precision) {
+                    (Precision::Float,_) | (_,Precision::Float) => ValEnum::RF,
+                    (Precision::Big,_) | (_,Precision::Big) => ValEnum::RB,
+                    _ => ValEnum::RI,
+                }
+            }
+        } else {
+            ValEnum::RI
+        }
     }
 }
 
@@ -58,10 +100,10 @@ impl Calc for i64 {
         }
     }
 
-    fn add_mat_real(&self, o: f64) -> DMatrix<f64> {
+    fn add_mat_real(&self, __o: f64) -> DMatrix<f64> {
         panic!("unable to do matrix add on ri");
     }
-    fn add_mat_comp(&self, o: Complex64) -> DMatrix<Complex64> {
+    fn add_mat_comp(&self, __o: Complex64) -> DMatrix<Complex64> {
         panic!("unable to do matrix add on ri");
     }
 
@@ -109,10 +151,10 @@ impl Calc for f64 {
         }
     }
 
-    fn add_mat_real(&self, o: f64) -> DMatrix<f64> {
+    fn add_mat_real(&self, __o: f64) -> DMatrix<f64> {
         panic!("unable to do matrix add on rf");
     }
-    fn add_mat_comp(&self, o: Complex64) -> DMatrix<Complex64> {
+    fn add_mat_comp(&self, __o: Complex64) -> DMatrix<Complex64> {
         panic!("unable to do matrix add on rf");
     }
 
@@ -160,10 +202,10 @@ impl Calc for BigInt {
         }
     }
 
-    fn add_mat_real(&self, o: f64) -> DMatrix<f64> {
+    fn add_mat_real(&self, __o: f64) -> DMatrix<f64> {
         panic!("unable to do matrix add on rb");
     }
-    fn add_mat_comp(&self, o: Complex64) -> DMatrix<Complex64> {
+    fn add_mat_comp(&self, __o: Complex64) -> DMatrix<Complex64> {
         panic!("unable to do matrix add on rb");
     }
 
@@ -287,10 +329,10 @@ impl Calc for Complex<i64> {
         }
     }
 
-    fn add_mat_real(&self, o: f64) -> DMatrix<f64> {
+    fn add_mat_real(&self, _o: f64) -> DMatrix<f64> {
         panic!("unable to do matrix add on ci");
     }
-    fn add_mat_comp(&self, o: Complex64) -> DMatrix<Complex64> {
+    fn add_mat_comp(&self, _o: Complex64) -> DMatrix<Complex64> {
         panic!("unable to do matrix add on ci");
     }
 
@@ -354,10 +396,10 @@ impl Calc for Complex64 {
         }
     }
 
-    fn add_mat_real(&self, o: f64) -> DMatrix<f64> {
+    fn add_mat_real(&self, _o: f64) -> DMatrix<f64> {
         panic!("unable to do matrix add on cf");
     }
-    fn add_mat_comp(&self, o: Complex64) -> DMatrix<Complex64> {
+    fn add_mat_comp(&self, _o: Complex64) -> DMatrix<Complex64> {
         panic!("unable to do matrix add on cf");
     }
 
@@ -421,10 +463,10 @@ impl Calc for Complex<BigInt> {
         }
     }
 
-    fn add_mat_real(&self, o: f64) -> DMatrix<f64> {
+    fn add_mat_real(&self, _o: f64) -> DMatrix<f64> {
         panic!("unable to do matrix add on cb");
     }
-    fn add_mat_comp(&self, o: Complex64) -> DMatrix<Complex64> {
+    fn add_mat_comp(&self, _o: Complex64) -> DMatrix<Complex64> {
         panic!("unable to do matrix add on cb");
     }
 
@@ -585,10 +627,10 @@ impl Calc for String {
         }
     }
     
-    fn add_mat_real(&self, o: f64) -> DMatrix<f64> {
+    fn add_mat_real(&self, _o: f64) -> DMatrix<f64> {
         panic!("realy");
     }
-    fn add_mat_comp(&self, o: Complex64) -> DMatrix<Complex64> {
+    fn add_mat_comp(&self, _o: Complex64) -> DMatrix<Complex64> {
         panic!("nah man")
     }
 
@@ -636,10 +678,10 @@ impl Calc for bool {
         }
     }
 
-    fn add_mat_real(&self, o: f64) -> DMatrix<f64> {
+    fn add_mat_real(&self, _o: f64) -> DMatrix<f64> {
         panic!("nop");
     }
-    fn add_mat_comp(&self, o: Complex64) -> DMatrix<Complex64> {
+    fn add_mat_comp(&self, _o: Complex64) -> DMatrix<Complex64> {
         panic!("howd you even manage to call this")
     }
 

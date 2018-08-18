@@ -7,32 +7,25 @@ use num_traits::{ToPrimitive,Zero};
 mod calc;
 use self::calc::*;
 
-pub fn from<'a>(rv: &'a RValue) -> V<Box<Calc>> {
-    match rv {
-        RValue::Number(f) if f % 1. == 0. => {
-            RI::new(*f as i64)
-        }
-        RValue::Number(f) => {
-            RF::new(*f)
-        }
-        RValue::StringLiteral(s) => {
-            S::new(s.clone())
-        }
-        RValue::Bool(b) => {
-            B::new(*b)
-        }
-        _ => panic!("i wasn't ready yet"),
-    }
-}
+#[derive(Debug,Copy,Clone,PartialEq)]
+pub struct Val<T>(T);
 
-#[derive(Debug,Copy,Clone)]
-pub struct V<T>(T);
+pub type RI = Val<i64>;
+pub type RF = Val<f64>;
+pub type RB = Val<BigInt>;
+pub type RM = Val<DMatrix<f64>>;
+pub type CI = Val<Complex<i64>>;
+pub type CF = Val<Complex64>;
+pub type CM = Val<DMatrix<Complex64>>;
+pub type S = Val<String>;
+pub type B = Val<bool>;
+pub type V = Val<Box<Calc>>;
 
-impl<T> V<T> {
+impl<T> Val<T> {
     fn unwrap(self) -> T {
         self.0
     }
-    pub fn from<'a>(rv: &'a RValue) -> V<Box<Calc>> {
+    pub fn from<'a>(rv: &'a RValue) -> Val<Box<Calc>> {
         match rv {
             RValue::Number(f) if f % 1. == 0. => {
                 RI::new(*f as i64)
@@ -49,42 +42,55 @@ impl<T> V<T> {
             _ => panic!("i wasn't ready yet"),
         }
     }
-    pub fn new<T1: Calc+'static>(n: T1) -> V<Box<Calc>> {
+    pub fn new<T1: Calc+'static>(n: T1) -> Val<Box<Calc>> {
         let result: Box<Calc> = Box::new(n);
-        V(result)
+        Val(result)
     }
 }
 
 use std::ops::Add;
-impl Add<V<Box<Calc>>> for V<Box<Calc>> {
-    type Output = V<Box<Calc>>;
+impl Add<Val<Box<Calc>>> for Val<Box<Calc>> {
+    type Output = Val<Box<Calc>>;
 
-    fn add(self, other: V<Box<Calc>>) -> Self::Output {
+    fn add(self, with: Val<Box<Calc>>) -> Self::Output {
         let v1 = self.unwrap();
-        let v2 = other.unwrap();
+        let v2 = with.unwrap();
         let t1 = v1.type_of();
         let t2 = v2.type_of();
-        if t1.list {
-            unimplemented!();
+        match t1.add_type(t2) {
+            ValEnum::L => {
+                unimplemented!();
+            }
+            ValEnum::S => {
+                return V::new(v1.to_str() + &v2.to_str());
+            }
+            ValEnum::B => {
+                panic!("cannot add booleans")
+            }
+            ValEnum::RI => {
+                return V::new(v1.to_ri() + v2.to_ri());
+            }
+            ValEnum::RF => {
+                return V::new(v1.to_rf() + v2.to_rf());
+            }
+            ValEnum::RB => {
+                return V::new(v1.to_rb() + v2.to_rb());
+            }
+            ValEnum::CI => {
+                return V::new(v1.to_ci() + v2.to_ci());
+            }
+            ValEnum::CF => {
+                return V::new(v1.to_cf() + v2.to_cf());
+            }
+            ValEnum::CB => {
+                return V::new(v1.to_cb() + v2.to_cb());
+            }
+            _ => unimplemented!(),
         }
-        if t1.string || t2.string {
-            return S::new(v1.to_str() + &v2.to_str());
-        }
-
         unimplemented!()
     }
 }
 
-
-type RI = V<i64>;
-type RF = V<f64>;
-type RB = V<BigInt>;
-type RM = V<DMatrix<f64>>;
-type CI = V<Complex<i64>>;
-type CF = V<Complex64>;
-type CM = V<DMatrix<Complex64>>;
-type S = V<String>;
-pub type B = V<bool>;
 
 use std::fmt::{Debug,Formatter,Display,Result};
 
