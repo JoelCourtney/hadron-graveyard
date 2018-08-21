@@ -9,8 +9,8 @@ pub fn eval(rv: &RValue) -> V {
             let e1 = eval(r1);
             let e2 = eval(r2);
             match bop {
-                BOP::Plus => e1 + e2,
-                BOP::Minus => e1 - e2,
+                BOP::Plus => e1.add(&e2),
+                BOP::Minus => e1.sub(&e2),
                 _ => unimplemented!(),
             }
         }

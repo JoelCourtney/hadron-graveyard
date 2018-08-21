@@ -22,8 +22,8 @@ type B = Val<bool>;
 pub type V = Val<Box<Calc>>;
 
 impl<T> Val<T> {
-    fn unwrap(self) -> T {
-        self.0
+    fn unwrap(&self) -> &T {
+        &self.0
     }
     pub fn from<'a>(rv: &'a RValue) -> V {
         match rv {
@@ -48,11 +48,8 @@ impl<T> Val<T> {
     }
 }
 
-use std::ops::{Add,Sub};
-impl Add<V> for V {
-    type Output = V;
-
-    fn add(self, with: V) -> Self::Output {
+impl V {
+    pub fn add(&self, with: &V) -> V {
         let v1 = self.unwrap();
         let v2 = with.unwrap();
         let t1 = v1.type_of();
@@ -89,12 +86,7 @@ impl Add<V> for V {
         }
         unimplemented!()
     }
-}
-
-impl Sub<V> for V {
-    type Output = V;
-
-    fn sub(self, with: V) -> Self::Output {
+    pub fn sub(&self, with: &V) -> V {
         let v1 = self.unwrap();
         let v2 = with.unwrap();
         let t1 = v1.type_of();
@@ -143,6 +135,6 @@ impl Debug for Calc {
 
 impl Display for Calc {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f,"{}",5)
+        write!(f,"{}",self.to_str())
     }
 }

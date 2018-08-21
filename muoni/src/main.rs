@@ -34,6 +34,7 @@ fn main() {
 
     let test = V::from(&ast::RValue::Bool(true));
     let test2 = V::new(String::from("asdf"));
-    println!("{:?}",test2+test);
-    println!("{:?}",V::new(true) - V::new(5));
+    println!("{:?}",test2.add(&test));
+    let test3 = test2.add(&test);
+    println!("{:?}",V::new(true).sub(&V::new(5)));
 }
