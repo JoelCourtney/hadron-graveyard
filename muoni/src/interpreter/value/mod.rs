@@ -10,22 +10,22 @@ use self::calc::*;
 #[derive(Debug,Copy,Clone,PartialEq)]
 pub struct Val<T>(T);
 
-pub type RI = Val<i64>;
-pub type RF = Val<f64>;
-pub type RB = Val<BigInt>;
-pub type RM = Val<DMatrix<f64>>;
-pub type CI = Val<Complex<i64>>;
-pub type CF = Val<Complex64>;
-pub type CM = Val<DMatrix<Complex64>>;
-pub type S = Val<String>;
-pub type B = Val<bool>;
+type RI = Val<i64>;
+type RF = Val<f64>;
+type RB = Val<BigInt>;
+type RM = Val<DMatrix<f64>>;
+type CI = Val<Complex<i64>>;
+type CF = Val<Complex64>;
+type CM = Val<DMatrix<Complex64>>;
+type S = Val<String>;
+type B = Val<bool>;
 pub type V = Val<Box<Calc>>;
 
 impl<T> Val<T> {
     fn unwrap(self) -> T {
         self.0
     }
-    pub fn from<'a>(rv: &'a RValue) -> Val<Box<Calc>> {
+    pub fn from<'a>(rv: &'a RValue) -> V {
         match rv {
             RValue::Number(f) if f % 1. == 0. => {
                 RI::new(*f as i64)
@@ -42,17 +42,17 @@ impl<T> Val<T> {
             _ => panic!("i wasn't ready yet"),
         }
     }
-    pub fn new<T1: Calc+'static>(n: T1) -> Val<Box<Calc>> {
+    pub fn new<T1: Calc+'static>(n: T1) -> V {
         let result: Box<Calc> = Box::new(n);
         Val(result)
     }
 }
 
-use std::ops::Add;
-impl Add<Val<Box<Calc>>> for Val<Box<Calc>> {
-    type Output = Val<Box<Calc>>;
+use std::ops::{Add,Sub};
+impl Add<V> for V {
+    type Output = V;
 
-    fn add(self, with: Val<Box<Calc>>) -> Self::Output {
+    fn add(self, with: V) -> Self::Output {
         let v1 = self.unwrap();
         let v2 = with.unwrap();
         let t1 = v1.type_of();
@@ -91,6 +91,47 @@ impl Add<Val<Box<Calc>>> for Val<Box<Calc>> {
     }
 }
 
+impl Sub<V> for V {
+    type Output = V;
+
+    fn sub(self, with: V) -> Self::Output {
+        let v1 = self.unwrap();
+        let v2 = with.unwrap();
+        let t1 = v1.type_of();
+        let t2 = v2.type_of();
+        match t1.sub_type(t2) {
+            ValEnum::L => {
+                unimplemented!();
+            }
+            ValEnum::S => {
+                panic!("cannot subtract strings");
+            }
+            ValEnum::B => {
+                panic!("cannot subtract booleans");
+            }
+            ValEnum::RI => {
+                return V::new(v1.to_ri() - v2.to_ri());
+            }
+            ValEnum::RF => {
+                return V::new(v1.to_rf() - v2.to_rf());
+            }
+            ValEnum::RB => {
+                return V::new(v1.to_rb() - v2.to_rb());
+            }
+            ValEnum::CI => {
+                return V::new(v1.to_ci() - v2.to_ci());
+            }
+            ValEnum::CF => {
+                return V::new(v1.to_cf() - v2.to_cf());
+            }
+            ValEnum::CB => {
+                return V::new(v1.to_cb() - v2.to_cb());
+            }
+            _ => unimplemented!(),
+        }
+        unimplemented!()
+    }
+}
 
 use std::fmt::{Debug,Formatter,Display,Result};
 

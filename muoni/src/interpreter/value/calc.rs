@@ -68,6 +68,36 @@ impl ValType {
             ValEnum::RI
         }
     }
+    
+    pub fn sub_type(&self, with: ValType) -> ValEnum {
+        if self.list || with.list {
+            panic!("cannot subtract by or from a list");
+        } else if self.string || with.string {
+            panic!("cannot subtract by or from a string");
+        } else if self.complex || with.complex {
+            if self.matrix.0 || with.matrix.0 {
+                ValEnum::CM
+            } else {
+                match (self.precision,with.precision) {
+                    (Precision::Float,_) | (_,Precision::Float) => ValEnum::CF,
+                    (Precision::Big,_) | (_,Precision::Big) => ValEnum::CB,
+                    _ => ValEnum::CI,
+                }
+            }
+        } else if !self.boolean && !with.boolean {
+            if self.matrix.0 || with.matrix.0 {
+                ValEnum::RM
+            } else {
+                match (self.precision,with.precision) {
+                    (Precision::Float,_) | (_,Precision::Float) => ValEnum::RF,
+                    (Precision::Big,_) | (_,Precision::Big) => ValEnum::RB,
+                    _ => ValEnum::RI,
+                }
+            }
+        } else {
+            ValEnum::RI
+        }
+    }
 }
 
 pub trait Calc {
