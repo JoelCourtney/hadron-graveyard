@@ -17,6 +17,7 @@ mod parser;
 mod interpreter;
 
 use interpreter::value::*;
+use interpreter::value::unit::*;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -37,4 +38,8 @@ fn main() {
     println!("{:?}",test2.add(&test));
     let test3 = test2.add(&test);
     println!("{:?}",V::new(true).sub(&V::new(5)));
+
+    let test = V::new(UV::from(5));
+    println!("{:?}",test);
+    println!("{:?}",V::new(V::new(true).sub(&V::new(5)).unwrap().to_uci()));
 }

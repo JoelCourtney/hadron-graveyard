@@ -5,39 +5,34 @@ use ni::{BigInt,ToBigInt};
 use num_traits::{ToPrimitive,Zero};
 
 mod calc;
+pub mod unit;
 use self::calc::*;
+use self::unit::*;
 
 #[derive(Debug,Copy,Clone,PartialEq)]
 pub struct Val<T>(T);
 
-type RI = Val<i64>;
-type RF = Val<f64>;
-type RB = Val<BigInt>;
-type RM = Val<DMatrix<f64>>;
-type CI = Val<Complex<i64>>;
-type CF = Val<Complex64>;
-type CM = Val<DMatrix<Complex64>>;
-type S = Val<String>;
-type B = Val<bool>;
 pub type V = Val<Box<Calc>>;
 
+pub struct Null;
+
 impl<T> Val<T> {
-    fn unwrap(&self) -> &T {
+    pub fn unwrap(&self) -> &T {
         &self.0
     }
     pub fn from<'a>(rv: &'a RValue) -> V {
         match rv {
             RValue::Number(f) if f % 1. == 0. => {
-                RI::new(*f as i64)
+                V::new(*f as i64)
             }
             RValue::Number(f) => {
-                RF::new(*f)
+                V::new(*f)
             }
             RValue::StringLiteral(s) => {
-                S::new(s.clone())
+                V::new(s.clone())
             }
             RValue::Bool(b) => {
-                B::new(*b)
+                V::new(*b)
             }
             _ => panic!("i wasn't ready yet"),
         }
@@ -122,6 +117,23 @@ impl V {
             _ => unimplemented!(),
         }
         unimplemented!()
+    }
+    pub fn eq(&self, with: &V) -> bool {
+        let v1 = self.unwrap();
+        let v2 = with.unwrap();
+        let t = v1.type_of().eq_type(v2.type_of());
+        match t {
+            ValEnum::L => unimplemented!(),
+            ValEnum::S => v1.to_str() == v2.to_str(),
+            ValEnum::B => v1.to_bool() == v2.to_bool(),
+            ValEnum::Z => unimplemented!(),
+            ValEnum::N => true,
+            ValEnum::RI => v1.to_ri() == v2.to_ri(),
+            ValEnum::RF => v1.to_rf() == v2.to_rf(),
+            ValEnum::RB => v1.to_rb() == v2.to_rb(),
+            ValEnum::RM => v1.to_rm() == v2.to_rm(),
+            _ => false,
+        }
     }
 }
 

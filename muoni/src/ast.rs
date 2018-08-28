@@ -227,4 +227,5 @@ pub enum UOP {
 pub enum Break {
     Dash,
     Tilde,
+    Equal,
 }

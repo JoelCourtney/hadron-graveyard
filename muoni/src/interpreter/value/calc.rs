@@ -3,6 +3,8 @@ use na::*;
 use nc::{Complex,Complex64};
 use ni::{BigInt,ToBigInt};
 use num_traits::{ToPrimitive,Zero};
+use super::unit::{UV,U};
+use super::Null;
 
 #[derive(Debug,PartialEq,Copy,Clone)]
 pub enum Precision {
@@ -20,6 +22,8 @@ pub struct ValType {
     pub matrix: (bool,usize),
     pub precision: Precision,
     pub boolean: bool,
+    pub unitless: bool,
+    pub null: bool,
 }
 
 #[derive(Debug,PartialEq,Copy,Clone)]
@@ -36,6 +40,8 @@ pub enum ValEnum {
     CF,
     CB,
     CM,
+    N,
+    None,
 }
 
 impl ValType {
@@ -98,13 +104,27 @@ impl ValType {
             ValEnum::RI
         }
     }
+    pub fn eq_type(&self, with: ValType) -> ValEnum {
+        if *self != with {
+            ValEnum::None
+        } else {
+            if self.list {
+                ValEnum::L
+            } else if self.string {
+                ValEnum::S
+            } else if self.boolean {
+                ValEnum::B
+            } else if self.null {
+                ValEnum::N
+            } else {
+                unimplemented!();
+            }
+        }
+    }
 }
 
 pub trait Calc {
     fn type_of(&self) -> ValType;
-
-    fn add_mat_real(&self, f64) -> DMatrix<f64>;
-    fn add_mat_comp(&self, Complex64) -> DMatrix<Complex64>;
 
     fn to_ri(&self) -> i64;
     fn to_rf(&self) -> f64;
@@ -114,6 +134,16 @@ pub trait Calc {
     fn to_cf(&self) -> Complex64;
     fn to_cb(&self) -> Complex<BigInt>;
     fn to_cm(&self) -> DMatrix<Complex64>;
+
+    fn to_uri(&self) -> UV<i64>;
+    fn to_urf(&self) -> UV<f64>;
+    fn to_urb(&self) -> UV<BigInt>;
+    fn to_urm(&self) -> UV<DMatrix<f64>>;
+    fn to_uci(&self) -> UV<Complex<i64>>;
+    fn to_ucf(&self) -> UV<Complex64>;
+    fn to_ucb(&self) -> UV<Complex<BigInt>>;
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>>;
+
     fn to_str(&self) -> String;
     fn to_bool(&self) -> bool;
 }
@@ -127,14 +157,9 @@ impl Calc for i64 {
             matrix: (false,0),
             precision: Precision::Int,
             boolean: false,
+            unitless: true,
+            null: false,
         }
-    }
-
-    fn add_mat_real(&self, __o: f64) -> DMatrix<f64> {
-        panic!("unable to do matrix add on ri");
-    }
-    fn add_mat_comp(&self, __o: Complex64) -> DMatrix<Complex64> {
-        panic!("unable to do matrix add on ri");
     }
 
     fn to_ri(&self) -> i64 {
@@ -161,6 +186,32 @@ impl Calc for i64 {
     fn to_cm(&self) -> DMatrix<Complex64> {
         DMatrix::from_element(1,1,Complex::from(*self as f64))
     }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV::from(self.clone())
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV::from(self.to_rf())
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV::from(self.to_rb())
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV::from(self.to_rm())
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV::from(self.to_ci())
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV::from(self.to_cf())
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV::from(self.to_cb())
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV::from(self.to_cm())
+    }
+
     fn to_str(&self) -> String {
         self.to_string()
     }
@@ -178,14 +229,9 @@ impl Calc for f64 {
             matrix: (false,0),
             precision: Precision::Float,
             boolean: false,
+            unitless: true,
+            null: false,
         }
-    }
-
-    fn add_mat_real(&self, __o: f64) -> DMatrix<f64> {
-        panic!("unable to do matrix add on rf");
-    }
-    fn add_mat_comp(&self, __o: Complex64) -> DMatrix<Complex64> {
-        panic!("unable to do matrix add on rf");
     }
 
     fn to_ri(&self) -> i64 {
@@ -212,6 +258,32 @@ impl Calc for f64 {
     fn to_cm(&self) -> DMatrix<Complex64> {
         DMatrix::from_element(1,1,Complex::from(*self))
     }
+    fn to_uri(&self) -> UV<i64> {
+        UV::from(self.to_ri())
+    }
+
+    fn to_urf(&self) -> UV<f64> {
+        UV::from(self.clone())
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV::from(self.to_rb())
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV::from(self.to_rm())
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV::from(self.to_ci())
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV::from(self.to_cf())
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV::from(self.to_cm())
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV::from(self.to_cb())
+    }
+
     fn to_str(&self) -> String {
         self.to_string()
     }
@@ -229,16 +301,10 @@ impl Calc for BigInt {
             matrix: (false, 0),
             precision: Precision::Big,
             boolean: false,
+            unitless: true,
+            null: false,
         }
     }
-
-    fn add_mat_real(&self, __o: f64) -> DMatrix<f64> {
-        panic!("unable to do matrix add on rb");
-    }
-    fn add_mat_comp(&self, __o: Complex64) -> DMatrix<Complex64> {
-        panic!("unable to do matrix add on rb");
-    }
-
 
     fn to_ri(&self) -> i64 {
         self.to_i64().unwrap()
@@ -264,6 +330,32 @@ impl Calc for BigInt {
     fn to_cm(&self) -> DMatrix<Complex64> {
         DMatrix::from_element(1,1,Complex::from(self.to_f64().unwrap()))
     }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV::from(self.to_ri())
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV::from(self.to_rf())
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV::from(self.clone())
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV::from(self.to_rm())
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV::from(self.to_ci())
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV::from(self.to_cf())
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV::from(self.to_cb())
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV::from(self.to_cm())
+    }
+
     fn to_str(&self) -> String {
         self.to_string()
     }
@@ -281,14 +373,9 @@ impl Calc for DMatrix<f64> {
             matrix: (true,self.len()),
             precision: Precision::Float,
             boolean: false,
+            unitless: true,
+            null: false,
         }
-    }
-
-    fn add_mat_real(&self, o: f64) -> DMatrix<f64> {
-        self.add_scalar(o)
-    }
-    fn add_mat_comp(&self, o: Complex64) -> DMatrix<Complex64> {
-        self.to_cm().add_scalar(o)
     }
 
     fn to_ri(&self) -> i64 {
@@ -339,6 +426,32 @@ impl Calc for DMatrix<f64> {
     fn to_cm(&self) -> DMatrix<Complex64> {
         self.map(|n| Complex::from(n))
     }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV::from(self.to_ri())
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV::from(self.to_rf())
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV::from(self.to_rb())
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV::from(self.clone())
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV::from(self.to_ci())
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV::from(self.to_cf())
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV::from(self.to_cb())
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV::from(self.to_cm())
+    }
+
     fn to_str(&self) -> String {
         self.to_string()
     }
@@ -356,14 +469,9 @@ impl Calc for Complex<i64> {
             matrix: (false,0),
             precision: Precision::Int,
             boolean: false,
+            unitless: true,
+            null: false,
         }
-    }
-
-    fn add_mat_real(&self, _o: f64) -> DMatrix<f64> {
-        panic!("unable to do matrix add on ci");
-    }
-    fn add_mat_comp(&self, _o: Complex64) -> DMatrix<Complex64> {
-        panic!("unable to do matrix add on ci");
     }
 
     fn to_ri(&self) -> i64 {
@@ -406,6 +514,32 @@ impl Calc for Complex<i64> {
     fn to_cm(&self) -> DMatrix<Complex64> {
         DMatrix::from_element(1,1,self.to_cf())
     }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV::from(self.to_ri())
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV::from(self.to_rf())
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV::from(self.to_rb())
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV::from(self.to_rm())
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV::from(self.clone())
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV::from(self.to_cf())
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV::from(self.to_cb())
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV::from(self.to_cm())
+    }
+
     fn to_str(&self) -> String {
         self.to_string()
     }
@@ -423,14 +557,9 @@ impl Calc for Complex64 {
             matrix: (false,0),
             precision: Precision::Float,
             boolean: false,
+            unitless: true,
+            null: false,
         }
-    }
-
-    fn add_mat_real(&self, _o: f64) -> DMatrix<f64> {
-        panic!("unable to do matrix add on cf");
-    }
-    fn add_mat_comp(&self, _o: Complex64) -> DMatrix<Complex64> {
-        panic!("unable to do matrix add on cf");
     }
 
     fn to_ri(&self) -> i64 {
@@ -473,6 +602,32 @@ impl Calc for Complex64 {
     fn to_cm(&self) -> DMatrix<Complex64> {
         DMatrix::from_element(1,1,*self)
     }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV::from(self.to_ri())
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV::from(self.to_rf())
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV::from(self.to_rb())
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV::from(self.to_rm())
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV::from(self.to_ci())
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV::from(self.clone())
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV::from(self.to_cb())
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV::from(self.to_cm())
+    }
+
     fn to_str(&self) -> String {
         self.to_string()
     }
@@ -490,16 +645,10 @@ impl Calc for Complex<BigInt> {
             matrix: (false, 0),
             precision: Precision::Big,
             boolean: false,
+            unitless: true,
+            null: false,
         }
     }
-
-    fn add_mat_real(&self, _o: f64) -> DMatrix<f64> {
-        panic!("unable to do matrix add on cb");
-    }
-    fn add_mat_comp(&self, _o: Complex64) -> DMatrix<Complex64> {
-        panic!("unable to do matrix add on cb");
-    }
-
 
     fn to_ri(&self) -> i64 {
         if self.im.is_zero() {
@@ -541,6 +690,32 @@ impl Calc for Complex<BigInt> {
     fn to_cm(&self) -> DMatrix<Complex64> {
         DMatrix::from_element(1,1,self.to_cf())
     }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV::from(self.to_ri())
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV::from(self.to_rf())
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV::from(self.to_rb())
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV::from(self.to_rm())
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV::from(self.to_ci())
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV::from(self.to_cf())
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV::from(self.clone())
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV::from(self.to_cm())
+    }
+
     fn to_str(&self) -> String {
         self.to_string()
     }
@@ -558,14 +733,9 @@ impl Calc for DMatrix<Complex64> {
             matrix: (true,self.len()),
             precision: Precision::Float,
             boolean: false,
+            unitless: true,
+            null: false,
         }
-    }
-
-    fn add_mat_real(&self, o: f64) -> DMatrix<f64> {
-        self.to_rm().add_scalar(o)
-    }
-    fn add_mat_comp(&self, o: Complex64) -> DMatrix<Complex64> {
-        self.add_scalar(o)
     }
 
     fn to_ri(&self) -> i64 {
@@ -637,6 +807,32 @@ impl Calc for DMatrix<Complex64> {
     fn to_cm(&self) -> DMatrix<Complex64> {
         self.clone()
     }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV::from(self.to_ri())
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV::from(self.to_rf())
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV::from(self.to_rb())
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV::from(self.to_rm())
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV::from(self.to_ci())
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV::from(self.to_cf())
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV::from(self.to_cb())
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV::from(self.clone())
+    }
+
     fn to_str(&self) -> String {
         self.to_string()
     }
@@ -654,16 +850,11 @@ impl Calc for String {
             matrix: (false,0),
             precision: Precision::None,
             boolean: false,
+            unitless: true,
+            null: false,
         }
     }
     
-    fn add_mat_real(&self, _o: f64) -> DMatrix<f64> {
-        panic!("realy");
-    }
-    fn add_mat_comp(&self, _o: Complex64) -> DMatrix<Complex64> {
-        panic!("nah man")
-    }
-
     fn to_ri(&self) -> i64 {
         self.parse::<i64>().unwrap()
     }
@@ -688,6 +879,32 @@ impl Calc for String {
     fn to_cm(&self) -> DMatrix<Complex64> {
         panic!("not till we got an interpreter")
     }
+
+    fn to_uri(&self) -> UV<i64> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_urf(&self) -> UV<f64> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        panic!("not till we got an interpreter")
+    }
+
     fn to_str(&self) -> String {
         self.clone()
     }
@@ -705,14 +922,9 @@ impl Calc for bool {
             matrix: (false,0),
             precision: Precision::None,
             boolean: true,
+            unitless: true,
+            null: false,
         }
-    }
-
-    fn add_mat_real(&self, _o: f64) -> DMatrix<f64> {
-        panic!("nop");
-    }
-    fn add_mat_comp(&self, _o: Complex64) -> DMatrix<Complex64> {
-        panic!("howd you even manage to call this")
     }
 
     fn to_ri(&self) -> i64 {
@@ -763,10 +975,1144 @@ impl Calc for bool {
     fn to_cm(&self) -> DMatrix<Complex64> {
         DMatrix::from_element(1,1,self.to_cf())
     }
+
+    fn to_uri(&self) -> UV<i64> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_urf(&self) -> UV<f64> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        panic!("not till we got an interpreter")
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        panic!("not till we got an interpreter")
+    }
+
     fn to_str(&self) -> String {
         self.to_string()
     }
     fn to_bool(&self) -> bool {
         *self
+    }
+}
+
+impl Calc for UV<i64> {
+    fn type_of(&self) -> ValType {
+        ValType {
+            list: false,
+            string: false,
+            complex: false,
+            matrix: (false,0),
+            precision: Precision::Int,
+            boolean: false,
+            unitless: false,
+            null: false,
+        }
+    }
+
+    fn to_ri(&self) -> i64 {
+        if self.u.is_unitless() {
+            self.v
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rf(&self) -> f64 {
+        if self.u.is_unitless() {
+            self.v.to_rf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rb(&self) -> BigInt {
+        if self.u.is_unitless() {
+            self.v.to_rb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rm(&self) -> DMatrix<f64> {
+        if self.u.is_unitless() {
+            self.v.to_rm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_ci(&self) -> Complex<i64> {
+        if self.u.is_unitless() {
+            self.v.to_ci()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cf(&self) -> Complex64 {
+        if self.u.is_unitless() {
+            self.v.to_cf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cb(&self) -> Complex<BigInt> {
+        if self.u.is_unitless() {
+            self.v.to_cb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cm(&self) -> DMatrix<Complex64> {
+        if self.u.is_unitless() {
+            self.v.to_cm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+
+    fn to_uri(&self) -> UV<i64> {
+        self.clone()
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV {
+            v: self.v.to_rf(),
+            u: self.u
+        }
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV {
+            v: self.v.to_rb(),
+            u: self.u
+        }
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV {
+            v: self.v.to_rm(),
+            u: self.u
+        }
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV {
+            v: self.v.to_ci(),
+            u: self.u
+        }
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV {
+            v: self.v.to_cf(),
+            u: self.u
+        }
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV {
+            v: self.v.to_cb(),
+            u: self.u
+        }
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV {
+            v: self.v.to_cm(),
+            u: self.u
+        }
+    }
+    
+    fn to_str(&self) -> String {
+        format!("{}{}",self.v.to_string(),self.u.to_str())
+    }
+    fn to_bool(&self) -> bool {
+        if self.u.is_unitless() {
+            self.v.to_bool()
+        } else {
+            panic!("units must be stripped to convert to boolean");
+        }
+    }
+}
+
+impl Calc for UV<f64> {
+    fn type_of(&self) -> ValType {
+        ValType {
+            list: false,
+            string: false,
+            complex: false,
+            matrix: (false,0),
+            precision: Precision::Float,
+            boolean: false,
+            unitless: false,
+            null: false,
+        }
+
+    }
+
+    fn to_ri(&self) -> i64 {
+        if self.u.is_unitless() {
+            self.v.to_ri()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rf(&self) -> f64 {
+        if self.u.is_unitless() {
+            self.v
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rb(&self) -> BigInt {
+        if self.u.is_unitless() {
+            self.v.to_rb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rm(&self) -> DMatrix<f64> {
+        if self.u.is_unitless() {
+            self.v.to_rm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_ci(&self) -> Complex<i64> {
+        if self.u.is_unitless() {
+            self.v.to_ci()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cf(&self) -> Complex64 {
+        if self.u.is_unitless() {
+            self.v.to_cf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cb(&self) -> Complex<BigInt> {
+        if self.u.is_unitless() {
+            self.v.to_cb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cm(&self) -> DMatrix<Complex64> {
+        if self.u.is_unitless() {
+            self.v.to_cm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV {
+            v: self.v.to_ri(),
+            u: self.u
+        }
+    }
+    fn to_urf(&self) -> UV<f64> {
+        self.clone()
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV {
+            v: self.v.to_rb(),
+            u: self.u
+        }
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV {
+            v: self.v.to_rm(),
+            u: self.u
+        }
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV {
+            v: self.v.to_ci(),
+            u: self.u
+        }
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV {
+            v: self.v.to_cf(),
+            u: self.u
+        }
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV {
+            v: self.v.to_cb(),
+            u: self.u
+        }
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV {
+            v: self.v.to_cm(),
+            u: self.u
+        }
+    }
+    
+    fn to_str(&self) -> String {
+        format!("{}{}",self.v.to_string(),self.u.to_str())
+    }
+    fn to_bool(&self) -> bool {
+        if self.u.is_unitless() {
+            self.v.to_bool()
+        } else {
+            panic!("units must be stripped to convert to boolean");
+        }
+    }
+}
+
+impl Calc for UV<BigInt> {
+    fn type_of(&self) -> ValType {
+        ValType {
+            list: false,
+            string: false,
+            complex: false,
+            matrix: (false,0),
+            precision: Precision::Big,
+            boolean: false,
+            unitless: false,
+            null: false,
+        }
+    }
+
+    fn to_ri(&self) -> i64 {
+        if self.u.is_unitless() {
+            self.v.to_ri()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rf(&self) -> f64 {
+        if self.u.is_unitless() {
+            self.v.to_rf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rb(&self) -> BigInt {
+        if self.u.is_unitless() {
+            self.v.clone()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rm(&self) -> DMatrix<f64> {
+        if self.u.is_unitless() {
+            self.v.to_rm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_ci(&self) -> Complex<i64> {
+        if self.u.is_unitless() {
+            self.v.to_ci()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cf(&self) -> Complex64 {
+        if self.u.is_unitless() {
+            self.v.to_cf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cb(&self) -> Complex<BigInt> {
+        if self.u.is_unitless() {
+            self.v.to_cb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cm(&self) -> DMatrix<Complex64> {
+        if self.u.is_unitless() {
+            self.v.to_cm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV {
+            v: self.v.to_ri(),
+            u: self.u
+        }
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV {
+            v: self.v.to_rf(),
+            u: self.u
+        }
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        self.clone()
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV {
+            v: self.v.to_rm(),
+            u: self.u
+        }
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV {
+            v: self.v.to_ci(),
+            u: self.u
+        }
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV {
+            v: self.v.to_cf(),
+            u: self.u
+        }
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV {
+            v: self.v.to_cb(),
+            u: self.u
+        }
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV {
+            v: self.v.to_cm(),
+            u: self.u
+        }
+    }
+    
+    fn to_str(&self) -> String {
+        format!("{}{}",self.v.to_string(),self.u.to_str())
+    }
+    fn to_bool(&self) -> bool {
+        if self.u.is_unitless() {
+            self.v.to_bool()
+        } else {
+            panic!("units must be stripped to convert to boolean");
+        }
+    }
+}
+
+impl Calc for UV<DMatrix<f64>> {
+    fn type_of(&self) -> ValType {
+        ValType {
+            list: false,
+            string: false,
+            complex: false,
+            matrix: (true,self.v.len()),
+            precision: Precision::Float,
+            boolean: false,
+            unitless: false,
+            null: false,
+        }
+
+    }
+
+    fn to_ri(&self) -> i64 {
+        if self.u.is_unitless() {
+            self.v.to_ri()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rf(&self) -> f64 {
+        if self.u.is_unitless() {
+            self.v.to_rf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rb(&self) -> BigInt {
+        if self.u.is_unitless() {
+            self.v.to_rb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rm(&self) -> DMatrix<f64> {
+        if self.u.is_unitless() {
+            self.v.clone()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_ci(&self) -> Complex<i64> {
+        if self.u.is_unitless() {
+            self.v.to_ci()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cf(&self) -> Complex64 {
+        if self.u.is_unitless() {
+            self.v.to_cf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cb(&self) -> Complex<BigInt> {
+        if self.u.is_unitless() {
+            self.v.to_cb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cm(&self) -> DMatrix<Complex64> {
+        if self.u.is_unitless() {
+            self.v.to_cm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV {
+            v: self.v.to_ri(),
+            u: self.u
+        }
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV {
+            v: self.v.to_rf(),
+            u: self.u
+        }
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV {
+            v: self.v.to_rb(),
+            u: self.u
+        }
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        self.clone()
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV {
+            v: self.v.to_ci(),
+            u: self.u
+        }
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV {
+            v: self.v.to_cf(),
+            u: self.u
+        }
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV {
+            v: self.v.to_cb(),
+            u: self.u
+        }
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV {
+            v: self.v.to_cm(),
+            u: self.u
+        }
+    }
+    
+    fn to_str(&self) -> String {
+        format!("{}{}",self.v.to_string(),self.u.to_str())
+    }
+    fn to_bool(&self) -> bool {
+        if self.u.is_unitless() {
+            self.v.to_bool()
+        } else {
+            panic!("units must be stripped to convert to boolean");
+        }
+    }
+}
+
+impl Calc for UV<Complex<i64>> {
+    fn type_of(&self) -> ValType {
+        ValType {
+            list: false,
+            string: false,
+            complex: true,
+            matrix: (false,0),
+            precision: Precision::Int,
+            boolean: false,
+            unitless: false,
+            null: false,
+        }
+
+    }
+
+    fn to_ri(&self) -> i64 {
+        if self.u.is_unitless() {
+            self.v.to_ri()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rf(&self) -> f64 {
+        if self.u.is_unitless() {
+            self.v.to_rf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rb(&self) -> BigInt {
+        if self.u.is_unitless() {
+            self.v.to_rb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rm(&self) -> DMatrix<f64> {
+        if self.u.is_unitless() {
+            self.v.to_rm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_ci(&self) -> Complex<i64> {
+        if self.u.is_unitless() {
+            self.v.clone()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cf(&self) -> Complex64 {
+        if self.u.is_unitless() {
+            self.v.to_cf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cb(&self) -> Complex<BigInt> {
+        if self.u.is_unitless() {
+            self.v.to_cb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cm(&self) -> DMatrix<Complex64> {
+        if self.u.is_unitless() {
+            self.v.to_cm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV {
+            v: self.v.to_ri(),
+            u: self.u
+        }
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV {
+            v: self.v.to_rf(),
+            u: self.u
+        }
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV {
+            v: self.v.to_rb(),
+            u: self.u
+        }
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV {
+            v: self.v.to_rm(),
+            u: self.u
+        }
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        self.clone()
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV {
+            v: self.v.to_cf(),
+            u: self.u
+        }
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV {
+            v: self.v.to_cb(),
+            u: self.u
+        }
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV {
+            v: self.v.to_cm(),
+            u: self.u
+        }
+    }
+    
+    fn to_str(&self) -> String {
+        format!("{}{}",self.v.to_string(),self.u.to_str())
+    }
+    fn to_bool(&self) -> bool {
+        if self.u.is_unitless() {
+            self.v.to_bool()
+        } else {
+            panic!("units must be stripped to convert to boolean");
+        }
+    }
+}
+
+impl Calc for UV<Complex64> {
+    fn type_of(&self) -> ValType {
+        ValType {
+            list: false,
+            string: false,
+            complex: true,
+            matrix: (false,0),
+            precision: Precision::Float,
+            boolean: false,
+            unitless: false,
+            null: false,
+        }
+    }
+
+    fn to_ri(&self) -> i64 {
+        if self.u.is_unitless() {
+            self.v.to_ri()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rf(&self) -> f64 {
+        if self.u.is_unitless() {
+            self.v.to_rf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rb(&self) -> BigInt {
+        if self.u.is_unitless() {
+            self.v.to_rb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rm(&self) -> DMatrix<f64> {
+        if self.u.is_unitless() {
+            self.v.to_rm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_ci(&self) -> Complex<i64> {
+        if self.u.is_unitless() {
+            self.v.to_ci()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cf(&self) -> Complex64 {
+        if self.u.is_unitless() {
+            self.v.clone()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cb(&self) -> Complex<BigInt> {
+        if self.u.is_unitless() {
+            self.v.to_cb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cm(&self) -> DMatrix<Complex64> {
+        if self.u.is_unitless() {
+            self.v.to_cm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV {
+            v: self.v.to_ri(),
+            u: self.u
+        }
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV {
+            v: self.v.to_rf(),
+            u: self.u
+        }
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV {
+            v: self.v.to_rb(),
+            u: self.u
+        }
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV {
+            v: self.v.to_rm(),
+            u: self.u
+        }
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV {
+            v: self.v.to_ci(),
+            u: self.u
+        }
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        self.clone()
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV {
+            v: self.v.to_cb(),
+            u: self.u
+        }
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV {
+            v: self.v.to_cm(),
+            u: self.u
+        }
+    }
+    
+    fn to_str(&self) -> String {
+        format!("{}{}",self.v.to_string(),self.u.to_str())
+    }
+    fn to_bool(&self) -> bool {
+        if self.u.is_unitless() {
+            self.v.to_bool()
+        } else {
+            panic!("units must be stripped to convert to boolean");
+        }
+    }
+}
+
+impl Calc for UV<Complex<BigInt>> {
+    fn type_of(&self) -> ValType {
+        ValType {
+            list: false,
+            string: false,
+            complex: true,
+            matrix: (false,0),
+            precision: Precision::Big,
+            boolean: false,
+            unitless: false,
+            null: false,
+        }
+    }
+
+    fn to_ri(&self) -> i64 {
+        if self.u.is_unitless() {
+            self.v.to_ri()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rf(&self) -> f64 {
+        if self.u.is_unitless() {
+            self.v.to_rf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rb(&self) -> BigInt {
+        if self.u.is_unitless() {
+            self.v.to_rb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rm(&self) -> DMatrix<f64> {
+        if self.u.is_unitless() {
+            self.v.to_rm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_ci(&self) -> Complex<i64> {
+        if self.u.is_unitless() {
+            self.v.to_ci()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cf(&self) -> Complex64 {
+        if self.u.is_unitless() {
+            self.v.to_cf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cb(&self) -> Complex<BigInt> {
+        if self.u.is_unitless() {
+            self.v.clone()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cm(&self) -> DMatrix<Complex64> {
+        if self.u.is_unitless() {
+            self.v.to_cm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV {
+            v: self.v.to_ri(),
+            u: self.u
+        }
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV {
+            v: self.v.to_rf(),
+            u: self.u
+        }
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV {
+            v: self.v.to_rb(),
+            u: self.u
+        }
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV {
+            v: self.v.to_rm(),
+            u: self.u
+        }
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV {
+            v: self.v.to_ci(),
+            u: self.u
+        }
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV {
+            v: self.v.to_cf(),
+            u: self.u
+        }
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        self.clone()
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        UV {
+            v: self.v.to_cm(),
+            u: self.u
+        }
+    }
+    
+    fn to_str(&self) -> String {
+        format!("{}{}",self.v.to_string(),self.u.to_str())
+    }
+    fn to_bool(&self) -> bool {
+        if self.u.is_unitless() {
+            self.v.to_bool()
+        } else {
+            panic!("units must be stripped to convert to boolean");
+        }
+    }
+}
+
+impl Calc for UV<DMatrix<Complex64>> {
+    fn type_of(&self) -> ValType {
+        ValType {
+            list: false,
+            string: false,
+            complex: true,
+            matrix: (true,self.v.len()),
+            precision: Precision::Float,
+            boolean: false,
+            unitless: false,
+            null: false,
+        }
+    }
+
+    fn to_ri(&self) -> i64 {
+        if self.u.is_unitless() {
+            self.v.to_ri()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rf(&self) -> f64 {
+        if self.u.is_unitless() {
+            self.v.to_rf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rb(&self) -> BigInt {
+        if self.u.is_unitless() {
+            self.v.to_rb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_rm(&self) -> DMatrix<f64> {
+        if self.u.is_unitless() {
+            self.v.to_rm()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_ci(&self) -> Complex<i64> {
+        if self.u.is_unitless() {
+            self.v.to_ci()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cf(&self) -> Complex64 {
+        if self.u.is_unitless() {
+            self.v.to_cf()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cb(&self) -> Complex<BigInt> {
+        if self.u.is_unitless() {
+            self.v.to_cb()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+    fn to_cm(&self) -> DMatrix<Complex64> {
+        if self.u.is_unitless() {
+            self.v.clone()
+        } else {
+            panic!("cannot implicitly strip units");
+        }
+    }
+
+    fn to_uri(&self) -> UV<i64> {
+        UV {
+            v: self.v.to_ri(),
+            u: self.u
+        }
+    }
+    fn to_urf(&self) -> UV<f64> {
+        UV {
+            v: self.v.to_rf(),
+            u: self.u
+        }
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        UV {
+            v: self.v.to_rb(),
+            u: self.u
+        }
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        UV {
+            v: self.v.to_rm(),
+            u: self.u
+        }
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        UV {
+            v: self.v.to_ci(),
+            u: self.u
+        }
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        UV {
+            v: self.v.to_cf(),
+            u: self.u
+        }
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        UV {
+            v: self.v.to_cb(),
+            u: self.u
+        }
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        self.clone()
+    }
+    
+    fn to_str(&self) -> String {
+        format!("{}{}",self.v.to_string(),self.u.to_str())
+    }
+    fn to_bool(&self) -> bool {
+        if self.u.is_unitless() {
+            self.v.to_bool()
+        } else {
+            panic!("units must be stripped to convert to boolean");
+        }
+    }
+}
+
+impl Calc for Null {
+    fn type_of(&self) -> ValType {
+        ValType {
+            list: false,
+            string: false,
+            complex: true,
+            matrix: (false, 0),
+            precision: Precision::None,
+            boolean: false,
+            unitless: true,
+            null: true,
+        }
+
+    }
+
+    fn to_ri(&self) -> i64 {
+        panic!("operations not allowed on null");
+    }
+    fn to_rf(&self) -> f64 {
+        panic!("operations not allowed on null");
+    }
+    fn to_rb(&self) -> BigInt {
+        panic!("operations not allowed on null");
+    }
+    fn to_rm(&self) -> DMatrix<f64> {
+        panic!("operations not allowed on null");
+    }
+    fn to_ci(&self) -> Complex<i64> {
+        panic!("operations not allowed on null");
+    }
+    fn to_cf(&self) -> Complex64 {
+        panic!("operations not allowed on null");
+    }
+    fn to_cb(&self) -> Complex<BigInt> {
+        panic!("operations not allowed on null");
+    }
+    fn to_cm(&self) -> DMatrix<Complex64> {
+        panic!("operations not allowed on null");
+    }
+
+    fn to_uri(&self) -> UV<i64> {
+        panic!("operations not allowed on null");
+    }
+    fn to_urf(&self) -> UV<f64> {
+        panic!("operations not allowed on null");
+    }
+    fn to_urb(&self) -> UV<BigInt> {
+        panic!("operations not allowed on null");
+    }
+    fn to_urm(&self) -> UV<DMatrix<f64>> {
+        panic!("operations not allowed on null");
+    }
+    fn to_uci(&self) -> UV<Complex<i64>> {
+        panic!("operations not allowed on null");
+    }
+    fn to_ucf(&self) -> UV<Complex64> {
+        panic!("operations not allowed on null");
+    }
+    fn to_ucb(&self) -> UV<Complex<BigInt>> {
+        panic!("operations not allowed on null");
+    }
+    fn to_ucm(&self) -> UV<DMatrix<Complex64>> {
+        panic!("operations not allowed on null");
+    }
+
+    fn to_str(&self) -> String {
+        panic!("operations not allowed on null");
+    }
+    fn to_bool(&self) -> bool {
+        panic!("operations not allowed on null");
     }
 }
