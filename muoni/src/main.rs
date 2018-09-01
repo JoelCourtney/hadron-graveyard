@@ -1,6 +1,7 @@
 extern crate regex;
 extern crate nalgebra as na;
-extern crate num_bigint as ni;
+extern crate num_bigint as nb;
+extern crate num_integer as ni;
 extern crate num_complex as nc;
 extern crate num_traits;
 
@@ -17,7 +18,6 @@ mod parser;
 mod interpreter;
 
 use interpreter::value::*;
-use interpreter::value::unit::*;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -32,14 +32,7 @@ fn main() {
     let lexemes = lexer::lex(code);
 
     let controls = parser::parse(lexemes);
-
-    let test = V::from(&ast::RValue::Bool(true));
-    let test2 = V::new(String::from("asdf"));
-    println!("{:?}",test2.add(&test));
-    let test3 = test2.add(&test);
-    println!("{:?}",V::new(true).sub(&V::new(5)));
-
-    let test = V::new(UV::from(5));
-    println!("{:?}",test);
-    println!("{:?}",V::new(V::new(true).sub(&V::new(5)).unwrap().to_uci()));
+    let v1 = V::RI(5,U::empty());
+    let v2 = V::RI(4,U::empty());
+    println!("{:?}",v1.add(v2));
 }

@@ -346,13 +346,16 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                         Some('=') => {
                             match lexemes.last() {
                                 Some(Lexeme::NewLine) | Some(Lexeme::Semicolon) => {
-                                    choice = Lexeme::Return;
+                                    i += 1;
+                                    let series = get_break_series(&chars[i..]);
+                                    i += series.len();
+                                    choice = Lexeme::BreakSeries(series);
                                 }
                                 _ => {
                                     choice = Lexeme::BinaryOp(BOP::LessOrEqual);
+                                    i += 2;
                                 }
                             }
-                            i += 2;
                         }
                         Some('-') | Some('~') => {
                             let prev = lexemes.last();
@@ -534,6 +537,9 @@ fn get_break_series(chars: &[char]) -> Vec<Break> {
             }
             Some('~') => {
                 series.push(Break::Tilde);
+            }
+            Some('=') => {
+                series.push(Break::Equal);
             }
             _ => {
                 return series;

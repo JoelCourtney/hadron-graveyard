@@ -126,45 +126,6 @@ pub fn parse(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
                 i,
                 )
         }
-        Some(Lexeme::Return) => {
-            let length = rvalue::delimit(&lexemes[i..]);
-            if length > 1 {
-                let e1 = rvalue::parse_contained(&lexemes[i+1..i+length]);
-                i += length;
-                (
-                    Box::new(Statement::Return {
-                        e1,
-                    }),
-                    i,
-                    )
-            } else {
-                (
-                    Box::new(Statement::ReturnEmpty),
-                    i,
-                    )
-            }
-        }
-        Some(Lexeme::BreakSeries(series)) => {
-            let length = rvalue::delimit(&lexemes[i..]);
-            if length > 1 {
-                let e1 = rvalue::parse_contained(&lexemes[i+1..i+length]);
-                i += length;
-                (
-                    Box::new(Statement::Break {
-                        series: (*series).clone(),
-                        e1,
-                    }),
-                    i,
-                    )
-            } else {
-                (
-                    Box::new(Statement::BreakEmpty {
-                        series: (*series).clone(),
-                    }),
-                    i,
-                    )
-            }
-        }
         Some(Lexeme::Collapse) => {
             i += 1;
             let (name,length) = lvalue::parse(&lexemes[i..]);
@@ -250,7 +211,6 @@ pub fn delimit(lexemes: &[Lexeme]) -> (usize,i32) {
                 }
             Some(Lexeme::Handle(_))
                 | Some(Lexeme::Number(_))
-                | Some(Lexeme::Return)
                 | Some(Lexeme::BreakSeries(_))
                 | Some(Lexeme::StringLiteral(_))
                 | Some(Lexeme::Question) => {

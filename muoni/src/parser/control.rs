@@ -200,6 +200,27 @@ pub fn parse(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                 i,
             )
         }
+        Some(Lexeme::BreakSeries(series)) => {
+            let length = rvalue::delimit(&lexemes[i..]);
+            if length > 1 {
+                let e1 = rvalue::parse_contained(&lexemes[i+1..i+length]);
+                i += length;
+                (
+                    Box::new(Control::Break {
+                        series: (*series).clone(),
+                        e1,
+                    }),
+                    i,
+                    )
+            } else {
+                (
+                    Box::new(Control::BreakEmpty {
+                        series: (*series).clone(),
+                    }),
+                    i,
+                    )
+            }
+        }
         Some(_) => {
             let (statement,length) = statement::parse(&lexemes[i..]);
             i += length;
@@ -213,4 +234,3 @@ pub fn parse(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
         None => (Box::new(Control::Empty),0)
     }
 }
-

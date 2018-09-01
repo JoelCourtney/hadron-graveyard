@@ -1,152 +1,95 @@
-use ast::{RValue,LValue,Statement};
-use na::*;
 use nc::{Complex,Complex64};
-use ni::{BigInt,ToBigInt};
-use num_traits::{ToPrimitive,Zero};
+use na::DMatrix;
 
+#[derive(Debug,PartialEq,Clone)]
+pub enum V {
+    RI(i64,U),
+    RF(f64,U),
+    RM(DMatrix<f64>,U),
+    CI(Complex<i64>,U),
+    CF(Complex64,U),
+    CM(DMatrix<Complex64>,U),
+    R(Box<V>,Box<V>,Box<V>),
+    S(String),
+    B(bool),
+    L(Vec<V>),
+    N,
+}
+
+mod convert;
 mod calc;
-pub mod unit;
-use self::calc::*;
-use self::unit::*;
 
-#[derive(Debug,Copy,Clone,PartialEq)]
-pub struct Val<T>(T);
+#[derive(Debug,PartialEq,Eq,Hash,Copy,Clone)]
+pub struct TypeFraction {
+    pub n: u64,
+    pub d: u64,
+}
 
-pub type V = Val<Box<Calc>>;
-
-pub struct Null;
-
-impl<T> Val<T> {
-    pub fn unwrap(&self) -> &T {
-        &self.0
-    }
-    pub fn from<'a>(rv: &'a RValue) -> V {
-        match rv {
-            RValue::Number(f) if f % 1. == 0. => {
-                V::new(*f as i64)
+impl TypeFraction {
+    fn reduce(mut self) -> Self {
+        use ni::Integer;
+        let mut gcd;
+        loop {
+            gcd = self.n.gcd(&self.d);
+            if gcd == 1 {
+                break;
             }
-            RValue::Number(f) => {
-                V::new(*f)
-            }
-            RValue::StringLiteral(s) => {
-                V::new(s.clone())
-            }
-            RValue::Bool(b) => {
-                V::new(*b)
-            }
-            _ => panic!("i wasn't ready yet"),
+            self.n /= gcd;
+            self.d /= gcd;
         }
+        self
     }
-    pub fn new<T1: Calc+'static>(n: T1) -> V {
-        let result: Box<Calc> = Box::new(n);
-        Val(result)
+    fn add(self, with: TypeFraction) -> Self {
+        if self.n != with.n || self.d != with.d {
+            panic!("incompatible units for addition")
+        }
+        self
+    }
+    fn multiply(self, with: TypeFraction) -> Self {
+        (TypeFraction {
+            n: self.n * with.n,
+            d: self.d * with.d,
+        }).reduce()
+    }
+    fn divide(self, with: TypeFraction) -> Self {
+        self.multiply(with.invert())
+    }
+    fn invert(mut self) -> Self {
+        let hold = self.d;
+        self.d = self.n;
+        self.n = hold;
+        self
+    }
+    fn equal(&self, with: &TypeFraction) -> bool {
+        self.n == with.n && self.d == with.d
     }
 }
 
-impl V {
-    pub fn add(&self, with: &V) -> V {
-        let v1 = self.unwrap();
-        let v2 = with.unwrap();
-        let t1 = v1.type_of();
-        let t2 = v2.type_of();
-        match t1.add_type(t2) {
-            ValEnum::L => {
-                unimplemented!();
-            }
-            ValEnum::S => {
-                return V::new(v1.to_str() + &v2.to_str());
-            }
-            ValEnum::B => {
-                panic!("cannot add booleans")
-            }
-            ValEnum::RI => {
-                return V::new(v1.to_ri() + v2.to_ri());
-            }
-            ValEnum::RF => {
-                return V::new(v1.to_rf() + v2.to_rf());
-            }
-            ValEnum::RB => {
-                return V::new(v1.to_rb() + v2.to_rb());
-            }
-            ValEnum::CI => {
-                return V::new(v1.to_ci() + v2.to_ci());
-            }
-            ValEnum::CF => {
-                return V::new(v1.to_cf() + v2.to_cf());
-            }
-            ValEnum::CB => {
-                return V::new(v1.to_cb() + v2.to_cb());
-            }
-            _ => unimplemented!(),
-        }
-        unimplemented!()
+pub type U = TypeFraction;
+pub type Q = TypeFraction;
+
+impl U {
+    pub fn is_empty(&self) -> bool {
+        self.n == self.d
     }
-    pub fn sub(&self, with: &V) -> V {
-        let v1 = self.unwrap();
-        let v2 = with.unwrap();
-        let t1 = v1.type_of();
-        let t2 = v2.type_of();
-        match t1.sub_type(t2) {
-            ValEnum::L => {
-                unimplemented!();
-            }
-            ValEnum::S => {
-                panic!("cannot subtract strings");
-            }
-            ValEnum::B => {
-                panic!("cannot subtract booleans");
-            }
-            ValEnum::RI => {
-                return V::new(v1.to_ri() - v2.to_ri());
-            }
-            ValEnum::RF => {
-                return V::new(v1.to_rf() - v2.to_rf());
-            }
-            ValEnum::RB => {
-                return V::new(v1.to_rb() - v2.to_rb());
-            }
-            ValEnum::CI => {
-                return V::new(v1.to_ci() - v2.to_ci());
-            }
-            ValEnum::CF => {
-                return V::new(v1.to_cf() - v2.to_cf());
-            }
-            ValEnum::CB => {
-                return V::new(v1.to_cb() - v2.to_cb());
-            }
-            _ => unimplemented!(),
-        }
-        unimplemented!()
+    pub fn empty() -> U {
+        U { n:1, d:1 }
     }
-    pub fn eq(&self, with: &V) -> bool {
-        let v1 = self.unwrap();
-        let v2 = with.unwrap();
-        let t = v1.type_of().eq_type(v2.type_of());
-        match t {
-            ValEnum::L => unimplemented!(),
-            ValEnum::S => v1.to_str() == v2.to_str(),
-            ValEnum::B => v1.to_bool() == v2.to_bool(),
-            ValEnum::Z => unimplemented!(),
-            ValEnum::N => true,
-            ValEnum::RI => v1.to_ri() == v2.to_ri(),
-            ValEnum::RF => v1.to_rf() == v2.to_rf(),
-            ValEnum::RB => v1.to_rb() == v2.to_rb(),
-            ValEnum::RM => v1.to_rm() == v2.to_rm(),
-            _ => false,
-        }
+    pub fn to_str(&self) -> String {
+        String::from(format!("[{}/{}]",self.n,self.d))
     }
 }
 
-use std::fmt::{Debug,Formatter,Display,Result};
-
-impl Debug for Calc {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f,"{}",self.to_str())
-    }
+pub struct Converter {
+    mult: f64,
+    add: f64,
 }
 
-impl Display for Calc {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f,"{}",self.to_str())
-    }
+pub type C = Converter;
+
+pub struct ValueIterator {
+    v: V,
+    i: usize,
+    c: V,
 }
+pub type VI = ValueIterator;

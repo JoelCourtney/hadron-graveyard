@@ -25,7 +25,6 @@ pub fn delimit(lexemes: &[Lexeme]) -> usize {
                 | Some(Lexeme::Number(_))
                 | Some(Lexeme::StringLiteral(_))
                 | Some(Lexeme::Bool(_))
-                | Some(Lexeme::Return)
                 | Some(Lexeme::BreakSeries(_)) => {
                     complete = true;
                     i += 1;

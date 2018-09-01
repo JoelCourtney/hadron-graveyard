@@ -48,6 +48,13 @@ pub enum Control {
     Loop {
         body: Box<Statement>,
     },
+    Break {
+        series: Vec<Break>,
+        e1: Box<RValue>
+    },
+    BreakEmpty {
+        series: Vec<Break>
+    },
     Empty,
 }
 
@@ -88,17 +95,6 @@ pub enum Statement {
     },
     Print {
         e1: Box<RValue>,
-    },
-    Return {
-        e1: Box<RValue>,
-    },
-    ReturnEmpty,
-    Break {
-        series: Vec<Break>,
-        e1: Box<RValue>
-    },
-    BreakEmpty {
-        series: Vec<Break>
     },
     Collapse {
         name: Box<LValue>,
@@ -149,7 +145,6 @@ pub enum Lexeme {
     Assign,
     AssignOp(BOP),
     RightArrow,
-    Return,
     BreakSeries(Vec<Break>),
     Comma,
     Semicolon,

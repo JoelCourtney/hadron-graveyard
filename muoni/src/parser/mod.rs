@@ -19,7 +19,7 @@ pub fn parse(lexemes: Vec<Lexeme>) -> Vec<Control> {
     let mut i = 0;
     while i < l-1 {
         let (control,length) = control::parse(&lexemes[i..]);
-        //println!("{:?}",control);
+        // println!("{:?}",control);
         controls.push(*control);
         i += length;
     }
