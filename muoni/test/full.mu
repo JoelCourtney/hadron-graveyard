@@ -43,7 +43,7 @@ var [x,y] = [1,2] // list decomposition
 (w,h) = $(1,2;3,4)
 
 a[1] // first element of a
-c[-1] = 7 // last element of c set to 7
+c(-1) = a(1) // last element of c set to 7
 
 a[3] = 5;
 a[4,5] = 3

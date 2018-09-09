@@ -99,6 +99,9 @@ pub enum Statement {
     Collapse {
         name: Box<LValue>,
     },
+    Drop {
+        name: Box<LValue>,
+    },
 }
 
 #[derive(Debug,PartialEq,Clone)]
@@ -119,17 +122,17 @@ pub enum LValue {
 
 #[derive(Debug,PartialEq,Clone)]
 pub enum RValue {
-    Binary(BOP,Box<RValue>,Box<RValue>),
-    Unary(UOP,Box<RValue>),
-    Call(Box<RValue>,Box<RValue>),
-    Access(Box<RValue>,String),
-    Name(String),
     Number(f64),
     StringLiteral(String),
+    Bool(bool),
+    Name(String),
+    Unary(UOP,Box<RValue>),
+    Binary(BOP,Box<RValue>,Box<RValue>),
+    Call(Box<RValue>,Box<RValue>),
+    Access(Box<RValue>,String),
     List(Vec<RValue>),
     Matrix(Vec<Vec<RValue>>),
     ArgList(Vec<RValue>),
-    Bool(bool),
     Unit(Box<RValue>),
     UnitTag(Box<RValue>,Box<RValue>),
     CaptureScope(Vec<LValue>,Vec<Control>),

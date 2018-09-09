@@ -61,7 +61,22 @@ impl V {
                 panic!("nah thanks");
             }
             N => panic!("that's a null"),
+            F(_) => {
+                panic!("cannot convert functions to any other type");
+            }
             _ => unimplemented!(),
+        }
+    }
+    fn to_ri_unwrap(self) -> i64 {
+        match self.to_ri() {
+            RI(i,u) => {
+                if u.is_empty() {
+                    i
+                } else {
+                    panic!("cannot unwrap number with units.")
+                }
+            }
+            _ => panic!("conversion to ri failed"),
         }
     }
     fn to_rf(self) -> Self {
@@ -120,10 +135,12 @@ impl V {
             L(l) => {
                 panic!("nah thanks");
             }
+            F(_) => {
+                panic!("cannot convert functions to any other type");
+            }
             _ => unimplemented!(),
         }
     }
-
     fn to_rm(self) -> Self {
         match self {
             RI(ri,u) => RM(DMatrix::from_element(1,1,ri as f64),u),
@@ -161,6 +178,9 @@ impl V {
             }
             L(l) => {
                 panic!("nah thanks");
+            }
+            F(_) => {
+                panic!("cannot convert functions to any other type");
             }
             _ => unimplemented!(),
         }
@@ -206,6 +226,9 @@ impl V {
             }
             L(l) => {
                 panic!("nah thanks");
+            }
+            F(_) => {
+                panic!("cannot convert functions to any other type");
             }
             _ => unimplemented!(),
         }
@@ -258,6 +281,9 @@ impl V {
             R(_,_,_) => {
                 unimplemented!();
             }
+            F(_) => {
+                panic!("cannot convert functions to any other type");
+            }
             N => panic!("cannot convert null to boolean"),
         }
     }
@@ -268,6 +294,20 @@ impl V {
         }
     }
     pub fn to_numeric(self) -> Self {
-        self
+        self // very much no
+    }
+    pub fn to_string(self) -> Self {
+        match self {
+            RI(ri,u) => {
+                S(format!("{}{}",ri,u.to_str()))
+            }
+            _ => unimplemented!(),
+        }
+    }
+    pub fn to_string_unwrap(self) -> String {
+        match self.to_string() {
+            S(s) => s,
+            _ => panic!("ya dun fuqd up"),
+        }
     }
 }

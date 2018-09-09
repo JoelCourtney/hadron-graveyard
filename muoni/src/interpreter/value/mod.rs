@@ -1,7 +1,9 @@
 use nc::{Complex,Complex64};
 use na::DMatrix;
+use ast::{Statement,LValue};
+use interpreter::env::Scope;
 
-#[derive(Debug,PartialEq,Clone)]
+#[derive(Debug,Clone,PartialEq)]
 pub enum V {
     RI(i64,U),
     RF(f64,U),
@@ -13,6 +15,7 @@ pub enum V {
     S(String),
     B(bool),
     L(Vec<V>),
+    F(Box<F>),
     N,
 }
 
@@ -80,6 +83,7 @@ impl U {
     }
 }
 
+#[derive(Debug,PartialEq,Clone)]
 pub struct Converter {
     mult: f64,
     add: f64,
@@ -93,3 +97,13 @@ pub struct ValueIterator {
     c: V,
 }
 pub type VI = ValueIterator;
+
+#[derive(Debug,PartialEq,Clone)]
+pub struct Function {
+    //pub name: String,
+    pub args: Vec<LValue>,
+    pub scope: Scope,
+    pub body: Box<Statement>,
+}
+
+pub type F = Function;

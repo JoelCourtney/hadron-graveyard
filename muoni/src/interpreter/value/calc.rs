@@ -38,7 +38,7 @@ impl Iterator for VI {
 
     fn next(&mut self) -> Option<V> {
         match self.v {
-            RI(_,_) | RF(_,_) | CI(_,_) | CF(_,_) | S(_) | B(_) => {
+            RI(_,_) | RF(_,_) | CI(_,_) | CF(_,_) | S(_) | B(_) | F(_) => {
                 match self.i {
                     0 => {
                         self.i = 1;
