@@ -8,12 +8,9 @@ pub enum Scope {
     Explicit {
         look_to: Option<usize>,
         varls: HashMap<String,(V,bool)>,
-        highest_base_unit: u64,
-        highest_base_quantity: u64,
-        units: HashMap<String,U>,
+        next_base_key: u64,
+        units: HashMap<String,C>,
         quantities: HashMap<String,Q>,
-        unit_quantity_map: HashMap<U,Q>,
-        converters: HashMap<String,C>,
         ans: Vec<V>,
     },
     Implicit {
@@ -23,6 +20,7 @@ pub enum Scope {
 }
 use self::Scope::*;
 
+#[derive(Debug)]
 pub struct Environment {
     stack: Vec<Scope>,
 }
@@ -33,12 +31,9 @@ impl Environment {
         stack.push( Scope::Explicit {
             look_to: None,
             varls: HashMap::new(),
-            highest_base_unit: 1,
-            highest_base_quantity: 1,
+            next_base_key: 0,
             units: HashMap::new(),
             quantities: HashMap::new(),
-            unit_quantity_map: HashMap::new(),
-            converters: HashMap::new(),
             ans: Vec::new(),
         } );
         Environment {
@@ -51,8 +46,8 @@ impl Environment {
     fn get_top_scope_mut(&mut self) -> &mut Scope {
         self.stack.last_mut().unwrap()
     }
-    pub fn get_scope_stack_height(&self) -> usize {
-        self.stack.len()
+    pub fn get_highest_scope_index(&self) -> usize {
+        self.stack.len() - 1
     }
     fn get_scope(&self, i: usize) -> &Scope {
         match self.stack.get(i) {
@@ -80,7 +75,7 @@ impl Environment {
         }
     }
     fn get_highest_explicit_mut(&mut self) -> &mut Scope {
-        let s = self.stack.len();
+        let s = self.stack.len()-1;
         let i;
         match self.stack.get(s).unwrap() {
             Explicit {..} => i = s,
@@ -146,7 +141,7 @@ impl Environment {
         }
     }
     pub fn assign_varl(&mut self, n: &String, mut v: V) {
-        let mut i = self.get_scope_stack_height();
+        let mut i = self.get_highest_scope_index();
         loop {
             let cursor = self.get_scope_mut(i);
             match cursor {
@@ -180,11 +175,11 @@ impl Environment {
             }
         }
     }
-    fn declare_quantity(&mut self, n: &String) {
+    fn declare_base_quantity(&mut self, n: &String) {
         match self.get_highest_explicit_mut() {
-            Explicit {quantities,highest_base_quantity,..} => {
-                *highest_base_quantity = next_prime(*highest_base_quantity);
-                quantities.insert(n.clone(), Q{n:*highest_base_quantity,d:1});
+            Explicit {quantities,next_base_key,..} => {
+                quantities.insert(n.clone(), Q::from_base(*next_base_key));
+                *next_base_key += 1;
             }
             _ => panic!("cannot declare quantities in implicit scope"),
         }
@@ -200,42 +195,35 @@ impl Environment {
             _ => panic!("cannot declare quantities in implicit scope"),
         }
     }
-    fn declare_base_unit(&mut self, n: &String, q: &Option<String>) {
+    fn declare_base_unit(&mut self, n: &String, q: Option<&Q>) {
         match self.get_highest_explicit_mut() {
-            Explicit {quantities,units,unit_quantity_map,highest_base_unit,..} => {
+            Explicit {quantities,units,next_base_key,..} => {
                 if let Some(_) = units.get(n) {
                     panic!("units cannot be shadowed or redefined");
                 }
-                *highest_base_unit = next_prime(*highest_base_unit);
-                let u = U {n: *highest_base_unit, d: 1};
-                units.insert(n.clone(), u);
-                if let Some(s) = q {
-                    let q = quantities.get(s);
-                    match q {
-                        Some(q) => {
-                            unit_quantity_map.insert(u,q.clone());
-                        }
-                        None => panic!("quantity does not exist"),
-                    }
+                if let Some(q) = q {
+                    units.insert(n.clone(), C::base_unit_converter(q.clone()));
+                } else {
+                    units.insert(n.clone(), C::base_unit_converter(U::from_base(*next_base_key)));
+                    *next_base_key += 1;
                 }
             }
-            _ => panic!("cannot declare quantities in implicit scope"),
+            _ => panic!("cannot declare units in implicit scope"),
         }
     }
-    fn declare_derived_unit(&mut self, n: &String, u: U, c: C) {
+    fn declare_derived_unit(&mut self, n: &String, c: C) {
         match self.get_highest_explicit_mut() {
-            Explicit {units,converters,..} => {
+            Explicit {units,..} => {
                 if let Some(_) = units.get(n) {
                     panic!("units cannot be shadowed or redefined");
                 }
-                units.insert(n.clone(),u);
-                converters.insert(n.clone(),c);
+                units.insert(n.clone(),c);
             }
             _ => panic!("cannot declare quantities in implicit scope"),
         }
     }
     pub fn drop_varl(&mut self, n: &String) {
-        let mut i = self.get_scope_stack_height();
+        let mut i = self.get_highest_scope_index();
         loop {
             let cursor = self.get_scope_mut(i);
             match cursor {
@@ -260,20 +248,18 @@ impl Environment {
         }
     }
     pub fn push_scope(&mut self, exp: bool) {
-        let height = self.get_scope_stack_height();
+        let height = self.get_highest_scope_index();
         if exp {
-            let (hbu, hbq);
+            let nui;
             {
                 match self.get_top_scope() {
-                    Explicit {highest_base_unit,highest_base_quantity,..} => {
-                        hbu = *highest_base_unit;
-                        hbq = *highest_base_quantity;
+                    Explicit {next_base_key,..} => {
+                        nui = *next_base_key;
                     }
                     Implicit {look_to,..} => {
                         match self.get_scope(*look_to) {
-                            Explicit {highest_base_unit,highest_base_quantity,..} => {
-                                hbu = *highest_base_unit;
-                                hbq = *highest_base_quantity;
+                            Explicit {next_base_key,..} => {
+                                nui = *next_base_key;
                             }
                             Implicit {..} => {
                                 panic!("thats not supposed to happen")
@@ -285,12 +271,9 @@ impl Environment {
             self.stack.push( Scope::Explicit {
                 look_to: Some(height),
                 varls: HashMap::new(),
-                highest_base_unit: hbu,
-                highest_base_quantity: hbq,
+                next_base_key: nui,
                 units: HashMap::new(),
                 quantities: HashMap::new(),
-                unit_quantity_map: HashMap::new(),
-                converters: HashMap::new(),
                 ans: Vec::new(),
             } );
         } else {
@@ -304,7 +287,7 @@ impl Environment {
         self.stack.push(s);
     }
     pub fn get_varl(&self, n: &String) -> V {
-        let mut i = self.get_scope_stack_height();
+        let mut i = self.get_highest_scope_index();
         loop {
             let cursor = self.get_scope(i);
             match cursor {
@@ -329,7 +312,7 @@ impl Environment {
         }
     }
     pub fn get_varl_mutability(&self, n: &String) -> (V,bool) {
-        let mut i = self.get_scope_stack_height();
+        let mut i = self.get_highest_scope_index();
         loop {
             let cursor = self.get_scope(i);
             match cursor {
@@ -353,6 +336,27 @@ impl Environment {
             }
         }
     }
+    pub fn get_unit(&self, n: &String) -> C {
+        let mut i = self.get_highest_scope_index();
+        loop {
+            let cursor = self.get_scope(i);
+            match cursor {
+                Explicit {look_to,units,..} => {
+                    if let Some(u) = units.get(n) {
+                        return u.clone();
+                    } else {
+                        match look_to {
+                            None => panic!("unit name not found"),
+                            Some(n) => i = *n,
+                        }
+                    }
+                }
+                Implicit {look_to,..} => {
+                    i = *look_to;
+                }
+            }
+        }
+    }
     pub fn pop_reduce_scope(&mut self) -> Option<V> {
         // let ans = self.get_top_scope_mut().ans.pop();
         self.stack.pop();
@@ -366,7 +370,7 @@ impl Environment {
 impl Environment {
     pub fn get_premade_implicit(&self, caps: &Vec<LValue>) -> Scope {
         let mut s = Scope::Implicit {
-            look_to: self.get_scope_stack_height(),
+            look_to: self.get_highest_scope_index(),
             varls: HashMap::new(),
         };
         for c in caps {

@@ -32,7 +32,6 @@ fn main() {
     let lexemes = lexer::lex(code);
 
     let controls = parser::parse(lexemes);
-    let v1 = V::RI(5,U::empty());
-    let v2 = V::RI(4,U::empty());
-    println!("{:?}",v1.add(v2));
+
+    interpreter::exec::exec(&controls);
 }

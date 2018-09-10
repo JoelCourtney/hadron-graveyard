@@ -6,6 +6,8 @@ b = (a; 3, 4) // (1,2;3,4)
 var c = a&[m] // convert a to meters
 var d = c&[s] // d is now in [m*s]
 
+var f = 1[[Distance]]
+
 var prec = 1 - 2 - 3
 
 val f = d * 1[m/ft] // useless

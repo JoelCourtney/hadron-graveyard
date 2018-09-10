@@ -9,7 +9,12 @@ impl V {
             (RI(n1,u1),RI(n2,u2)) => {
                 let n3 = n1 + n2;
                 let u3 = u1.add(u2);
-                RI(n1+n2,u3)
+                RI(n3,u3)
+            }
+            (RF(n1,u1),RF(n2,u2)) => {
+                let n3 = n1 + n2;
+                let u3 = u1.add(u2);
+                RF(n3,u3)
             }
             _ => unimplemented!(),
         }
@@ -19,14 +24,70 @@ impl V {
     }
     pub fn sub(self, with: V) -> Self {
         match (self,with) {
+            (RI(n1,u1),RI(n2,u2)) => {
+                let n3 = n1 - n2;
+                let u3 = u1.add(u2);
+                RI(n3,u3)
+            }
+            (RF(n1,u1),RF(n2,u2)) => {
+                let n3 = n1 - n2;
+                let u3 = u1.add(u2);
+                RF(n3,u3)
+            }
+            _ => unimplemented!(),
+        }
+    }
+    pub fn times(self, with: V) -> Self {
+        match (self,with) {
+            _ => unimplemented!(),
+        }
+    }
+    pub fn divide(self, with: V) -> Self {
+        match (self,with) {
             _ => unimplemented!(),
         }
     }
     pub fn less_or_equal_ref(&self, with: &V) -> Self {
         match (self,with) {
             (RI(n1,u1),RI(n2,u2)) => {
-                u1.equal(u2);
+                if !u1.equal(u2) {
+                    panic!("cannot compare different units");
+                }
                 B(n1 <= n2)
+            }
+            _ => unimplemented!(),
+        }
+    }
+    pub fn is(self, with: V) -> Self {
+        match (self,with) {
+            (RI(n1,u1),RI(n2,u2)) => {
+                if !u1.equal(&u2) {
+                    panic!("cannot compare different units");
+                }
+                B(n1 == n2)
+            }
+            (RF(n1,u1),RF(n2,u2)) => {
+                if !u1.equal(&u2) {
+                    panic!("cannot compare different units");
+                }
+                B(n1 == n2)
+            }
+            _ => unimplemented!(),
+        }
+    }
+    pub fn less(self, with: V) -> Self {
+        match (self,with) {
+            (RI(n1,u1),RI(n2,u2)) => {
+                if !u1.equal(&u2) {
+                    panic!("cannot compare different units");
+                }
+                B(n1 < n2)
+            }
+            (RF(n1,u1),RF(n2,u2)) => {
+                if !u1.equal(&u2) {
+                    panic!("cannot compare different units");
+                }
+                B(n1 < n2)
             }
             _ => unimplemented!(),
         }
@@ -47,20 +108,20 @@ impl Iterator for VI {
                     _ => None,
                 }
             }
-            RM(ref m, u) => {
+            RM(ref m, ref u) => {
                 match m.data.get(self.i) {
                     Some(n) => {
                         self.i += 1;
-                        Some(RF(*n,u))
+                        Some(RF(*n,u.clone()))
                     }
                     None => None,
                 }
             }
-            CM(ref m,u) => {
+            CM(ref m, ref u) => {
                 match m.data.get(self.i) {
                     Some(n) => {
                         self.i += 1;
-                        Some(CF(*n,u))
+                        Some(CF(*n,u.clone()))
                     }
                     None => None,
                 }

@@ -30,7 +30,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                             }
                             Some(Break::Dash) => {
                                 b.pop();
-                                return (r.0,Some(b));
+                                if b.len() > 0 {
+                                    return (r.0,Some(b));
+                                } else {
+                                    return (r.0,None);
+                                }
                             }
                             Some(Break::Tilde) => {
                                 return (r.0,Some(b));
@@ -54,7 +58,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
-                                    return (r.0,Some(b));
+                                    if b.len() > 0 {
+                                        return (r.0,Some(b));
+                                    } else {
+                                        return (r.0,None);
+                                    }
                                 }
                                 Some(Break::Tilde) => {
                                     return (r.0,Some(b));
@@ -79,7 +87,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
-                                    return (r.0,Some(b));
+                                    if b.len() > 0 {
+                                        return (r.0,Some(b));
+                                    } else {
+                                        return (r.0,None);
+                                    }
                                 }
                                 Some(Break::Tilde) => {
                                     return (r.0,Some(b));
@@ -101,7 +113,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
-                                    return (r.0,Some(b));
+                                    if b.len() > 0 {
+                                        return (r.0,Some(b));
+                                    } else {
+                                        return (r.0,None);
+                                    }
                                 }
                                 Some(Break::Tilde) => {
                                     return (r.0,Some(b));
@@ -127,7 +143,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                     }
                                     Some(Break::Dash) => {
                                         b.pop();
-                                        return (r.0,Some(b));
+                                        if b.len() > 0 {
+                                            return (r.0,Some(b));
+                                        } else {
+                                            return (r.0,None);
+                                        }
                                     }
                                     Some(Break::Tilde) => {
                                         return (r.0,Some(b));
@@ -156,7 +176,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                     }
                                     Some(Break::Dash) => {
                                         b.pop();
-                                        return (r.0,Some(b));
+                                        if b.len() > 0 {
+                                            return (r.0,Some(b));
+                                        } else {
+                                            return (r.0,None);
+                                        }
                                     }
                                     Some(Break::Tilde) => {
                                         return (r.0,Some(b));
@@ -182,7 +206,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
-                                    return (r.0,Some(b));
+                                    if b.len() > 0 {
+                                        return (r.0,Some(b));
+                                    } else {
+                                        return (r.0,None);
+                                    }
                                 }
                                 Some(Break::Tilde) => {
                                     return (r.0,Some(b));
@@ -207,7 +235,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
-                                    return (r.0,Some(b));
+                                    if b.len() > 0 {
+                                        return (r.0,Some(b));
+                                    } else {
+                                        return (r.0,None);
+                                    }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
@@ -237,7 +269,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
-                                    return (r.0,Some(b));
+                                    if b.len() > 0 {
+                                        return (r.0,Some(b));
+                                    } else {
+                                        return (r.0,None);
+                                    }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
@@ -301,7 +337,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
-                                    return (r.0,Some(b));
+                                    if b.len() > 0 {
+                                        return (r.0,Some(b));
+                                    } else {
+                                        return (r.0,None);
+                                    }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
@@ -368,7 +408,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
-                                    return (r.0,Some(b));
+                                    if b.len() > 0 {
+                                        return (r.0,Some(b));
+                                    } else {
+                                        return (r.0,None);
+                                    }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
@@ -396,7 +440,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
-                                    return (r.0,Some(b));
+                                    if b.len() > 0 {
+                                        return (r.0,Some(b));
+                                    } else {
+                                        return (r.0,None);
+                                    }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
@@ -423,7 +471,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
-                                    return (r.0,Some(b));
+                                    if b.len() > 0 {
+                                        return (r.0,Some(b));
+                                    } else {
+                                        return (r.0,None);
+                                    }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
@@ -439,7 +491,14 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                 }
             }
             Control::Break {series, e1} => {
-                let v1 = eval(e1,env).0;
+                let v1 = eval(e1,env);
+                let v1 = {
+                    if v1.1 != None {
+                        panic!("cannot break out of break statement")
+                    } else {
+                        v1.0
+                    }
+                };
                 match series.last() {
                     Some(Break::Equal) => {
                         return (v1,Some(series.clone()));
@@ -447,7 +506,11 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                     Some(Break::Dash) => {
                         let mut s = series.clone();
                         s.pop();
-                        return (v1,Some(s));
+                        if s.len() > 0 {
+                            return (v1,Some(s));
+                        } else {
+                            return (v1,None);
+                        }
                     }
                     Some(Break::Tilde) => {
                         return (v1,Some(series.clone()));
@@ -478,7 +541,7 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
             _ => unimplemented!(),
         }
     }
-    unimplemented!();
+    return (None,None);
 }
 
 pub fn exec_statement(state: &Statement, mut env: &mut Environment) -> (Option<V>,Option<Vec<Break>>) {

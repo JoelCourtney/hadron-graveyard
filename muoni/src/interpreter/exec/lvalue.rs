@@ -22,7 +22,7 @@ pub fn assign_varl(l: &LValue, v: V, env: &mut Environment) {
                     if r2 != r1 || c2 != c1 {
                         panic!("matrix dimensions of assignment do not match")
                     } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u)));
+                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u.clone())));
                         for (l,r) in pairs {
                             assign_varl(l,r,env);
                         }
@@ -33,7 +33,7 @@ pub fn assign_varl(l: &LValue, v: V, env: &mut Environment) {
                     if r2 != r1 || c2 != c1 {
                         panic!("matrix dimensions of assignment do not match")
                     } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u)));
+                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u.clone())));
                         for (l,r) in pairs {
                             assign_varl(l,r,env);
                         }
@@ -169,7 +169,7 @@ pub fn declare_assign_param(l: &LValue, v: V, env: &mut Environment) {
                     if r2 != r1 || c2 != c1 {
                         panic!("matrix dimensions of assignment do not match")
                     } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u)));
+                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u.clone())));
                         for (l,r) in pairs {
                             declare_assign_param(l,r,env);
                         }
@@ -180,7 +180,7 @@ pub fn declare_assign_param(l: &LValue, v: V, env: &mut Environment) {
                     if r2 != r1 || c2 != c1 {
                         panic!("matrix dimensions of assignment do not match")
                     } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u)));
+                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u.clone())));
                         for (l,r) in pairs {
                             declare_assign_param(l,r,env);
                         }
@@ -250,7 +250,7 @@ pub fn declare_assign_var(l: &LValue, v: V, env: &mut Environment) {
                     if r2 != r1 || c2 != c1 {
                         panic!("matrix dimensions of assignment do not match")
                     } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u)));
+                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u.clone())));
                         for (l,r) in pairs {
                             declare_assign_var(l,r,env);
                         }
@@ -261,7 +261,7 @@ pub fn declare_assign_var(l: &LValue, v: V, env: &mut Environment) {
                     if r2 != r1 || c2 != c1 {
                         panic!("matrix dimensions of assignment do not match")
                     } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u)));
+                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u.clone())));
                         for (l,r) in pairs {
                             declare_assign_var(l,r,env);
                         }
@@ -331,7 +331,7 @@ pub fn declare_assign_val(l: &LValue, v: V, env: &mut Environment) {
                     if r2 != r1 || c2 != c1 {
                         panic!("matrix dimensions of assignment do not match")
                     } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u)));
+                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u.clone())));
                         for (l,r) in pairs {
                             declare_assign_val(l,r,env);
                         }
@@ -342,7 +342,7 @@ pub fn declare_assign_val(l: &LValue, v: V, env: &mut Environment) {
                     if r2 != r1 || c2 != c1 {
                         panic!("matrix dimensions of assignment do not match")
                     } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u)));
+                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u.clone())));
                         for (l,r) in pairs {
                             declare_assign_val(l,r,env);
                         }

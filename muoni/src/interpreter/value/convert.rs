@@ -301,6 +301,19 @@ impl V {
             RI(ri,u) => {
                 S(format!("{}{}",ri,u.to_str()))
             }
+            RF(rf,u) => {
+                S(format!("{}{}",rf,u.to_str()))
+            }
+            S(_) => {
+                self
+            }
+            B(b) => {
+                if b {
+                    S(String::from("true"))
+                } else {
+                    S(String::from("false"))
+                }
+            }
             _ => unimplemented!(),
         }
     }
@@ -308,6 +321,15 @@ impl V {
         match self.to_string() {
             S(s) => s,
             _ => panic!("ya dun fuqd up"),
+        }
+    }
+
+    pub fn get_unit(&self) -> U {
+        match self {
+            RI(_,u) | RF(_,u) | RM(_,u) | CI(_,u) | CF(_,u) | CM(_,u) => {
+                return u.clone();
+            }
+            _ => unimplemented!(),
         }
     }
 }

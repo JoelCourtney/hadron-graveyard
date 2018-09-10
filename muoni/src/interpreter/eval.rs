@@ -4,9 +4,9 @@ use interpreter::exec::unwrap_break;
 use interpreter::env::Environment;
 use interpreter::exec::{lvalue,exec_scope,exec_statement};
 use na::DMatrix;
+use self::RValue::*;
 
 pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>) {
-    use self::RValue::*;
     match rv {
         Number(n) => {
             (Some(V::RF(*n,U::empty())),None)
@@ -16,6 +16,9 @@ pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>
         }
         Bool(b) => {
             (Some(V::B(*b)),None)
+        }
+        Name(n) => {
+            (Some(env.get_varl(n)),None)
         }
         Unary(uop, e1) => {
             let v1 = unwrap_break(eval(e1,env));
@@ -53,6 +56,7 @@ pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>
                         lvalue::declare_assign_param(l,r,env);
                     }
                     let mut r = exec_statement(&f.body, env);
+                    env.pop_scope();
                     match r.1 {
                         None => {
                             return (r.0,None);
@@ -78,7 +82,6 @@ pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>
                             }
                         }
                     }
-                    env.pop_scope();
                 }
                 V::RM(m1,u1) => {
                     let args = eval_arglist(e2,env);
@@ -151,16 +154,16 @@ pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>
                     match elem {
                         V::RI(_,u2) | V::RF(_,u2) | V::RM(_,u2) => {
                             if u == None {
-                                u = Some(u2);
-                            } else if u.unwrap() != u2 {
+                                u = Some(u2.clone());
+                            } else if !u.as_ref().unwrap().equal(u2) {
                                 panic!("units of elements do not match");
                             }
                         }
                         V::CI(_,u2) | V::CF(_,u2) | V::CM(_,u2) => {
                             complex = true;
                             if u == None {
-                                u = Some(u2);
-                            } else if u.unwrap() != u2 {
+                                u = Some(u2.clone());
+                            } else if !u.as_ref().unwrap().equal(u2) {
                                 panic!("units of elements do not match");
                             }
                         }
@@ -226,12 +229,36 @@ pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>
                     }
                 }
                 let data = col_major.into_iter().flat_map(|x| x).collect::<Vec<f64>>();
-                return (Some(V::RM(DMatrix::from_column_slice(height,width,&data),*u.unwrap())),None);
+                return (Some(V::RM(DMatrix::from_column_slice(height,width,&data),u.unwrap())),None);
             } else {
                 unimplemented!();
             }
         }
-        _ => unimplemented!(),
+        ArgList(_) => {
+            panic!("should not be attempting to eval this directly");
+        }
+        Unit(u) => {
+            return (Some(eval_unit(u,env)),None);
+        }
+        Scope(s) => {
+            env.push_scope(true);
+            let result = exec_scope(s,env);
+            env.pop_scope();
+            return result;
+        }
+        Function(name, args, caps, body) => {
+            let scope = env.get_premade_implicit(caps);
+            let f = F {
+                args: args.clone(),
+                scope,
+                body: body.clone(),
+            };
+            return (Some(V::F(Box::new(f))),None);
+        }
+        _ => {
+            println!("{:?}",rv);
+            unimplemented!();
+        }
     }
 }
 
@@ -253,6 +280,53 @@ pub fn eval_bop(bop: BOP, v1: V, v2: V) -> V {
     match bop {
         BOP::Plus => v1.add(v2),
         BOP::Minus => v1.sub(v2),
+        BOP::Is => v1.is(v2),
+        BOP::Less => v1.less(v2),
+        _ => unimplemented!(),
+    }
+}
+
+pub fn eval_unit(u: &RValue, env: &mut Environment) -> V {
+    match u {
+        Name(n) => {
+            let c = env.get_unit(n);
+            c.convert(V::RI(1,U::empty()))
+        }
+        StringLiteral(_) | Bool(_) => {
+            panic!("invalid unit stuffs")
+        }
+        Number(n) => {
+            if *n == 1. {
+                V::RI(1,U::empty())
+            } else {
+                panic!("1 is the only number allowed in unit blocks, except in exponents")
+            }
+        }
+        Unary(..) => {
+            panic!("*, /, and ^ are the only operators allowed in units")
+        }
+        Binary(bop, e1, e2) => {
+            match bop {
+                BOP::Times => {
+                    let v1 = eval_unit(e1,env);
+                    let v2 = eval_unit(e2,env);
+                    v1.times(v2)
+                }
+                BOP::Divide => {
+                    let v1 = eval_unit(e1,env);
+                    let v2 = eval_unit(e2,env);
+                    v1.divide(v2)
+                }
+                BOP::Power => {
+                    let v1 = eval_unit(e1,env);
+                    let v2 = unwrap_break(eval(e2,env)).to_numeric();
+                    match v2 {
+                        _ => unimplemented!(),
+                    }
+                }
+                _ => unimplemented!(),
+            }
+        }
         _ => unimplemented!(),
     }
 }

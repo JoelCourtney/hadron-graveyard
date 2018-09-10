@@ -1,4 +1,4 @@
-use super::{OPENERS,traverse,rvalue,lvalue};
+use super::{OPENERS,CLOSERS,traverse,rvalue,lvalue};
 use ast::{Statement,Lexeme,Assign};
 
 pub fn parse(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
@@ -213,6 +213,7 @@ pub fn delimit(lexemes: &[Lexeme]) -> (usize,i32) {
                 | Some(Lexeme::Number(_))
                 | Some(Lexeme::BreakSeries(_))
                 | Some(Lexeme::StringLiteral(_))
+                | Some(Lexeme::Bool(_))
                 | Some(Lexeme::Question) => {
                     complete = true;
                     i += 1;
@@ -233,6 +234,13 @@ pub fn delimit(lexemes: &[Lexeme]) -> (usize,i32) {
                         panic!("unexpected end of input");
                     }
                 }
+            Some(l) if CLOSERS.contains(l) => {
+                if complete {
+                    return (i,s);
+                } else {
+                    panic!("unexpected end of input")
+                }
+            }
             Some(Lexeme::NewLine) => {
                 if complete {
                     return (i,s);

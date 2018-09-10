@@ -2,6 +2,7 @@ use nc::{Complex,Complex64};
 use na::DMatrix;
 use ast::{Statement,LValue};
 use interpreter::env::Scope;
+use std::collections::HashMap;
 
 #[derive(Debug,Clone,PartialEq)]
 pub enum V {
@@ -22,49 +23,64 @@ pub enum V {
 mod convert;
 mod calc;
 
-#[derive(Debug,PartialEq,Eq,Hash,Copy,Clone)]
+#[derive(Debug,PartialEq,Clone)]
 pub struct TypeFraction {
-    pub n: u64,
-    pub d: u64,
+    components: HashMap<u64,f64>,
 }
 
 impl TypeFraction {
-    fn reduce(mut self) -> Self {
-        use ni::Integer;
-        let mut gcd;
-        loop {
-            gcd = self.n.gcd(&self.d);
-            if gcd == 1 {
-                break;
-            }
-            self.n /= gcd;
-            self.d /= gcd;
-        }
-        self
-    }
     fn add(self, with: TypeFraction) -> Self {
-        if self.n != with.n || self.d != with.d {
-            panic!("incompatible units for addition")
+        for (u,e1) in self.components {
+            if let Some(e2) = with.components.get(&u) {
+                if *e2 != e1 {
+                    panic!("cannot add different units")
+                }
+            } else {
+                panic!("cannot add different units")
+            }
         }
+        with
+    }
+    fn multiply(mut self, with: TypeFraction) -> Self {
+        for (u,e1) in with.components {
+            let e2 = self.components.entry(u).or_insert(0.);
+            *e2 += e1;
+        }
+        self.components.retain(|_,e| *e != 0.);
         self
     }
-    fn multiply(self, with: TypeFraction) -> Self {
-        (TypeFraction {
-            n: self.n * with.n,
-            d: self.d * with.d,
-        }).reduce()
-    }
-    fn divide(self, with: TypeFraction) -> Self {
-        self.multiply(with.invert())
+    fn divide(mut self, with: TypeFraction) -> Self {
+        for (u,e1) in with.components {
+            let e2 = self.components.entry(u).or_insert(0.);
+            *e2 -= e1;
+        }
+        self.components.retain(|_,e| *e != 0.);
+        self
     }
     fn invert(mut self) -> Self {
-        let hold = self.d;
-        self.d = self.n;
-        self.n = hold;
+        for e in self.components.values_mut() {
+            *e = -*e;
+        }
         self
     }
-    fn equal(&self, with: &TypeFraction) -> bool {
-        self.n == with.n && self.d == with.d
+    pub fn equal(&self, with: &TypeFraction) -> bool {
+        for (u,e1) in self.components.iter() {
+            if let Some(e2) = with.components.get(&u) {
+                if *e2 != *e1 {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+    pub fn from_base(b: u64) -> TypeFraction {
+        let mut h = HashMap::new();
+        h.insert(b,1.);
+        TypeFraction {
+            components: h,
+        }
     }
 }
 
@@ -73,23 +89,42 @@ pub type Q = TypeFraction;
 
 impl U {
     pub fn is_empty(&self) -> bool {
-        self.n == self.d
+        self.components.len() == 0
     }
     pub fn empty() -> U {
-        U { n:1, d:1 }
+        U { components: HashMap::new() }
     }
     pub fn to_str(&self) -> String {
-        String::from(format!("[{}/{}]",self.n,self.d))
+        if self.is_empty() {
+            String::from("")
+        } else {
+            unimplemented!()
+        }
     }
 }
 
 #[derive(Debug,PartialEq,Clone)]
 pub struct Converter {
+    unit: U,
     mult: f64,
     add: f64,
 }
 
 pub type C = Converter;
+
+impl C {
+    pub fn base_unit_converter(unit: U) -> C {
+        C {
+            unit,
+            mult: 1.,
+            add: 1.,
+        }
+    }
+    pub fn convert(self, v: V) -> V {
+        let old_unit = v.get_unit();
+        v.add(V::RF(self.add,old_unit)).times(V::RF(self.mult,self.unit))
+    }
+}
 
 pub struct ValueIterator {
     v: V,
