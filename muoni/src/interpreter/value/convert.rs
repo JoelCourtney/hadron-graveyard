@@ -304,6 +304,26 @@ impl V {
             RF(rf,u) => {
                 S(format!("{}{}",rf,u.to_str()))
             }
+            RM(m,u) => {
+                S(format!("{}{}",m.to_string(),u.to_str()))
+            }
+            CI(ci,u) => {
+                if u.is_empty() {
+                    S(format!("{}",ci.to_string()))
+                } else {
+                    S(format!("({}){}",ci.to_string(),u.to_str()))
+                }
+            }
+            CF(cf,u) => {
+                if u.is_empty() {
+                    S(format!("{}",cf.to_string()))
+                } else {
+                    S(format!("({}){}",cf.to_string(),u.to_str()))
+                }
+            }
+            CM(m,u) => {
+                S(format!("{}{}",m.to_string(),u.to_str()))
+            }
             S(_) => {
                 self
             }
@@ -314,6 +334,7 @@ impl V {
                     S(String::from("false"))
                 }
             }
+
             _ => unimplemented!(),
         }
     }

@@ -1,14 +1,17 @@
 use regex::Regex;
 use super::ast::{Lexeme,BOP,UOP,Break};
+use std::collections::HashMap;
+use std::str;
 
 pub fn lex(code: String) -> Vec<Lexeme> {
     let mut lexemes = Vec::new();
-    let l = code.len();
     let chars = code.chars().collect::<Vec<_>>();
+    let l = chars.len();
     let mut i = 0;
+    let mut diff = 0;
     while i < l {
         let mut choice = Lexeme::None;
-        let c = chars.get(i).unwrap();
+        let c = chars.get(i).expect(&format!("{}",i));
         if c.is_whitespace() {
             if c == &'\n' {
                 let prev = lexemes.last();
@@ -17,10 +20,12 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 }
             }
             i += 1;
-        } else if c.is_alphabetic() || c == &'_' {
-            let string = get_handle_string(&code[i..]);
-            i += string.len();
-            choice = match string {
+        } else if c.is_alphabetic() || c == &'_' || c == &'`' {
+            let (old,string) = get_handle_string(&code[i+diff..]);
+            let hold = old.chars().count();
+            i += hold;
+            diff += old.len() - hold;
+            choice = match &string[..] {
                 "is" => {
                     let next = chars.get(i+1);
                     match next {
@@ -116,22 +121,25 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 "var" => Lexeme::Var,
                 "val" => Lexeme::Val,
                 "sym" => Lexeme::Sym,
+                "drop" => Lexeme::Drop,
+                "unit" => Lexeme::Unit,
+                "quantity" => Lexeme::Quantity,
                 "fn" => Lexeme::Func,
                 "collapse" => Lexeme::Collapse,
                 "true" => Lexeme::Bool(true),
                 "false" => Lexeme::Bool(false),
                 _ => Lexeme::Handle(String::from(string))
-            }
+            };
         } else if c.is_numeric() {
-            let (num,len) = get_number_token(&code[i..]);
+            let (num,len) = get_number_token(&code[i+diff..]);
             i += len;
             choice = num;
         } else if c == &'\'' {
-            let string = get_string_squote(&code[i+1..]);
+            let string = get_string_squote(&code[i+1+diff..]);
             i += string.len() + 2;
             choice = Lexeme::StringLiteral(String::from(string));
         } else if c == &'"' {
-            let string = get_string_dquote(&code[i+1..]);
+            let string = get_string_dquote(&code[i+1+diff..]);
             i += string.len() + 2;
             choice = Lexeme::StringLiteral(String::from(string));
         } else {
@@ -154,7 +162,8 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     match prev {
                         Some(Lexeme::Handle(_))
                             | Some(Lexeme::CParen)
-                            | Some(Lexeme::Number(_))
+                            | Some(Lexeme::Integer(_))
+                            | Some(Lexeme::Float(_))
                             | Some(Lexeme::CBrace)
                             | Some(Lexeme::CBraket) => {
                             let next = chars.get(i+1);
@@ -224,6 +233,11 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                     let n1 = chars.get(i+1);
                     let n2 = chars.get(i+2);
                     match (n1, n2) {
+                        (Some(c),_) if c.is_numeric() => {
+                            let (num,len) = get_number_token(&code[i+diff..]);
+                            choice = num;
+                            i += len;
+                        }
                         (Some('*'),Some('=')) => {
                             choice = Lexeme::AssignOp(BOP::ElemTimes);
                             i += 3;
@@ -311,7 +325,8 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 '[' => {
                     let prev = lexemes.last();
                     match prev {
-                        Some(Lexeme::Number(_))
+                        Some(Lexeme::Integer(_))
+                            | Some(Lexeme::Float(_))
                             | Some(Lexeme::CParen)
                             | Some(Lexeme::BinaryOp(BOP::StripUnit))
                             | Some(Lexeme::BinaryOp(BOP::ConcatUnit))
@@ -441,52 +456,139 @@ lazy_static! {
     static ref FLOAT_FORM: Regex =
         Regex::new(r"([[:digit:]]+\.[[:digit:]]*)|([[:digit:]]*\.[[:digit:]]+)").unwrap();
     static ref SCIENTIFIC_FORM: Regex =
-        Regex::new(r"[[:digit:]]+(\.[[:digit:]]*)?e[[:digit:]]+").unwrap();
+        Regex::new(r"(([[:digit:]]+)|([[:digit:]]+\.[[:digit:]]*)|([[:digit:]]*\.[[:digit:]]+))e[[:digit:]]+").unwrap();
+    static ref SCIENTIFIC_SUFFIX_FORM: Regex =
+        Regex::new(r"e[[:digit:]]+").unwrap();
     static ref HANDLE_FORM: Regex =
-        Regex::new(r"[[:alpha:]_][[:word:]]*").unwrap();
+        Regex::new(r"[[:alpha:]_`\p{Greek}][[:word:]`\p{Greek}]*").unwrap();
+    static ref GREEK_HASHMAP: HashMap<&'static str,&'static str> = {
+        let mut m = HashMap::new();
+        m.insert("`alpha`","α");
+        m.insert("`Alpha`","Α");
+        m.insert("`beta`","β");
+        m.insert("`Beta`","Β");
+        m.insert("`gamma`","γ");
+        m.insert("`Gamma`","Γ");
+        m.insert("`delta`","δ");
+        m.insert("`Delta`","Δ");
+        m.insert("`epsilon`","ε");
+        m.insert("`Epsilon`","Ε");
+        m.insert("`zeta`","ζ");
+        m.insert("`Zeta`","Ζ");
+        m.insert("`eta`","η");
+        m.insert("`Eta`","Η");
+        m.insert("`theta`","θ");
+        m.insert("`Theta`","Θ");
+        m.insert("`iota`","ι");
+        m.insert("`Iota`","Ι");
+        m.insert("`kappa`","κ");
+        m.insert("`Kappa`","Κ");
+        m.insert("`lambda`","λ");
+        m.insert("`Lambda`","Λ");
+        m.insert("`mu`","μ");
+        m.insert("`Mu`","Μ");
+        m.insert("`nu`","ν");
+        m.insert("`Nu`","Ν");
+        m.insert("`xi`","ξ");
+        m.insert("`Xi`","Ξ");
+        m.insert("`omicron`","ο");
+        m.insert("`Omicron`","Ο");
+        m.insert("`pi`","π");
+        m.insert("`Pi`","Π");
+        m.insert("`rho`","ρ");
+        m.insert("`Rho`","Ρ");
+        m.insert("`sigma`","σ");
+        m.insert("`Sigma`","Σ");
+        m.insert("`tau`","τ");
+        m.insert("`Tau`","Τ");
+        m.insert("`upsilon`","υ");
+        m.insert("`upsilon`","Υ");
+        m.insert("`phi`","φ");
+        m.insert("`Phi`","Φ");
+        m.insert("`chi`","χ");
+        m.insert("`Chi`","Χ");
+        m.insert("`psi`","ψ");
+        m.insert("`Psi`","Ψ");
+        m.insert("`omega`","ω");
+        m.insert("`Omega`","Ω");
+        m
+    };
 }
 
-fn get_handle_string(state: &str) -> &str {
+fn get_handle_string(state: &str) -> (&str,String) {
     let loc = HANDLE_FORM.find(state).unwrap();
     if loc.start() != 0 {
-        panic!("Failed to parse token!\n{}",state);
+        panic!("Failed to parse token!\n{}",&state[0..5]);
     }
-    &state[..loc.end()]
+    let end = loc.end();
+    let mut s = String::from(&state[..end]);
+    for (escape,chr) in GREEK_HASHMAP.iter() {
+        s = s.replace(escape,chr);
+    }
+    (&state[..loc.end()],s)
 }
 
 fn get_number_token(state: &str) -> (Lexeme, usize) {
     let scientific = SCIENTIFIC_FORM.find(&state);
     match scientific {
-        Some(inst) => {
-            if inst.start() == 0 {
-                let len = inst.end();
-                let mut s = String::from(&state[..inst.end()]);
-                return (Lexeme::Number(s.parse::<f64>().unwrap()),len);
-            }
+        Some(inst) if inst.start() == 0 => {
+            let len = inst.end();
+            let mut s = String::from(&state[..inst.end()]);
+            return (Lexeme::Float(s.parse::<f64>().unwrap()),len);
         }
-        None => {}
+        _ => {}
     }
     let float = FLOAT_FORM.find(&state);
     match float {
-        Some(inst) => {
-            if inst.start() == 0 {
-                let len = inst.end();
-                let mut s = String::from(&state[..inst.end()]);
-                return (Lexeme::Number(s.parse::<f64>().unwrap()),len);
+        Some(inst) if inst.start() == 0 => {
+            let len = inst.end();
+            let mut s = String::from(&state[..inst.end()]);
+            match (&state[len..len+1],&state[len+1..len+2]) {
+                ("i","e") => {
+                    let scientific_suffix = SCIENTIFIC_SUFFIX_FORM.find(&state[len+1..]);
+                    match scientific_suffix {
+                        Some(suffix) if suffix.start() == len+1 => {
+                            s.push_str(&state[len+1..suffix.end()]);
+                            return (Lexeme::ImagFloat(s.parse::<f64>().unwrap()),suffix.end())
+                        }
+                        _ => panic!("unable to parse number"),
+                    }
+                }
+                ("i",_) => {
+                    return (Lexeme::ImagFloat(s.parse::<f64>().unwrap()),len+1);
+                }
+                _ => {
+                    return (Lexeme::Float(s.parse::<f64>().unwrap()),len);
+                }
             }
         }
-        None => {}
+        _ => {}
     }
     let int = INTEGER_FORM.find(&state);
     match int {
-        Some(inst) => {
-            if inst.start() == 0 {
-                let len = inst.end();
-                let mut s = String::from(&state[..inst.end()]);
-                return (Lexeme::Number(s.parse::<f64>().unwrap()),len);
+        Some(inst) if inst.start() == 0 => {
+            let len = inst.end();
+            let mut s = String::from(&state[..inst.end()]);
+            match (&state[len..len+1],&state[len+1..len+2]) {
+                ("i","e") => {
+                    let scientific_suffix = SCIENTIFIC_SUFFIX_FORM.find(&state[len+1..]);
+                    match scientific_suffix {
+                        Some(suffix) if suffix.start() == len+1 => {
+                            s.push_str(&state[len+1..suffix.end()]);
+                            return (Lexeme::ImagFloat(s.parse::<f64>().unwrap()),suffix.end())
+                        }
+                        _ => panic!("unable to parse number"),
+                    }
+                }
+                ("i",_) => {
+                    return (Lexeme::ImagInteger(s.parse::<i64>().unwrap()),len+1);
+                }
+                _ => {
+                    return (Lexeme::Integer(s.parse::<i64>().unwrap()),len);
+                }
             }
         }
-        None => {}
+        _ => {}
     }
     panic!(format!("Number parsing failed!\n{}",state));
 }

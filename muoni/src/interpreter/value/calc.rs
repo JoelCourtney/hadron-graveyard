@@ -16,11 +16,44 @@ impl V {
                 let u3 = u1.add(u2);
                 RF(n3,u3)
             }
+            (CI(n1,u1),CI(n2,u2)) => {
+                let n3 = n1 + n2;
+                let u3 = u1.add(u2);
+                CI(n3,u3)
+            }
+            (RI(n1,u1),RF(n2,u2)) | (RF(n2,u2),RI(n1,u1)) => {
+                let n3 = (n1 as f64) + n2;
+                let u3 = u1.add(u2);
+                RF(n3,u3)
+            }
+            (RI(n1,u1),CI(n2,u2)) | (CI(n2,u2),RI(n1,u1)) => {
+                let n3 = Complex::<i64>::from(n1) + n2;
+                let u3 = u1.add(u2);
+                CI(n3,u3)
+            }
             _ => unimplemented!(),
         }
     }
     pub fn add_ref(&self, with: &V) -> Self {
-        self.clone().add(with.clone())
+        match (self,with) {
+            (RI(n1,u1),RI(n2,u2)) => {
+                let n3 = n1 + n2;
+                if !u1.equal(u2) {
+                    panic!("units in addition are not equal");
+                }
+                RI(n3,u1.clone())
+            }
+            (RF(n1,u1),RF(n2,u2)) => {
+                let n3 = n1 + n2;
+                if !u1.equal(u2) {
+                    panic!("units in addition are not equal");
+                }
+                RF(n3,u1.clone())
+            }
+            _ => {
+                panic!("failed to {:?} + {:?}",self,with);
+            }
+        }
     }
     pub fn sub(self, with: V) -> Self {
         match (self,with) {
@@ -55,7 +88,15 @@ impl V {
                 }
                 B(n1 <= n2)
             }
-            _ => unimplemented!(),
+            (RF(n1,u1),RF(n2,u2)) => {
+                if !u1.equal(u2) {
+                    panic!("cannot compare different units");
+                }
+                B(n1 <= n2)
+            }
+            _ => {
+                panic!("failed to {:?} &<= {:?}",self,with);
+            }
         }
     }
     pub fn is(self, with: V) -> Self {

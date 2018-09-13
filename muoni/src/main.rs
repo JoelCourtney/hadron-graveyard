@@ -4,6 +4,7 @@ extern crate num_bigint as nb;
 extern crate num_integer as ni;
 extern crate num_complex as nc;
 extern crate num_traits;
+extern crate time;
 
 #[macro_use]
 extern crate lazy_static;
@@ -11,6 +12,7 @@ extern crate lazy_static;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
+use time::PreciseTime;
 
 mod ast;
 mod lexer;
@@ -28,10 +30,12 @@ fn main() {
     let mut code = String::new();
     file.read_to_string(&mut code)
         .expect("error reading file");
-
+    let start = PreciseTime::now();
     let lexemes = lexer::lex(code);
 
     let controls = parser::parse(lexemes);
 
     interpreter::exec::exec(&controls);
+
+    // println!("{}",start.to(PreciseTime::now()));
 }

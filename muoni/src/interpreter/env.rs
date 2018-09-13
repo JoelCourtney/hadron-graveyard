@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use super::value::*;
 use ast::LValue;
 use interpreter::exec::lvalue;
+use nc::Complex;
 
 #[derive(Clone,PartialEq,Debug)]
 pub enum Scope {
@@ -28,14 +29,20 @@ pub struct Environment {
 impl Environment {
     pub fn new() -> Self {
         let mut stack = Vec::new();
-        stack.push( Scope::Explicit {
+        let mut varls = HashMap::new();
+        varls.insert(String::from("i"),(V::CI(Complex::<i64>::i(),U::empty()),false));
+        varls.insert(String::from("e"),(V::RF(2.718281828459045235360287471352662497757247093699959574966967627724076630354,U::empty()),false));
+        varls.insert(String::from("π"),(V::RF(3.14159265358979323846264338327950288419716939937510582097494459230781640628620899863,U::empty()),false));
+        varls.insert(String::from("φ"),(V::RF(1.61803398874989484820458683436563811772030917980576286213544862270526046281890,U::empty()),false));
+        let s = Scope::Explicit {
             look_to: None,
-            varls: HashMap::new(),
+            varls,
             next_base_key: 0,
             units: HashMap::new(),
             quantities: HashMap::new(),
             ans: Vec::new(),
-        } );
+        };
+        stack.push(s);
         Environment {
             stack
         }
@@ -296,7 +303,7 @@ impl Environment {
                         return v.clone();
                     } else {
                         match look_to {
-                            None => panic!("variable name not found"),
+                            None => panic!("variable name not found: {}",n),
                             Some(n) => i = *n,
                         }
                     }
@@ -358,12 +365,34 @@ impl Environment {
         }
     }
     pub fn pop_reduce_scope(&mut self) -> Option<V> {
-        // let ans = self.get_top_scope_mut().ans.pop();
-        self.stack.pop();
-        return None;
+        match self.stack.pop() {
+            None => panic!("cannot pop; stack is already empty"),
+            Some(s) => {
+                match s {
+                    Explicit {mut ans,..} => {
+                        return ans.pop();
+                    }
+                    Implicit {..} => panic!("attempting to pop implicit scope"),
+                }
+            }
+        }
     }
     pub fn pop_scope(&mut self) {
         self.stack.pop();
+    }
+    pub fn push_ans(&mut self, v: V) {
+        if let Explicit {ans,..} = self.get_highest_explicit_mut() {
+            ans.push(v);
+        } else {
+            panic!("something has gone horribly wrong");
+        }
+    }
+    pub fn clear_ans(&mut self) {
+        if let Explicit {ans,..} = self.get_highest_explicit_mut() {
+            ans.clear();
+        } else {
+            panic!("something has gone horribly wrong");
+        }
     }
 }
 

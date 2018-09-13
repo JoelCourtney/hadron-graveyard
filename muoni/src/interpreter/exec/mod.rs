@@ -14,30 +14,29 @@ pub fn exec(scope: &[Control]) {
     exec_scope(scope, &mut env);
 }
 
-pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Option<Vec<Break>>) {
+pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> Option<Vec<Break>> {
     use self::Control::*;
-    use self::Break;
     for control in scope {
         match control {
             State {statement} => {
                 let mut r = exec_statement(statement, env);
-                match r.1 {
+                match r {
                     None => {}
                     Some(mut b) => {
                         match b.last() {
                             Some(Break::Equal) => {
-                                return (r.0,Some(b));
+                                return Some(b);
                             }
                             Some(Break::Dash) => {
                                 b.pop();
                                 if b.len() > 0 {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 } else {
-                                    return (r.0,None);
+                                    return None;
                                 }
                             }
                             Some(Break::Tilde) => {
-                                return (r.0,Some(b));
+                                return Some(b);
                             }
                             None => {
                                 panic!("thats not how breaks work");
@@ -49,23 +48,23 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
             If {condition, body} => {
                 if unwrap_break(eval(condition,env)).to_bool_unwrap() {
                     let mut r = exec_statement(body, env);
-                    match r.1 {
+                    match r {
                         None => {}
                         Some(mut b) => {
                             match b.last() {
                                 Some(Break::Equal) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
                                     if b.len() > 0 {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     } else {
-                                        return (r.0,None);
+                                        return None;
                                     }
                                 }
                                 Some(Break::Tilde) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 None => {
                                     panic!("thats not how breaks work");
@@ -78,23 +77,23 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
             IfElse {condition, if_body, else_body} => {
                 if unwrap_break(eval(condition,env)).to_bool_unwrap() {
                     let mut r = exec_statement(if_body, env);
-                    match r.1 {
+                    match r {
                         None => {}
                         Some(mut b) => {
                             match b.last() {
                                 Some(Break::Equal) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
                                     if b.len() > 0 {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     } else {
-                                        return (r.0,None);
+                                        return None;
                                     }
                                 }
                                 Some(Break::Tilde) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 None => {
                                     panic!("thats not how breaks work");
@@ -104,23 +103,23 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                     }
                 } else {
                     let mut r = exec_statement(else_body, env);
-                    match r.1 {
+                    match r {
                         None => {}
                         Some(mut b) => {
                             match b.last() {
                                 Some(Break::Equal) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
                                     if b.len() > 0 {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     } else {
-                                        return (r.0,None);
+                                        return None;
                                     }
                                 }
                                 Some(Break::Tilde) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 None => {
                                     panic!("thats not how breaks work");
@@ -134,23 +133,23 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                 for (i,condition) in conditions.iter().enumerate() {
                     if unwrap_break(eval(condition,env)).to_bool_unwrap() {
                         let mut r = exec_statement(bodies.get(i).unwrap(), env);
-                        match r.1 {
+                        match r {
                             None => {}
                             Some(mut b) => {
                                 match b.last() {
                                     Some(Break::Equal) => {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     }
                                     Some(Break::Dash) => {
                                         b.pop();
                                         if b.len() > 0 {
-                                            return (r.0,Some(b));
+                                            return Some(b);
                                         } else {
-                                            return (r.0,None);
+                                            return None;
                                         }
                                     }
                                     Some(Break::Tilde) => {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     }
                                     None => {
                                         panic!("thats not how breaks work");
@@ -167,23 +166,23 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                 for (i,condition) in conditions.iter().enumerate() {
                     if unwrap_break(eval(condition,env)).to_bool_unwrap() {
                         let mut r = exec_statement(if_bodies.get(i).unwrap(), env);
-                        match r.1 {
+                        match r {
                             None => {}
                             Some(mut b) => {
                                 match b.last() {
                                     Some(Break::Equal) => {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     }
                                     Some(Break::Dash) => {
                                         b.pop();
                                         if b.len() > 0 {
-                                            return (r.0,Some(b));
+                                            return Some(b);
                                         } else {
-                                            return (r.0,None);
+                                            return None;
                                         }
                                     }
                                     Some(Break::Tilde) => {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     }
                                     None => {
                                         panic!("thats not how breaks work");
@@ -191,29 +190,27 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                                 }
                             }
                         }
-                        e = false;
-                        break;
                     }
                 }
                 if e {
                     let mut r = exec_statement(else_body, env);
-                    match r.1 {
+                    match r {
                         None => {}
                         Some(mut b) => {
                             match b.last() {
                                 Some(Break::Equal) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
                                     if b.len() > 0 {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     } else {
-                                        return (r.0,None);
+                                        return None;
                                     }
                                 }
                                 Some(Break::Tilde) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 None => {
                                     panic!("thats not how breaks work");
@@ -226,25 +223,28 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
             For {range, body} => {
                 for _ in unwrap_break(eval(range,env)) {
                     let mut r = exec_statement(body, env);
-                    match r.1 {
+                    match r {
                         None => {}
                         Some(mut b) => {
                             match b.last() {
                                 Some(Break::Equal) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
                                     if b.len() > 0 {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     } else {
-                                        return (r.0,None);
+                                        return None;
                                     }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
-                                    unimplemented!(); // have to push to ans
-                                    break;
+                                    if b.len() > 0 {
+                                        return Some(b);
+                                    } else {
+                                        break;
+                                    }
                                 }
                                 None => {
                                     panic!("thats not how breaks work");
@@ -260,25 +260,28 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                 for v in unwrap_break(eval(range,env)) {
                     lvalue::assign_varl(target,v,env);
                     let mut r = exec_statement(body, env);
-                    match r.1 {
+                    match r {
                         None => {}
                         Some(mut b) => {
                             match b.last() {
                                 Some(Break::Equal) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
                                     if b.len() > 0 {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     } else {
-                                        return (r.0,None);
+                                        return None;
                                     }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
-                                    unimplemented!(); // have to push to ans
-                                    break;
+                                    if b.len() > 0 {
+                                        return Some(b);
+                                    } else {
+                                        break;
+                                    }
                                 }
                                 None => {
                                     panic!("thats not how breaks work");
@@ -328,25 +331,28 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                         unimplemented!();
                     }
                     let mut r = exec_statement(body, env);
-                    match r.1 {
+                    match r {
                         None => {}
                         Some(mut b) => {
                             match b.last() {
                                 Some(Break::Equal) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
                                     if b.len() > 0 {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     } else {
-                                        return (r.0,None);
+                                        return None;
                                     }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
-                                    unimplemented!(); // have to push to ans
-                                    break;
+                                    if b.len() > 0 {
+                                        return Some(b);
+                                    } else {
+                                        break;
+                                    }
                                 }
                                 None => {
                                     panic!("thats not how breaks work");
@@ -396,28 +402,31 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                             env
                         );
                     } else {
-                        unimplemented!();
+                        lvalue::assign_varl(index,V::RI(e as i64,U::empty()),env);
                     }
                     let mut r = exec_statement(body, env);
-                    match r.1 {
+                    match r {
                         None => {}
                         Some(mut b) => {
                             match b.last() {
                                 Some(Break::Equal) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
                                     if b.len() > 0 {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     } else {
-                                        return (r.0,None);
+                                        return None;
                                     }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
-                                    unimplemented!(); // have to push to ans
-                                    break;
+                                    if b.len() > 0 {
+                                        return Some(b);
+                                    } else {
+                                        break;
+                                    }
                                 }
                                 None => {
                                     panic!("thats not how breaks work");
@@ -425,31 +434,35 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                             }
                         }
                     }
+                    e += 1;
                 }
                 env.pop_scope();
             }
             While {condition, body} => {
                 while unwrap_break(eval(condition,env)).to_bool_unwrap() {
                     let mut r = exec_statement(body, env);
-                    match r.1 {
+                    match r {
                         None => {}
                         Some(mut b) => {
                             match b.last() {
                                 Some(Break::Equal) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
                                     if b.len() > 0 {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     } else {
-                                        return (r.0,None);
+                                        return None;
                                     }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
-                                    unimplemented!(); // have to push to ans
-                                    break;
+                                    if b.len() > 0 {
+                                        return Some(b);
+                                    } else {
+                                        break;
+                                    }
                                 }
                                 None => {
                                     panic!("thats not how breaks work");
@@ -462,25 +475,28 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
             Loop {body} => {
                 loop {
                     let mut r = exec_statement(body, env);
-                    match r.1 {
+                    match r {
                         None => {}
                         Some(mut b) => {
                             match b.last() {
                                 Some(Break::Equal) => {
-                                    return (r.0,Some(b));
+                                    return Some(b);
                                 }
                                 Some(Break::Dash) => {
                                     b.pop();
                                     if b.len() > 0 {
-                                        return (r.0,Some(b));
+                                        return Some(b);
                                     } else {
-                                        return (r.0,None);
+                                        return None;
                                     }
                                 }
                                 Some(Break::Tilde) => {
                                     b.pop();
-                                    unimplemented!(); // have to push to ans
-                                    break;
+                                    if b.len() > 0 {
+                                        return Some(b);
+                                    } else {
+                                        break;
+                                    }
                                 }
                                 None => {
                                     panic!("thats not how breaks work");
@@ -490,62 +506,15 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> (Option<V>,Op
                     }
                 }
             }
-            Control::Break {series, e1} => {
-                let v1 = eval(e1,env);
-                let v1 = {
-                    if v1.1 != None {
-                        panic!("cannot break out of break statement")
-                    } else {
-                        v1.0
-                    }
-                };
-                match series.last() {
-                    Some(Break::Equal) => {
-                        return (v1,Some(series.clone()));
-                    }
-                    Some(Break::Dash) => {
-                        let mut s = series.clone();
-                        s.pop();
-                        if s.len() > 0 {
-                            return (v1,Some(s));
-                        } else {
-                            return (v1,None);
-                        }
-                    }
-                    Some(Break::Tilde) => {
-                        return (v1,Some(series.clone()));
-                    }
-                    None => {
-                        panic!("thats not how breaks work");
-                    }
-                }
-            }
-            BreakEmpty {series} => {
-                match series.last() {
-                    Some(Break::Equal) => {
-                        return (env.pop_reduce_scope(),Some(series.clone()));
-                    }
-                    Some(Break::Dash) => {
-                        let mut s = series.clone();
-                        s.pop();
-                        return (env.pop_reduce_scope(),Some(s));
-                    }
-                    Some(Break::Tilde) => {
-                        return (env.pop_reduce_scope(),Some(series.clone()));
-                    }
-                    None => {
-                        panic!("thats not how breaks work");
-                    }
-                }
-            }
             _ => unimplemented!(),
         }
     }
-    return (None,None);
+    return None;
 }
 
-pub fn exec_statement(state: &Statement, mut env: &mut Environment) -> (Option<V>,Option<Vec<Break>>) {
+pub fn exec_statement(state: &Statement, mut env: &mut Environment) -> Option<Vec<Break>> {
     use self::Statement::*;
+    use self::Break;
     match state {
         VarDecl {name} => {
             lvalue::declare_var(name, env);
@@ -611,7 +580,12 @@ pub fn exec_statement(state: &Statement, mut env: &mut Environment) -> (Option<V
             }
         }
         StateValue {e1} => {
-            return eval(e1,env);
+            let r = eval(e1,env);
+            match r.0 {
+                Some(v) => env.push_ans(v),
+                None => {}
+            }
+            return r.1;
         }
         Print {e1} => {
             let v1 = unwrap_break(eval(e1,env));
@@ -630,9 +604,42 @@ pub fn exec_statement(state: &Statement, mut env: &mut Environment) -> (Option<V
             };
             env.declare_assign_val(name,V::F(Box::new(f)));
         }
+        Statement::Break {series, e1} => {
+            let v1 = eval(e1,env);
+            if v1.1 != None {
+                panic!("cannot break out of break statement")
+            } else {
+                match v1.0 {
+                    Some(v) => {
+                        env.push_ans(v);
+                    }
+                    None => {
+                        env.clear_ans();
+                    }
+                }
+            }
+            match series.last() {
+                Some(_) => {
+                    return Some(series.clone());
+                }
+                None => {
+                    panic!("thats not how breaks work");
+                }
+            }
+        }
+        BreakEmpty {series} => {
+            match series.last() {
+                Some(_) => {
+                    return Some(series.clone());
+                }
+                None => {
+                    panic!("thats not how breaks work");
+                }
+            }
+        }
         _ => unimplemented!(),
     }
-    return (None,None);
+    return None;
 }
 
 pub fn unwrap_break((v,s): (Option<V>,Option<Vec<Break>>)) -> V {

@@ -22,7 +22,10 @@ pub fn delimit(lexemes: &[Lexeme]) -> usize {
                     i += 1;
                 }
             Some(Lexeme::Handle(_))
-                | Some(Lexeme::Number(_))
+                | Some(Lexeme::Float(_))
+                | Some(Lexeme::Integer(_))
+                | Some(Lexeme::ImagFloat(_))
+                | Some(Lexeme::ImagInteger(_))
                 | Some(Lexeme::StringLiteral(_))
                 | Some(Lexeme::Bool(_))
                 | Some(Lexeme::BreakSeries(_)) => {
@@ -175,16 +178,70 @@ pub fn parse_atom(lexemes: &[Lexeme]) -> Box<RValue> {
                 }
             }
         }
-        Lexeme::Number(n) => {
+        Lexeme::Integer(n) => {
             if l == 1 {
-                return Box::new(RValue::Number(*n));
+                return Box::new(RValue::Integer(*n));
             } else {
                 match lexemes.get(1) {
                     Some(Lexeme::OUnit) => {
                         let u = parse_contained(&lexemes[2..lexemes.len()-1]);
                         return Box::new(
                             RValue::UnitTag(
-                                Box::new(RValue::Number(*n)),
+                                Box::new(RValue::Integer(*n)),
+                                u
+                                )
+                            );
+                    }
+                    _ => panic!("unexpected character in rvalue"),
+                }
+            }
+        }
+        Lexeme::ImagInteger(n) => {
+            if l == 1 {
+                return Box::new(RValue::ImagInteger(*n));
+            } else {
+                match lexemes.get(1) {
+                    Some(Lexeme::OUnit) => {
+                        let u = parse_contained(&lexemes[2..lexemes.len()-1]);
+                        return Box::new(
+                            RValue::UnitTag(
+                                Box::new(RValue::ImagInteger(*n)),
+                                u
+                                )
+                            );
+                    }
+                    _ => panic!("unexpected character in rvalue"),
+                }
+            }
+        }
+        Lexeme::Float(n) => {
+            if l == 1 {
+                return Box::new(RValue::Float(*n));
+            } else {
+                match lexemes.get(1) {
+                    Some(Lexeme::OUnit) => {
+                        let u = parse_contained(&lexemes[2..lexemes.len()-1]);
+                        return Box::new(
+                            RValue::UnitTag(
+                                Box::new(RValue::Float(*n)),
+                                u
+                                )
+                            );
+                    }
+                    _ => panic!("unexpected character in rvalue"),
+                }
+            }
+        }
+        Lexeme::ImagFloat(n) => {
+            if l == 1 {
+                return Box::new(RValue::ImagFloat(*n));
+            } else {
+                match lexemes.get(1) {
+                    Some(Lexeme::OUnit) => {
+                        let u = parse_contained(&lexemes[2..lexemes.len()-1]);
+                        return Box::new(
+                            RValue::UnitTag(
+                                Box::new(RValue::ImagFloat(*n)),
                                 u
                                 )
                             );
@@ -375,7 +432,7 @@ fn parse_function(lexemes: &[Lexeme]) -> Box<RValue> {
         }
         l => panic!("expected -> or capture block: {:?}",l),
     }
-    let (body,length) = statement::parse(&lexemes[i..]);
+    let (body,length) = parse(&lexemes[i..]);
     i += length;
     // if i != lexemes.len() {
     //     panic!("unexpected code after function: {},{}",i,lexemes.len());

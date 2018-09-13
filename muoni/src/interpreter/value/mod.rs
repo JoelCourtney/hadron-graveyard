@@ -1,6 +1,6 @@
 use nc::{Complex,Complex64};
 use na::DMatrix;
-use ast::{Statement,LValue};
+use ast::{Statement,LValue,RValue};
 use interpreter::env::Scope;
 use std::collections::HashMap;
 
@@ -138,7 +138,7 @@ pub struct Function {
     //pub name: String,
     pub args: Vec<LValue>,
     pub scope: Scope,
-    pub body: Box<Statement>,
+    pub body: Box<RValue>,
 }
 
 pub type F = Function;

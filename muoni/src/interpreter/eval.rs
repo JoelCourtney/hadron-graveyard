@@ -5,11 +5,21 @@ use interpreter::env::Environment;
 use interpreter::exec::{lvalue,exec_scope,exec_statement};
 use na::DMatrix;
 use self::RValue::*;
+use nc::{Complex,Complex64};
 
 pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>) {
     match rv {
-        Number(n) => {
+        Integer(n) => {
+            (Some(V::RI(*n,U::empty())),None)
+        }
+        ImagInteger(n) => {
+            (Some(V::CI(Complex::<i64>::new(0,*n),U::empty())),None)
+        }
+        Float(n) => {
             (Some(V::RF(*n,U::empty())),None)
+        }
+        ImagFloat(n) => {
+            (Some(V::CF(Complex64::new(0.,*n),U::empty())),None)
         }
         StringLiteral(s) => {
             (Some(V::S(s.clone())),None)
@@ -24,17 +34,17 @@ pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>
             let v1 = unwrap_break(eval(e1,env));
             (Some(eval_uop(*uop,v1)),None)
         }
-        Binary(BOP::Range, e1, e2) => {
-            let mut v1 = unwrap_break(eval(e1,env)).to_numeric();
-            match **e2 {
-                Binary(BOP::Range, ref e3, ref e4) => {
-                    let v3 = unwrap_break(eval(&e3,env)).to_numeric();
-                    let v4 = unwrap_break(eval(&e4,env)).to_numeric();
-                    (Some(V::R(Box::new(v1),Box::new(v3),Box::new(v4))),None)
+        Binary(BOP::Range, e1, ee) => {
+            let mut ve = unwrap_break(eval(ee,env)).to_numeric();
+            match **e1 {
+                Binary(BOP::Range, ref es, ref eb) => {
+                    let vs = unwrap_break(eval(&es,env)).to_numeric();
+                    let vb = unwrap_break(eval(&eb,env)).to_numeric();
+                    (Some(V::R(Box::new(vs),Box::new(vb),Box::new(ve))),None)
                 }
                 _ => {
-                    let v2 = unwrap_break(eval(e2,env)).to_numeric();
-                    (Some(V::R(Box::new(v1),Box::new(V::N),Box::new(v2))),None)
+                    let vs = unwrap_break(eval(e1,env)).to_numeric();
+                    (Some(V::R(Box::new(vs),Box::new(V::RI(1,U::empty())),Box::new(ve))),None)
                 }
             }
         }
@@ -55,7 +65,7 @@ pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>
                     for (l,r) in f.args.iter().zip(args.into_iter()) {
                         lvalue::declare_assign_param(l,r,env);
                     }
-                    let mut r = exec_statement(&f.body, env);
+                    let mut r = eval(&f.body, env);
                     env.pop_scope();
                     match r.1 {
                         None => {
@@ -231,7 +241,73 @@ pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>
                 let data = col_major.into_iter().flat_map(|x| x).collect::<Vec<f64>>();
                 return (Some(V::RM(DMatrix::from_column_slice(height,width,&data),u.unwrap())),None);
             } else {
-                unimplemented!();
+                let mut col_major = Vec::new();
+                for row in &m {
+                    let mut row_height = 0;
+                    let mut cols = Vec::new();
+                    for elem in row {
+                        match elem {
+                            V::RI(ri,_) => {
+                                if row_height == 0 {
+                                    row_height = 1;
+                                } else if row_height != 1 {
+                                    panic!("row heights do not match");
+                                }
+                                cols.push(vec![Complex64::from(*ri as f64)]);
+                            }
+                            V::RF(rf,_) => {
+                                if row_height == 0 {
+                                    row_height = 1;
+                                } else if row_height != 1 {
+                                    panic!("row heights do not match");
+                                }
+                                cols.push(vec![Complex64::from(rf)]);
+                            }
+                            V::RM(rm,_) => {
+                                if row_height == 0 {
+                                    row_height = rm.nrows();
+                                } else if row_height != rm.nrows() {
+                                    panic!("row heights do not match");
+                                }
+                                for c in 0..rm.ncols() {
+                                    cols.push(rm.column(c).iter().map(|x| Complex64::from(*x)).collect());
+                                }
+                            }
+                            V::CI(ci,_) => {
+                                if row_height == 0 {
+                                    row_height = 1;
+                                } else if row_height != 1 {
+                                    panic!("row heights do not match");
+                                }
+                                cols.push(vec![Complex64::new(ci.re as f64,ci.im as f64)]);
+                            }
+                            V::CF(cf,_) => {
+                                if row_height == 0 {
+                                    row_height = 1;
+                                } else if row_height != 1 {
+                                    panic!("row heights do not match");
+                                }
+                                cols.push(vec![*cf]);
+                            }
+                            _ => panic!("should not be seeing these here"),
+                        }
+                    }
+                    height += row_height;
+                    if width == 0 {
+                        width = cols.len();
+                    } else if width != cols.len() {
+                        panic!("row lengths do not match");
+                    }
+                    if col_major.len() == 0 {
+                        col_major = cols;
+                    } else {
+                        for (i,c) in cols.into_iter().enumerate() {
+                            col_major.get_mut(i).unwrap().extend(c);
+                        }
+                    }
+                }
+                let data = col_major.into_iter().flat_map(|x| x).collect::<Vec<Complex64>>();
+                return (Some(V::CM(DMatrix::from_column_slice(height,width,&data),u.unwrap())),None);
             }
         }
         ArgList(_) => {
@@ -242,9 +318,9 @@ pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>
         }
         Scope(s) => {
             env.push_scope(true);
-            let result = exec_scope(s,env);
-            env.pop_scope();
-            return result;
+            let breaks = exec_scope(s,env);
+            let result = env.pop_reduce_scope();
+            return (result,breaks);
         }
         Function(name, args, caps, body) => {
             let scope = env.get_premade_implicit(caps);
@@ -295,7 +371,14 @@ pub fn eval_unit(u: &RValue, env: &mut Environment) -> V {
         StringLiteral(_) | Bool(_) => {
             panic!("invalid unit stuffs")
         }
-        Number(n) => {
+        Integer(n) => {
+            if *n == 1 {
+                V::RI(1,U::empty())
+            } else {
+                panic!("1 is the only number allowed in unit blocks, except in exponents")
+            }
+        }
+        Float(n) => {
             if *n == 1. {
                 V::RI(1,U::empty())
             } else {

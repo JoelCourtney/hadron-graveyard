@@ -48,13 +48,6 @@ pub enum Control {
     Loop {
         body: Box<Statement>,
     },
-    Break {
-        series: Vec<Break>,
-        e1: Box<RValue>
-    },
-    BreakEmpty {
-        series: Vec<Break>
-    },
     Empty,
 }
 
@@ -91,7 +84,7 @@ pub enum Statement {
         name: String,
         args: Vec<LValue>,
         caps: Vec<LValue>,
-        body: Box<Statement>,
+        body: Box<RValue>,
     },
     Print {
         e1: Box<RValue>,
@@ -101,6 +94,13 @@ pub enum Statement {
     },
     Drop {
         name: Box<LValue>,
+    },
+    Break {
+        series: Vec<Break>,
+        e1: Box<RValue>
+    },
+    BreakEmpty {
+        series: Vec<Break>
     },
 }
 
@@ -122,7 +122,10 @@ pub enum LValue {
 
 #[derive(Debug,PartialEq,Clone)]
 pub enum RValue {
-    Number(f64),
+    Integer(i64),
+    Float(f64),
+    ImagInteger(i64),
+    ImagFloat(f64),
     StringLiteral(String),
     Bool(bool),
     Name(String),
@@ -137,8 +140,8 @@ pub enum RValue {
     UnitTag(Box<RValue>,Box<RValue>),
     CaptureScope(Vec<LValue>,Vec<Control>),
     Scope(Vec<Control>),
-    Function(String,Vec<LValue>,Vec<LValue>,Box<Statement>),
-    AnonFunction(Vec<LValue>,Vec<LValue>,Box<Statement>),
+    Function(String,Vec<LValue>,Vec<LValue>,Box<RValue>),
+    AnonFunction(Vec<LValue>,Vec<LValue>,Box<RValue>),
 }
 
 #[derive(Debug,PartialEq)]
@@ -153,10 +156,13 @@ pub enum Lexeme {
     Semicolon,
     NewLine,
     Dot,
-    Number(f64),
-    Handle(String),
+    Integer(i64),
+    Float(f64),
+    ImagInteger(i64),
+    ImagFloat(f64),
     StringLiteral(String),
     Bool(bool),
+    Handle(String),
     If,
     ElseIf,
     Else,
@@ -167,7 +173,10 @@ pub enum Lexeme {
     At,
     Var,
     Val,
+    Drop,
     Sym,
+    Unit,
+    Quantity,
     Func,
     Question,
     OParen,

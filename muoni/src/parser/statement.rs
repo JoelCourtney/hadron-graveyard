@@ -104,7 +104,7 @@ pub fn parse(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
                 }
                 l => panic!("expected -> or capture block: {:?}",l),
             }
-            let (body,length) = parse(&lexemes[i..]);
+            let (body,length) = rvalue::parse(&lexemes[i..]);
             (
                 Box::new(Statement::AssignFunction {
                     name,
@@ -136,6 +136,31 @@ pub fn parse(lexemes: &[Lexeme]) -> (Box<Statement>,usize) {
                 }),
                 i,
                 )
+        }
+        Some(Lexeme::BreakSeries(series)) => {
+            let length = rvalue::delimit(&lexemes[i..]);
+            if length > 1 {
+                let e1 = rvalue::parse_contained(&lexemes[i+1..i+length]);
+                i += length;
+                let mut s = series.clone();
+                s.reverse();
+                (
+                    Box::new(Statement::Break {
+                        series: s,
+                        e1,
+                    }),
+                    i,
+                    )
+            } else {
+                let mut s = series.clone();
+                s.reverse();
+                (
+                    Box::new(Statement::BreakEmpty {
+                        series: s,
+                    }),
+                    i+1,
+                    )
+            }
         }
         Some(_) => {
             let (length,assign) = delimit(&lexemes[i..]);
@@ -210,7 +235,10 @@ pub fn delimit(lexemes: &[Lexeme]) -> (usize,i32) {
                     i += 1;
                 }
             Some(Lexeme::Handle(_))
-                | Some(Lexeme::Number(_))
+                | Some(Lexeme::Integer(_))
+                | Some(Lexeme::Float(_))
+                | Some(Lexeme::ImagInteger(_))
+                | Some(Lexeme::ImagFloat(_))
                 | Some(Lexeme::BreakSeries(_))
                 | Some(Lexeme::StringLiteral(_))
                 | Some(Lexeme::Bool(_))
