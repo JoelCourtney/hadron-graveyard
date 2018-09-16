@@ -22,6 +22,7 @@ pub enum V {
 
 mod convert;
 mod calc;
+mod types;
 
 #[derive(Debug,PartialEq,Clone)]
 pub struct TypeFraction {

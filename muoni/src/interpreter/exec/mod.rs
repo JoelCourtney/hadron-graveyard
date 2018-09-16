@@ -589,7 +589,7 @@ pub fn exec_statement(state: &Statement, mut env: &mut Environment) -> Option<Ve
         }
         Print {e1} => {
             let v1 = unwrap_break(eval(e1,env));
-            println!("{}",v1.to_string_unwrap());
+            println!("{}",v1.to_str_unwrap());
         }
         Drop {name} => {
             lvalue::drop_varl(name,env);

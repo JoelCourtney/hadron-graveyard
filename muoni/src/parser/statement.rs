@@ -254,6 +254,7 @@ pub fn delimit(lexemes: &[Lexeme]) -> (usize,i32) {
                 }
             None
                 | Some(Lexeme::Semicolon)
+                | Some(Lexeme::Comma)
                 | Some(Lexeme::Else)
                 | Some(Lexeme::ElseIf) => {
                     if complete {

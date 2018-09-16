@@ -122,12 +122,14 @@ pub fn lex(code: String) -> Vec<Lexeme> {
                 "val" => Lexeme::Val,
                 "sym" => Lexeme::Sym,
                 "drop" => Lexeme::Drop,
-                "unit" => Lexeme::Unit,
-                "quantity" => Lexeme::Quantity,
+                "dimension" => Lexeme::Dimension,
                 "fn" => Lexeme::Func,
                 "collapse" => Lexeme::Collapse,
                 "true" => Lexeme::Bool(true),
                 "false" => Lexeme::Bool(false),
+                "struct" => Lexeme::Struct,
+                "class" => Lexeme::Class,
+                "enum" => Lexeme::Enum,
                 _ => Lexeme::Handle(String::from(string))
             };
         } else if c.is_numeric() {

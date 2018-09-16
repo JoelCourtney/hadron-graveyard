@@ -1,5 +1,5 @@
 use ast::{Control,Lexeme};
-use super::{rvalue,lvalue,statement,traverse};
+use super::{rvalue,lvalue,statement,traverse,list};
 
 pub fn parse(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
     let mut i = 0;
@@ -190,12 +190,31 @@ pub fn parse(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
                 )
         }
         Some(Lexeme::Loop) => {
-            i +=1;
+            i += 1;
             let (body,length) = statement::parse(&lexemes[i..]);
             i += length;
             (
                 Box::new(Control::Loop {
                     body,
+                }),
+                i,
+            )
+        }
+        Some(Lexeme::Dimension) => {
+            i += 1;
+            let name = match lexemes.get(i) {
+                Some(Lexeme::Handle(n)) => {
+                    i += 1;
+                    Some(n.clone())
+                }
+                _ => None,
+            };
+            let (units,length) = list::parse(&lexemes[i..]);
+            i += length;
+            (
+                Box::new(Control::Dimension {
+                    name,
+                    units,
                 }),
                 i,
             )

@@ -296,7 +296,7 @@ impl V {
     pub fn to_numeric(self) -> Self {
         self // very much no
     }
-    pub fn to_string(self) -> Self {
+    pub fn to_str(self) -> Self {
         match self {
             RI(ri,u) => {
                 S(format!("{}{}",ri,u.to_str()))
@@ -305,7 +305,27 @@ impl V {
                 S(format!("{}{}",rf,u.to_str()))
             }
             RM(m,u) => {
-                S(format!("{}{}",m.to_string(),u.to_str()))
+                S(
+                    m.to_string()
+                        .replace("┌","╭")
+                        .replace("┐","╮")
+                        .replace("└","╰")
+                        .replace("┘","╯")
+                )
+                // let mut s = String::from("(");
+                // let c = m.ncols();
+                // for (i,v) in m.into_iter().enumerate() {
+                //     s.push_str(&v.to_string());
+                //     if i % c == c-1 {
+                //         s.push_str("; ");
+                //     } else {
+                //         s.push_str(", ");
+                //     }
+                // }
+                // s.pop();
+                // s.push_str(")");
+                // s.push_str(&format!("{}",u.to_str()));
+                // S(s)
             }
             CI(ci,u) => {
                 if u.is_empty() {
@@ -322,7 +342,20 @@ impl V {
                 }
             }
             CM(m,u) => {
-                S(format!("{}{}",m.to_string(),u.to_str()))
+                let mut s = String::from("(");
+                let c = m.ncols();
+                for (i,v) in m.into_iter().enumerate() {
+                    s.push_str(&v.to_string());
+                    if i % c == c-1 {
+                        s.push_str("; ");
+                    } else {
+                        s.push_str(", ");
+                    }
+                }
+                s.pop();
+                s.push_str(")");
+                s.push_str(&u.to_str());
+                S(s)
             }
             S(_) => {
                 self
@@ -334,12 +367,21 @@ impl V {
                     S(String::from("false"))
                 }
             }
-
+            L(l) => {
+                let mut s = String::from("[ ");
+                for v in l.into_iter() {
+                    s.push_str(&v.to_str_unwrap());
+                    s.push_str(", ");
+                }
+                s.pop(); s.pop();
+                s.push_str(" ]");
+                S(s)
+            }
             _ => unimplemented!(),
         }
     }
-    pub fn to_string_unwrap(self) -> String {
-        match self.to_string() {
+    pub fn to_str_unwrap(self) -> String {
+        match self.to_str() {
             S(s) => s,
             _ => panic!("ya dun fuqd up"),
         }

@@ -48,6 +48,10 @@ pub enum Control {
     Loop {
         body: Box<Statement>,
     },
+    Dimension {
+        name: Option<String>,
+        units: Vec<Statement>,
+    },
     Empty,
 }
 
@@ -175,9 +179,11 @@ pub enum Lexeme {
     Val,
     Drop,
     Sym,
-    Unit,
-    Quantity,
+    Dimension,
     Func,
+    Struct,
+    Class,
+    Enum,
     Question,
     OParen,
     OArgList,

@@ -95,3 +95,12 @@ print (cm,5i+3i)
 
 print i
 print e
+
+val l = ["hello",5]
+val l2 = [l, (3,4,5)]
+print l2
+
+dimension Test [
+	m,
+	km = 1000*m
+]

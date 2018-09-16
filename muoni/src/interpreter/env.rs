@@ -44,7 +44,7 @@ impl Environment {
         };
         stack.push(s);
         Environment {
-            stack
+            stack,
         }
     }
     pub fn get_top_scope(&self) -> &Scope {
