@@ -1,7 +1,8 @@
-use interpreter::value::{V,U};
+use interpreter::value::{D,V};
 use V::*;
 use nc::{Complex,Complex64};
 use na::DMatrix;
+use interpreter::env::Environment;
 
 impl V {
     fn to_ri(self) -> Self {
@@ -43,14 +44,14 @@ impl V {
             }
             S(s) => {
                 let ri = s.parse::<i64>();
-                let u = U::empty();
+                let u = D::empty();
                 match ri {
                     Ok(ri) => RI(ri,u),
                     Err(_) => panic!("cannot parse string as int"),
                 }
             }
             B(b) => {
-                let u = U::empty();
+                let u = D::empty();
                 if b {
                     RI(1,u)
                 } else {
@@ -118,14 +119,14 @@ impl V {
             }
             S(s) => {
                 let rf = s.parse::<f64>();
-                let u = U::empty();
+                let u = D::empty();
                 match rf {
                     Ok(rf) => RF(rf,u),
                     Err(_) => panic!("cannot parse string as int"),
                 }
             }
             B(b) => {
-                let u = U::empty();
+                let u = D::empty();
                 if b {
                     RF(1.,u)
                 } else {
@@ -139,6 +140,18 @@ impl V {
                 panic!("cannot convert functions to any other type");
             }
             _ => unimplemented!(),
+        }
+    }
+    pub fn to_rf_unwrap(self) -> f64 {
+        match self.to_rf() {
+            RF(f,u) => {
+                if u.is_empty() {
+                    f
+                } else {
+                    panic!("cannot unwrap number with units.")
+                }
+            }
+            _ => panic!("conversion to rf failed"),
         }
     }
     fn to_rm(self) -> Self {
@@ -169,7 +182,7 @@ impl V {
                 panic!("not yet sorry");
             }
             B(b) => {
-                let u = U::empty();
+                let u = D::empty();
                 if b {
                     RM(DMatrix::from_element(1,1,1.),u)
                 } else {
@@ -217,7 +230,7 @@ impl V {
                 panic!("not yet sorry");
             }
             B(b) => {
-                let u = U::empty();
+                let u = D::empty();
                 if b {
                     RM(DMatrix::from_element(1,1,1.),u)
                 } else {
@@ -296,13 +309,13 @@ impl V {
     pub fn to_numeric(self) -> Self {
         self // very much no
     }
-    pub fn to_str(self) -> Self {
+    pub fn to_str(self, env: &Environment) -> Self {
         match self {
             RI(ri,u) => {
-                S(format!("{}{}",ri,u.to_str()))
+                S(format!("{}{}",ri,u.to_str(env)))
             }
             RF(rf,u) => {
-                S(format!("{}{}",rf,u.to_str()))
+                S(format!("{}{}",rf,u.to_str(env)))
             }
             RM(m,u) => {
                 S(
@@ -331,14 +344,14 @@ impl V {
                 if u.is_empty() {
                     S(format!("{}",ci.to_string()))
                 } else {
-                    S(format!("({}){}",ci.to_string(),u.to_str()))
+                    S(format!("({}){}",ci.to_string(),u.to_str(env)))
                 }
             }
             CF(cf,u) => {
                 if u.is_empty() {
                     S(format!("{}",cf.to_string()))
                 } else {
-                    S(format!("({}){}",cf.to_string(),u.to_str()))
+                    S(format!("({}){}",cf.to_string(),u.to_str(env)))
                 }
             }
             CM(m,u) => {
@@ -354,7 +367,7 @@ impl V {
                 }
                 s.pop();
                 s.push_str(")");
-                s.push_str(&u.to_str());
+                s.push_str(&u.to_str(env));
                 S(s)
             }
             S(_) => {
@@ -370,7 +383,7 @@ impl V {
             L(l) => {
                 let mut s = String::from("[ ");
                 for v in l.into_iter() {
-                    s.push_str(&v.to_str_unwrap());
+                    s.push_str(&v.to_str_unwrap(env));
                     s.push_str(", ");
                 }
                 s.pop(); s.pop();
@@ -380,14 +393,14 @@ impl V {
             _ => unimplemented!(),
         }
     }
-    pub fn to_str_unwrap(self) -> String {
-        match self.to_str() {
+    pub fn to_str_unwrap(self, env: &Environment) -> String {
+        match self.to_str(env) {
             S(s) => s,
             _ => panic!("ya dun fuqd up"),
         }
     }
 
-    pub fn get_unit(&self) -> U {
+    pub fn get_unit(&self) -> D {
         match self {
             RI(_,u) | RF(_,u) | RM(_,u) | CI(_,u) | CF(_,u) | CM(_,u) => {
                 return u.clone();

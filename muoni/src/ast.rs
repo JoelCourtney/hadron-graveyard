@@ -49,7 +49,7 @@ pub enum Control {
         body: Box<Statement>,
     },
     Dimension {
-        name: Option<String>,
+        name: String,
         units: Vec<Statement>,
     },
     Empty,

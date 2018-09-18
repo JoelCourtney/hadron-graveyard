@@ -11,7 +11,7 @@ pub enum Scope {
         varls: HashMap<String,(V,bool)>,
         next_base_key: u64,
         units: HashMap<String,C>,
-        quantities: HashMap<String,Q>,
+        dimensions: HashMap<String,D>,
         ans: Vec<V>,
     },
     Implicit {
@@ -30,16 +30,16 @@ impl Environment {
     pub fn new() -> Self {
         let mut stack = Vec::new();
         let mut varls = HashMap::new();
-        varls.insert(String::from("i"),(V::CI(Complex::<i64>::i(),U::empty()),false));
-        varls.insert(String::from("e"),(V::RF(2.718281828459045235360287471352662497757247093699959574966967627724076630354,U::empty()),false));
-        varls.insert(String::from("π"),(V::RF(3.14159265358979323846264338327950288419716939937510582097494459230781640628620899863,U::empty()),false));
-        varls.insert(String::from("φ"),(V::RF(1.61803398874989484820458683436563811772030917980576286213544862270526046281890,U::empty()),false));
+        varls.insert(String::from("i"),(V::CI(Complex::<i64>::i(),D::empty()),false));
+        varls.insert(String::from("e"),(V::RF(2.718281828459045235360287471352662497757247093699959574966967627724076630354,D::empty()),false));
+        varls.insert(String::from("π"),(V::RF(3.14159265358979323846264338327950288419716939937510582097494459230781640628620899863,D::empty()),false));
+        varls.insert(String::from("φ"),(V::RF(1.61803398874989484820458683436563811772030917980576286213544862270526046281890,D::empty()),false));
         let s = Scope::Explicit {
             look_to: None,
             varls,
             next_base_key: 0,
             units: HashMap::new(),
-            quantities: HashMap::new(),
+            dimensions: HashMap::new(),
             ans: Vec::new(),
         };
         stack.push(s);
@@ -182,43 +182,43 @@ impl Environment {
             }
         }
     }
-    fn declare_base_quantity(&mut self, n: &String) {
+    pub fn declare_base_dimension(&mut self, n: &String) -> D {
         match self.get_highest_explicit_mut() {
-            Explicit {quantities,next_base_key,..} => {
-                quantities.insert(n.clone(), Q::from_base(*next_base_key));
-                *next_base_key += 1;
-            }
-            _ => panic!("cannot declare quantities in implicit scope"),
-        }
-    }
-    fn declare_derived_quantity(&mut self, n: &String, q: Q) {
-        match self.get_highest_explicit_mut() {
-            Explicit {quantities,..} => {
-                if let Some(_) = quantities.get(n) {
-                    panic!("quantities cannot be shadowed or redefined");
+            Explicit {dimensions,next_base_key,..} => {
+                if let Some(_) = dimensions.get(n) {
+                    panic!("dimensions cannot be shadowed or redefined");
                 }
-                quantities.insert(n.clone(),q);
+                let q = D::from_base(*next_base_key);
+                dimensions.insert(n.clone(), q.clone());
+                *next_base_key += 1;
+                return q;
             }
-            _ => panic!("cannot declare quantities in implicit scope"),
+            _ => panic!("cannot declare dimensions in implicit scope"),
         }
     }
-    fn declare_base_unit(&mut self, n: &String, q: Option<&Q>) {
+    pub fn declare_derived_dimension(&mut self, n: &String, q: D) {
         match self.get_highest_explicit_mut() {
-            Explicit {quantities,units,next_base_key,..} => {
+            Explicit {dimensions,..} => {
+                if let Some(_) = dimensions.get(n) {
+                    panic!("dimensions cannot be shadowed or redefined");
+                }
+                dimensions.insert(n.clone(),q);
+            }
+            _ => panic!("cannot declare dimensions in implicit scope"),
+        }
+    }
+    pub fn declare_base_unit(&mut self, n: &String, q: D) {
+        match self.get_highest_explicit_mut() {
+            Explicit {dimensions,units,next_base_key,..} => {
                 if let Some(_) = units.get(n) {
                     panic!("units cannot be shadowed or redefined");
                 }
-                if let Some(q) = q {
-                    units.insert(n.clone(), C::base_unit_converter(q.clone()));
-                } else {
-                    units.insert(n.clone(), C::base_unit_converter(U::from_base(*next_base_key)));
-                    *next_base_key += 1;
-                }
+                units.insert(n.clone(), C::base_unit_converter(q));
             }
             _ => panic!("cannot declare units in implicit scope"),
         }
     }
-    fn declare_derived_unit(&mut self, n: &String, c: C) {
+    pub fn declare_derived_unit(&mut self, n: &String, c: C) {
         match self.get_highest_explicit_mut() {
             Explicit {units,..} => {
                 if let Some(_) = units.get(n) {
@@ -226,7 +226,7 @@ impl Environment {
                 }
                 units.insert(n.clone(),c);
             }
-            _ => panic!("cannot declare quantities in implicit scope"),
+            _ => panic!("cannot declare dimensions in implicit scope"),
         }
     }
     pub fn drop_varl(&mut self, n: &String) {
@@ -280,7 +280,7 @@ impl Environment {
                 varls: HashMap::new(),
                 next_base_key: nui,
                 units: HashMap::new(),
-                quantities: HashMap::new(),
+                dimensions: HashMap::new(),
                 ans: Vec::new(),
             } );
         } else {
@@ -343,6 +343,48 @@ impl Environment {
             }
         }
     }
+    pub fn get_dimension(&self, n: &String) -> D {
+        let mut i = self.get_highest_scope_index();
+        loop {
+            let cursor = self.get_scope(i);
+            match cursor {
+                Explicit {look_to,dimensions,..} => {
+                    if let Some(d) = dimensions.get(n) {
+                        return d.clone();
+                    } else {
+                        match look_to {
+                            None => panic!("dimension name not found"),
+                            Some(n) => i = *n,
+                        }
+                    }
+                }
+                Implicit {look_to,..} => {
+                    i = *look_to;
+                }
+            }
+        }
+    }
+    pub fn get_dimension_opt(&self, n: &String) -> Option<D> {
+        let mut i = self.get_highest_scope_index();
+        loop {
+            let cursor = self.get_scope(i);
+            match cursor {
+                Explicit {look_to,dimensions,..} => {
+                    if let Some(d) = dimensions.get(n) {
+                        return Some(d.clone());
+                    } else {
+                        match look_to {
+                            None => return None,
+                            Some(n) => i = *n,
+                        }
+                    }
+                }
+                Implicit {look_to,..} => {
+                    i = *look_to;
+                }
+            }
+        }
+    }
     pub fn get_unit(&self, n: &String) -> C {
         let mut i = self.get_highest_scope_index();
         loop {
@@ -356,6 +398,30 @@ impl Environment {
                             None => panic!("unit name not found"),
                             Some(n) => i = *n,
                         }
+                    }
+                }
+                Implicit {look_to,..} => {
+                    i = *look_to;
+                }
+            }
+        }
+    }
+    pub fn get_unit_name(&self, u: u64) -> String {
+        let mut i = self.get_highest_scope_index();
+        let test_dim = D::from_base(u);
+        let test_conv = C::base_unit_converter(test_dim);
+        loop {
+            let cursor = self.get_scope(i);
+            match cursor {
+                Explicit {look_to,units,..} => {
+                    for (n,c) in units {
+                        if *c == test_conv {
+                            return n.clone();
+                        }
+                    }
+                    match look_to {
+                        None => panic!("unit number not found"),
+                        Some(n) => i = *n,
                     }
                 }
                 Implicit {look_to,..} => {

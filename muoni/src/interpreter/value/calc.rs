@@ -1,4 +1,4 @@
-use interpreter::value::{V,U,VI};
+use interpreter::value::{D,VI,V};
 use V::*;
 use nc::{Complex,Complex64};
 use na::DMatrix;
@@ -72,11 +72,41 @@ impl V {
     }
     pub fn times(self, with: V) -> Self {
         match (self,with) {
+            (RI(n1,u1),RI(n2,u2)) => {
+                let n3 = n1 * n2;
+                let u3 = u1.multiply(u2);
+                RI(n3,u3)
+            }
+            (RF(n1,u1),RF(n2,u2)) => {
+                let n3 = n1 * n2;
+                let u3 = u1.multiply(u2);
+                RF(n3,u3)
+            }
+            (RI(n1,u1),RF(n2,u2)) | (RF(n2,u2),RI(n1,u1)) => {
+                let n3 = (n1 as f64) * n2;
+                let u3 = u1.multiply(u2);
+                RF(n3,u3)
+            }
             _ => unimplemented!(),
         }
     }
     pub fn divide(self, with: V) -> Self {
         match (self,with) {
+            (RI(n1,u1),RI(n2,u2)) => {
+                let n3 = n1 / n2;
+                let u3 = u1.divide(u2);
+                RI(n3,u3)
+            }
+            (RF(n1,u1),RF(n2,u2)) => {
+                let n3 = n1 / n2;
+                let u3 = u1.divide(u2);
+                RF(n3,u3)
+            }
+            (RI(n1,u1),RF(n2,u2)) | (RF(n2,u2),RI(n1,u1)) => {
+                let n3 = (n1 as f64) / n2;
+                let u3 = u1.divide(u2);
+                RF(n3,u3)
+            }
             _ => unimplemented!(),
         }
     }

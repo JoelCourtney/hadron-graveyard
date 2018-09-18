@@ -1,4 +1,4 @@
-use super::Q;
+use super::D;
 
 pub enum Types {
     Numeric(Set,Precision,Dimension,Cardinality),
@@ -20,7 +20,7 @@ pub enum Set {
 }
 
 pub enum Dimension {
-    Quantity(Q),
+    Quantity(D),
     Wild,
 }
 

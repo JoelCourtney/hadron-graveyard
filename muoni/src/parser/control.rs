@@ -205,9 +205,9 @@ pub fn parse(lexemes: &[Lexeme]) -> (Box<Control>,usize) {
             let name = match lexemes.get(i) {
                 Some(Lexeme::Handle(n)) => {
                     i += 1;
-                    Some(n.clone())
+                    n.clone()
                 }
-                _ => None,
+                _ => panic!("missing dimension name"),
             };
             let (units,length) = list::parse(&lexemes[i..]);
             i += length;

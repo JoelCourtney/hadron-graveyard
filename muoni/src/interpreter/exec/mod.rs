@@ -323,7 +323,7 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> Option<Vec<Br
                                 DMatrix::from_row_slice(1,2,
                                     &[r as f64, c as f64]
                                 ),
-                                U::empty()
+                                D::empty()
                             ),
                             env
                         );
@@ -397,12 +397,12 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> Option<Vec<Br
                                 DMatrix::from_row_slice(1,2,
                                     &[r as f64, c as f64]
                                 ),
-                                U::empty()
+                                D::empty()
                             ),
                             env
                         );
                     } else {
-                        lvalue::assign_varl(index,V::RI(e as i64,U::empty()),env);
+                        lvalue::assign_varl(index,V::RI(e as i64,D::empty()),env);
                     }
                     let mut r = exec_statement(body, env);
                     match r {
@@ -506,6 +506,80 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> Option<Vec<Br
                     }
                 }
             }
+            Dimension {name:qname, units} => {
+                use ast::Statement::{StateValue};
+                use ast::RValue::Name;
+                let q;
+                if units.len() > 0 {
+                    match units.get(0).unwrap() {
+                        StateValue {e1} => {
+                            match **e1 {
+                                Name(ref u) => {
+                                    q = env.declare_base_dimension(qname);
+                                    env.declare_base_unit(u,q.clone());
+                                }
+                                _ => panic!("expected base unit declaration"),
+                            }
+                        }
+                        Statement::Assign {name:uname, op, e1} => {
+                            let uname = {
+                                match **uname {
+                                    LValue::Name(ref uname) => {
+                                        uname
+                                    }
+                                    _ => panic!("fancy-ass assignments aren't gonna fly in unit declarations"),
+                                }
+                            };
+                            if *op != Assign::Equal {
+                                panic!("expected = operator");
+                            }
+                            let c = eval_converter(e1,env);
+                            q = c.dim.clone();
+                            if let Some(q2) = env.get_dimension_opt(qname) {
+                                if !q.equal(&q2) {
+                                    panic!("dimensions do not agree with previous definition");
+                                }
+                            } else {
+                                env.declare_derived_dimension(qname, q.clone());
+                                env.declare_derived_unit(uname, c);
+                            }
+                        }
+                        _ => panic!("only base unit declarations and simple assignment are allowed in dimension blocks"),
+                    }
+                    let mut i = 1;
+                    while let Some(state) = units.get(i) {
+                        match state {
+                            StateValue {..} => {
+                                panic!("derived dimensions cannot contain base units");
+                            }
+                            Statement::Assign {name:uname, op, e1} => {
+                                let uname = {
+                                    match **uname {
+                                        LValue::Name(ref uname) => {
+                                            uname
+                                        }
+                                        _ => panic!("fancy-ass assignments aren't gonna fly in unit declarations"),
+                                    }
+                                };
+                                if *op != Assign::Equal {
+                                    panic!("expected = operator");
+                                }
+                                let c = eval_converter(e1,env);
+                                let q2 = c.dim.clone();
+                                if !q2.equal(&q) {
+                                    panic!("unit is not of the same dimension as prior units in block")
+                                } else {
+                                    env.declare_derived_unit(uname, c);
+                                }
+                            }
+                            _ => panic!("only base unit declarations and simple assignment are allowed in dimension blocks"),
+                        }
+                        i += 1;
+                    }
+                } else {
+                    env.declare_base_dimension(qname);
+                }
+            }
             _ => unimplemented!(),
         }
     }
@@ -589,7 +663,7 @@ pub fn exec_statement(state: &Statement, mut env: &mut Environment) -> Option<Ve
         }
         Print {e1} => {
             let v1 = unwrap_break(eval(e1,env));
-            println!("{}",v1.to_str_unwrap());
+            println!("{}",v1.to_str_unwrap(env));
         }
         Drop {name} => {
             lvalue::drop_varl(name,env);
@@ -643,12 +717,12 @@ pub fn exec_statement(state: &Statement, mut env: &mut Environment) -> Option<Ve
 }
 
 pub fn unwrap_break((v,s): (Option<V>,Option<Vec<Break>>)) -> V {
-    match s {
-        None => {}
-        Some(_) => panic!("cannot break out of the middle of a statement"),
+    if let Some(_) = s {
+        panic!("cannot break out of the middle of a statement");
     }
-    match v {
-        None => panic!("a value is required for this operation"),
-        Some(v) => v,
+    if let Some(v) = v {
+        v
+    } else {
+        panic!("a value is required for this operation")
     }
 }

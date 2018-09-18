@@ -100,7 +100,24 @@ val l = ["hello",5]
 val l2 = [l, (3,4,5)]
 print l2
 
-dimension Test [
+dimension Length [
 	m,
-	km = 1000*m
+	km = 1000*m,
+	ft = 0.3048*m
 ]
+
+dimension Area [
+	ac = 43560*ft^2
+]
+
+dimension Time [
+	s,
+	min = 60*s,
+	hr = 60*min
+]
+
+val d = 6[m]
+print d
+
+val v = d / 4[min]
+print v
