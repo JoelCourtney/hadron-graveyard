@@ -1,6 +1,7 @@
 use interpreter::value::*;
 use interpreter::env::{Environment,Scope};
 use ast::{LValue,LValue::*};
+use interpreter::value::numeric::*;
 
 pub fn assign_varl(l: &LValue, v: V, env: &mut Environment) {
     match l {
@@ -17,35 +18,66 @@ pub fn assign_varl(l: &LValue, v: V, env: &mut Environment) {
                 }
             };
             match v {
-                V::RM(rm,u) => {
-                    let (r2,c2) = (rm.nrows(),rm.ncols());
-                    if r2 != r1 || c2 != c1 {
-                        panic!("matrix dimensions of assignment do not match")
-                    } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u.clone())));
-                        for (l,r) in pairs {
-                            assign_varl(l,r,env);
+                V::N(n) => {
+                    match n.type_of() {
+                        NT::RIM => {
+                            let rm = n.to_rim();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RI(*x)));
+                                for (l,r) in pairs {
+                                    assign_varl(l,r,env);
+                                }
+                            }
                         }
-                    }
-                }
-                V::CM(rm,u) => {
-                    let (r2,c2) = (rm.nrows(),rm.ncols());
-                    if r2 != r1 || c2 != c1 {
-                        panic!("matrix dimensions of assignment do not match")
-                    } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u.clone())));
-                        for (l,r) in pairs {
-                            assign_varl(l,r,env);
+                        NT::RFM => {
+                            let rm = n.to_rfm();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x)));
+                                for (l,r) in pairs {
+                                    assign_varl(l,r,env);
+                                }
+                            }
                         }
+                        NT::CIM => {
+                            let rm = n.to_cim();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CI(*x)));
+                                for (l,r) in pairs {
+                                    assign_varl(l,r,env);
+                                }
+                            }
+                        }
+                        NT::CFM => {
+                            let rm = n.to_cfm();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x)));
+                                for (l,r) in pairs {
+                                    assign_varl(l,r,env);
+                                }
+                            }
+                        }
+                        _ => unimplemented!(),
                     }
                 }
                 V::L(_) | V::S(_) | V::B(_) => {
                     panic!("cannot assign non-numeric types to matrix decomposition")
                 }
-                V::N => {
+                V::Null => {
                     for r in lm {
                         for c in r {
-                            assign_varl(c,V::N,env);
+                            assign_varl(c,V::Null,env);
                         }
                     }
                 }
@@ -70,9 +102,9 @@ pub fn assign_varl(l: &LValue, v: V, env: &mut Environment) {
                         }
                     }
                 }
-                V::N => {
+                V::Null => {
                     for s in l {
-                        assign_varl(s,V::N,env);
+                        assign_varl(s,V::Null,env);
                     }
                 }
                 _ => panic!("cannot decompose value into list"),
@@ -164,35 +196,66 @@ pub fn declare_assign_param(l: &LValue, v: V, env: &mut Environment) {
                 }
             };
             match v {
-                V::RM(rm,u) => {
-                    let (r2,c2) = (rm.nrows(),rm.ncols());
-                    if r2 != r1 || c2 != c1 {
-                        panic!("matrix dimensions of assignment do not match")
-                    } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u.clone())));
-                        for (l,r) in pairs {
-                            declare_assign_param(l,r,env);
+                V::N(n) => {
+                    match n.type_of() {
+                        NT::RIM => {
+                            let rm = n.to_rim();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RI(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_param(l,r,env);
+                                }
+                            }
                         }
-                    }
-                }
-                V::CM(rm,u) => {
-                    let (r2,c2) = (rm.nrows(),rm.ncols());
-                    if r2 != r1 || c2 != c1 {
-                        panic!("matrix dimensions of assignment do not match")
-                    } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u.clone())));
-                        for (l,r) in pairs {
-                            declare_assign_param(l,r,env);
+                        NT::RFM => {
+                            let rm = n.to_rfm();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_param(l,r,env);
+                                }
+                            }
                         }
+                        NT::CIM => {
+                            let rm = n.to_cim();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CI(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_param(l,r,env);
+                                }
+                            }
+                        }
+                        NT::CFM => {
+                            let rm = n.to_cfm();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_param(l,r,env);
+                                }
+                            }
+                        }
+                        _ => unimplemented!(),
                     }
                 }
                 V::L(_) | V::S(_) | V::B(_) => {
                     panic!("cannot assign non-numeric types to matrix decomposition")
                 }
-                V::N => {
+                V::Null => {
                     for r in lm {
                         for c in r {
-                            declare_assign_param(c,V::N,env);
+                            declare_assign_param(c,V::Null,env);
                         }
                     }
                 }
@@ -217,9 +280,9 @@ pub fn declare_assign_param(l: &LValue, v: V, env: &mut Environment) {
                         }
                     }
                 }
-                V::N => {
+                V::Null => {
                     for s in l {
-                        declare_assign_param(s,V::N,env);
+                        declare_assign_param(s,V::Null,env);
                     }
                 }
                 _ => panic!("cannot decompose value into list"),
@@ -245,35 +308,66 @@ pub fn declare_assign_var(l: &LValue, v: V, env: &mut Environment) {
                 }
             };
             match v {
-                V::RM(rm,u) => {
-                    let (r2,c2) = (rm.nrows(),rm.ncols());
-                    if r2 != r1 || c2 != c1 {
-                        panic!("matrix dimensions of assignment do not match")
-                    } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u.clone())));
-                        for (l,r) in pairs {
-                            declare_assign_var(l,r,env);
+                V::N(n) => {
+                    match n.type_of() {
+                        NT::RIM => {
+                            let rm = n.to_rim();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RI(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_var(l,r,env);
+                                }
+                            }
                         }
-                    }
-                }
-                V::CM(rm,u) => {
-                    let (r2,c2) = (rm.nrows(),rm.ncols());
-                    if r2 != r1 || c2 != c1 {
-                        panic!("matrix dimensions of assignment do not match")
-                    } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u.clone())));
-                        for (l,r) in pairs {
-                            declare_assign_var(l,r,env);
+                        NT::RFM => {
+                            let rm = n.to_rfm();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_var(l,r,env);
+                                }
+                            }
                         }
+                        NT::CIM => {
+                            let rm = n.to_cim();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CI(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_var(l,r,env);
+                                }
+                            }
+                        }
+                        NT::CFM => {
+                            let rm = n.to_cfm();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_var(l,r,env);
+                                }
+                            }
+                        }
+                        _ => unimplemented!(),
                     }
                 }
                 V::L(_) | V::S(_) | V::B(_) => {
                     panic!("cannot assign non-numeric types to matrix decomposition")
                 }
-                V::N => {
+                V::Null => {
                     for r in lm {
                         for c in r {
-                            declare_assign_var(c,V::N,env);
+                            declare_assign_var(c,V::Null,env);
                         }
                     }
                 }
@@ -298,9 +392,9 @@ pub fn declare_assign_var(l: &LValue, v: V, env: &mut Environment) {
                         }
                     }
                 }
-                V::N => {
+                V::Null => {
                     for s in l {
-                        declare_assign_var(s,V::N,env);
+                        declare_assign_var(s,V::Null,env);
                     }
                 }
                 _ => panic!("cannot decompose value into list"),
@@ -326,35 +420,66 @@ pub fn declare_assign_val(l: &LValue, v: V, env: &mut Environment) {
                 }
             };
             match v {
-                V::RM(rm,u) => {
-                    let (r2,c2) = (rm.nrows(),rm.ncols());
-                    if r2 != r1 || c2 != c1 {
-                        panic!("matrix dimensions of assignment do not match")
-                    } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x,u.clone())));
-                        for (l,r) in pairs {
-                            declare_assign_val(l,r,env);
+                V::N(n) => {
+                    match n.type_of() {
+                        NT::RIM => {
+                            let rm = n.to_rim();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RI(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_val(l,r,env);
+                                }
+                            }
                         }
-                    }
-                }
-                V::CM(rm,u) => {
-                    let (r2,c2) = (rm.nrows(),rm.ncols());
-                    if r2 != r1 || c2 != c1 {
-                        panic!("matrix dimensions of assignment do not match")
-                    } else {
-                        let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x,u.clone())));
-                        for (l,r) in pairs {
-                            declare_assign_val(l,r,env);
+                        NT::RFM => {
+                            let rm = n.to_rfm();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::RF(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_val(l,r,env);
+                                }
+                            }
                         }
+                        NT::CIM => {
+                            let rm = n.to_cim();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CI(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_val(l,r,env);
+                                }
+                            }
+                        }
+                        NT::CFM => {
+                            let rm = n.to_cfm();
+                            let (r2,c2) = (rm.nrows(),rm.ncols());
+                            if r2 != r1 || c2 != c1 {
+                                panic!("matrix dimensions of assignment do not match")
+                            } else {
+                                let pairs = lm.iter().flat_map(|x| x).zip(rm.iter().map(|x| V::CF(*x)));
+                                for (l,r) in pairs {
+                                    declare_assign_val(l,r,env);
+                                }
+                            }
+                        }
+                        _ => unimplemented!(),
                     }
                 }
                 V::L(_) | V::S(_) | V::B(_) => {
                     panic!("cannot assign non-numeric types to matrix decomposition")
                 }
-                V::N => {
+                V::Null => {
                     for r in lm {
                         for c in r {
-                            declare_assign_val(c,V::N,env);
+                            declare_assign_val(c,V::Null,env);
                         }
                     }
                 }
@@ -379,9 +504,9 @@ pub fn declare_assign_val(l: &LValue, v: V, env: &mut Environment) {
                         }
                     }
                 }
-                V::N => {
+                V::Null => {
                     for s in l {
-                        declare_assign_val(s,V::N,env);
+                        declare_assign_val(s,V::Null,env);
                     }
                 }
                 _ => panic!("cannot decompose value into list"),

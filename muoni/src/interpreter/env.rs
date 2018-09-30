@@ -4,7 +4,7 @@ use ast::LValue;
 use interpreter::exec::lvalue;
 use nc::Complex;
 
-#[derive(Clone,PartialEq,Debug)]
+#[derive(Clone)]
 pub enum Scope {
     Explicit {
         look_to: Option<usize>,
@@ -21,7 +21,6 @@ pub enum Scope {
 }
 use self::Scope::*;
 
-#[derive(Debug)]
 pub struct Environment {
     stack: Vec<Scope>,
 }
@@ -30,10 +29,10 @@ impl Environment {
     pub fn new() -> Self {
         let mut stack = Vec::new();
         let mut varls = HashMap::new();
-        varls.insert(String::from("i"),(V::CI(Complex::<i64>::i(),D::empty()),false));
-        varls.insert(String::from("e"),(V::RF(2.718281828459045235360287471352662497757247093699959574966967627724076630354,D::empty()),false));
-        varls.insert(String::from("π"),(V::RF(3.14159265358979323846264338327950288419716939937510582097494459230781640628620899863,D::empty()),false));
-        varls.insert(String::from("φ"),(V::RF(1.61803398874989484820458683436563811772030917980576286213544862270526046281890,D::empty()),false));
+        varls.insert(String::from("i"),(V::CI(Complex::<i64>::i()),false));
+        varls.insert(String::from("e"),(V::RF(2.718281828459045235360287471352662497757247093699959574966967627724076630354),false));
+        varls.insert(String::from("π"),(V::RF(3.14159265358979323846264338327950288419716939937510582097494459230781640628620899863),false));
+        varls.insert(String::from("φ"),(V::RF(1.61803398874989484820458683436563811772030917980576286213544862270526046281890),false));
         let s = Scope::Explicit {
             look_to: None,
             varls,
@@ -98,7 +97,7 @@ impl Environment {
     pub fn declare_var(&mut self, n: &String) {
         match self.get_highest_explicit_mut() {
             Explicit {varls,..} => {
-                varls.insert(n.clone(), (V::N,true));
+                varls.insert(n.clone(), (V::Null,true));
             }
             _ => panic!("cannot declare vars in implicit scope"),
         }
@@ -106,7 +105,7 @@ impl Environment {
     pub fn declare_val(&mut self, n: &String) {
         match self.get_highest_explicit_mut() {
             Explicit {varls,..} => {
-                varls.insert(n.clone(), (V::N,false));
+                varls.insert(n.clone(), (V::Null,false));
             }
             _ => panic!("cannot declare vals in implicit scope"),
         }
@@ -117,7 +116,7 @@ impl Environment {
                 panic!("cannot declare parameters on explicit scope");
             }
             Implicit {varls,..} => {
-                varls.insert(n.clone(),(V::N,true));
+                varls.insert(n.clone(),(V::Null,true));
             }
         }
     }
@@ -154,7 +153,7 @@ impl Environment {
             match cursor {
                 Explicit {look_to,varls,..} => {
                     if let Some((o,m)) = varls.get_mut(n) {
-                        if  *o == V::N || *m {
+                        if  o.is_null() || *m {
                             *o = v;
                             return;
                         } else {
@@ -169,7 +168,7 @@ impl Environment {
                 }
                 Implicit {look_to,varls} => {
                     if let Some((o,m)) = varls.get_mut(n) {
-                        if *o == V::N || *m {
+                        if o.is_null() || *m {
                             *o = v;
                             return;
                         } else {

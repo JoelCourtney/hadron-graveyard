@@ -1,33 +1,107 @@
+mod convert;
+mod calc;
+mod types;
+pub mod numeric;
+
 use nc::{Complex,Complex64};
 use na::DMatrix;
 use ast::{Statement,LValue,RValue};
 use interpreter::env::Scope;
 use std::collections::HashMap;
+use std::iter::Iterator;
 use interpreter::env::Environment;
+use self::numeric::*;
 
-#[derive(Debug,Clone,PartialEq)]
+#[derive(Clone)]
 pub enum V {
-    RI(i64,D),
-    RF(f64,D),
-    RM(DMatrix<f64>,D),
-    CI(Complex<i64>,D),
-    CF(Complex64,D),
-    CM(DMatrix<Complex64>,D),
-    R(Box<V>,Box<V>,Box<V>),
+    N(Box<Numeric>),
+    R(R),
     S(String),
     B(bool),
     L(Vec<V>),
     F(Box<F>),
-    N,
+    Null,
 }
 
-mod convert;
-mod calc;
-mod types;
+impl V {
+    pub fn RI(ri: RI) -> V {
+        V::N(Box::new(ri))
+    }
+    pub fn RF(rf: RF) -> V {
+        V::N(Box::new(rf))
+    }
+    pub fn RB(rb: RB) -> V {
+        V::N(Box::new(rb))
+    }
+    pub fn RIM(rim: RIM) -> V {
+        V::N(Box::new(rim))
+    }
+    pub fn RFM(rfm: RFM) -> V {
+        V::N(Box::new(rfm))
+    }
+    pub fn URI(ri: RI, u: D) -> V {
+        V::N(Box::new(UT::new(ri,u)))
+    }
+    pub fn URF(rf: RF, u: D) -> V {
+        V::N(Box::new(UT::new(rf,u)))
+    }
+    pub fn URB(rb: RB, u: D) -> V {
+        V::N(Box::new(UT::new(rb,u)))
+    }
+    pub fn URIM(rim: RIM, u: D) -> V {
+        V::N(Box::new(UT::new(rim,u)))
+    }
+    pub fn URFM(rfm: RFM, u: D) -> V {
+        V::N(Box::new(UT::new(rfm,u)))
+    }
+    pub fn CI(ci: CI) -> V {
+        V::N(Box::new(ci))
+    }
+    pub fn CF(cf: CF) -> V {
+        V::N(Box::new(cf))
+    }
+    pub fn CB(cb: CB) -> V {
+        V::N(Box::new(cb))
+    }
+    pub fn CIM(cim: CIM) -> V {
+        V::N(Box::new(cim))
+    }
+    pub fn CFM(cfm: CFM) -> V {
+        V::N(Box::new(cfm))
+    }
+    pub fn UCI(ci: CI, u: D) -> V {
+        V::N(Box::new(UT::new(ci,u)))
+    }
+    pub fn UCF(cf: CF, u: D) -> V {
+        V::N(Box::new(UT::new(cf,u)))
+    }
+    pub fn UCB(cb: CB, u: D) -> V {
+        V::N(Box::new(UT::new(cb,u)))
+    }
+    pub fn UCIM(cim: CIM, u: D) -> V {
+        V::N(Box::new(UT::new(cim,u)))
+    }
+    pub fn UCFM(cfm: CFM, u: D) -> V {
+        V::N(Box::new(UT::new(cfm,u)))
+    }
+}
+
+impl V {
+    pub fn is_null(&self) -> bool {
+        match self {
+            V::Null => true,
+            _ => false,
+        }
+    }
+}
 
 #[derive(Debug,PartialEq,Clone)]
 pub struct Dimension {
     components: HashMap<u64,f64>,
+}
+
+lazy_static! {
+    static ref EMPTY: Dimension = D::empty();
 }
 
 impl Dimension {
@@ -96,7 +170,7 @@ impl Dimension {
     pub fn empty() -> D {
         D { components: HashMap::new() }
     }
-    pub fn to_str(&self, env: &Environment) -> String {
+    pub fn to_string(&self, env: &Environment) -> String {
         if self.is_empty() {
             String::from("")
         } else {
@@ -169,20 +243,43 @@ impl C {
             mult: 1.,
         }
     }
-    // pub fn convert(self, v: V) -> V {
-    //     let old_unit = v.get_unit();
-    //     v.add(V::RF(self.add,old_unit)).times(V::RF(self.mult,self.unit))
-    // }
+}
+
+pub enum IterEnum {
+    RI(RI,bool),
+    RF(RF,bool),
+    RB(RB,bool),
+    RIM(Box<Iterator<Item=RI>>),
+    RFM(Box<Iterator<Item=RF>>),
+    URI(URI,bool),
+    URF(URF,bool),
+    URB(URB,bool),
+    URIM(Box<Iterator<Item=RI>>,D),
+    URFM(Box<Iterator<Item=RF>>,D),
+    CI(CI,bool),
+    CF(CF,bool),
+    CB(CB,bool),
+    CIM(Box<Iterator<Item=CI>>),
+    CFM(Box<Iterator<Item=CF>>),
+    UCI(UCI,bool),
+    UCF(UCF,bool),
+    UCB(UCB,bool),
+    UCIM(Box<Iterator<Item=CI>>,D),
+    UCFM(Box<Iterator<Item=CF>>,D),
+    L(Vec<V>,bool),
+    S(String,bool),
+    B(bool,bool),
+    F(Box<F>,bool),
+    R()
 }
 
 pub struct ValueIterator {
-    v: V,
-    i: usize,
-    c: V,
+    iter: IterEnum,
+    unit: Option<D>,
 }
 pub type VI = ValueIterator;
 
-#[derive(Debug,PartialEq,Clone)]
+#[derive(Clone)]
 pub struct Function {
     //pub name: String,
     pub args: Vec<LValue>,
@@ -191,3 +288,36 @@ pub struct Function {
 }
 
 pub type F = Function;
+
+pub struct R {
+    s: Box<V>,
+    b: Box<V>,
+    e: Box<V>,
+}
+
+impl R {
+    fn new(s: V, b: V, e: V) -> R {
+        match (s,b,e) {
+            (N(n1), N(n2), N(n3)) => {
+                let t1 = n1.type_of();
+                let t3 = n3.type_of();
+                match t1 {
+                    NT::RIM | NT::RFM | NT::CIM | NT::CFM => {
+                        match t3 {
+                            NT::RIM
+                        }
+                    }
+                }
+            }
+            _ => unimplemented!(),
+        }
+    }
+}
+
+impl Iterator for R {
+    type Item = V;
+
+    fn next(&mut self) -> Option<V> {
+        unimplemented!()
+    }
+}

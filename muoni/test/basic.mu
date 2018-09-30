@@ -2,46 +2,46 @@ print `phi`
 print 2
 //print "hello world!"
 
-//val x = 5
-//print x
+val x = 5
+print x
 
-//var x = 4
-//print x
+var x = 4
+print x
 
-//{
-//	val y = true
-//	print y
-//}
+{
+	val y = true
+	print y
+}
 
 // print y
 
-//fn hello(x) => {
-//	print x
-//}
-//hello(7)
-//print x
+fn hello(x) => {
+	print x
+}
+hello(7)
+print x
 
-//{
-//	fn hello() => {print "hello"}
-//	{
-//		(fn world() => {
-//			hello()
-//			print "world"
-//		})()
-//	}
-//}
+{
+	fn hello() => {print "hello"}
+	{
+		(fn world() => {
+			hello()
+			print "world"
+		})()
+	}
+}
 
-//var x = 5
-//x += 1
-//print x
+var x = 5
+x += 1
+print x
 
-//val x += 7
-//print x
+val x += 7
+print x
 
-//if x is 122
-//	print "yep"
-//else
-//	print "nop"
+if x is 122
+	print "yep"
+else
+	print "nop"
 
 var x = 0
 while x < 5; x += 1

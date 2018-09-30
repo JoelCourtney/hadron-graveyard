@@ -6,6 +6,7 @@ use super::env::{Environment,Scope};
 use self::LValue::*;
 use na::DMatrix;
 use std::collections::HashMap;
+use interpreter::value::numeric::*;
 
 pub mod lvalue;
 
@@ -299,13 +300,18 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> Option<Vec<Br
                 let stride;
                 let matrix;
                 match range {
-                    V::RM(ref m,_) => {
-                        matrix = true;
-                        stride = m.nrows();
-                    }
-                    V::CM(ref m,_) => {
-                        matrix = true;
-                        stride = m.nrows();
+                    V::N(ref n) => {
+                        match n.type_of() {
+                            NT::RIM | NT::RFM | NT::CIM | NT::CFM
+                            | NT::URIM | NT::URFM | NT::UCIM | NT::UCFM => {
+                                matrix = true;
+                                stride = n.get_shape().0
+                            }
+                            _ => {
+                                matrix = false;
+                                stride = 0;
+                            }
+                        }
                     }
                     _ => {
                         matrix = false;
@@ -319,11 +325,10 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> Option<Vec<Br
                         let c = (e - r) / stride;
                         lvalue::assign_varl(
                             index,
-                            V::RM(
+                            V::RIM(
                                 DMatrix::from_row_slice(1,2,
-                                    &[r as f64, c as f64]
-                                ),
-                                D::empty()
+                                    &[r as RI, c as RI]
+                                )
                             ),
                             env
                         );
@@ -372,13 +377,18 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> Option<Vec<Br
                 let stride;
                 let matrix;
                 match range {
-                    V::RM(ref m,_) => {
-                        matrix = true;
-                        stride = m.nrows();
-                    }
-                    V::CM(ref m,_) => {
-                        matrix = true;
-                        stride = m.nrows();
+                    V::N(ref n) => {
+                        match n.type_of() {
+                            NT::RIM | NT::RFM | NT::CIM | NT::CFM
+                            | NT::URIM | NT::URFM | NT::UCIM | NT::UCFM => {
+                                matrix = true;
+                                stride = n.get_shape().0
+                            }
+                            _ => {
+                                matrix = false;
+                                stride = 0;
+                            }
+                        }
                     }
                     _ => {
                         matrix = false;
@@ -393,16 +403,15 @@ pub fn exec_scope(scope: &[Control], mut env: &mut Environment) -> Option<Vec<Br
                         let c = (e - r) / stride;
                         lvalue::assign_varl(
                             index,
-                            V::RM(
+                            V::RIM(
                                 DMatrix::from_row_slice(1,2,
-                                    &[r as f64, c as f64]
-                                ),
-                                D::empty()
+                                    &[r as RI, c as RI]
+                                )
                             ),
                             env
                         );
                     } else {
-                        lvalue::assign_varl(index,V::RI(e as i64,D::empty()),env);
+                        lvalue::assign_varl(index,V::RI(e as RI),env);
                     }
                     let mut r = exec_statement(body, env);
                     match r {
