@@ -43,11 +43,11 @@ pub fn eval(rv: &RValue, env: &mut Environment) -> (Option<V>,Option<Vec<Break>>
                 Binary(BOP::Range, ref es, ref eb) => {
                     let vs = unwrap_break(eval(&es,env)).to_numeric();
                     let vb = unwrap_break(eval(&eb,env)).to_numeric();
-                    (Some(V::R(Box::new(vs),Box::new(vb),Box::new(ve))),None)
+                    (Some(V::R(R::new(vs,vb,ve))),None)
                 }
                 _ => {
                     let vs = unwrap_break(eval(e1,env)).to_numeric();
-                    (Some(V::R(Box::new(vs),Box::new(V::RI(1)),Box::new(ve))),None)
+                    (Some(V::R(R::new(vs,V::RI(1),ve))),None)
                 }
             }
         }
@@ -357,6 +357,6 @@ pub fn eval_converter(rv: &RValue, env: &mut Environment) -> C {
     }
 }
 
-fn expand_range(s: V, b: V, e: V) -> V {
+fn expand_range(r: R) -> V {
     unimplemented!();
 }

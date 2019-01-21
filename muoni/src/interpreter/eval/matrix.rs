@@ -14,8 +14,8 @@ pub fn eval(v: &Vec<Vec<RValue>>, env: &mut Environment) -> (Option<V>,Option<Ve
         let mut r = Vec::new();
         for elem in row {
             let mut hold = unwrap_break(super::eval(elem,env));
-            if let V::R(s,b,e) = hold {
-                hold = expand_range(*s,*b,*e);
+            if let V::R(r) = hold {
+                hold = expand_range(r);
             }
             r.push(hold);
         }

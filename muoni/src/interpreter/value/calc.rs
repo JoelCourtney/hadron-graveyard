@@ -3,7 +3,6 @@ use V::*;
 use nc::{Complex,Complex64};
 use na::DMatrix;
 use super::numeric::*;
-use super::IterEnum;
 
 impl V {
     pub fn add(self, with: V) -> Self {
@@ -66,7 +65,36 @@ impl Iterator for VI {
     type Item = V;
 
     fn next(&mut self) -> Option<V> {
-        unimplemented!()
+        match self {
+            VI::RI(ref ri, mut b) => {
+                if b {
+                    b = false;
+                    Some(V::N(Box::new(*ri)))
+                } else {
+                    None
+                }
+            }
+            VI::R(ref mut r) => {
+                if r.b.greater_ref(V::RI(0)).to_bool_unwrap() {
+                    if r.s.less_or_equal_ref(r.e) {
+                        let hold = r.s.box_clone();
+                        r.s = r.s.add_ref(r.b);
+                        Some(V::N(hold))
+                    } else {
+                        None
+                    }
+                } else {
+                    if r.s.greater_or_equal_ref(r.e) {
+                        let hold = r.s.box_clone();
+                        r.s = r.s.add_ref(r.b);
+                        Some(V::N(hold))
+                    } else {
+                        None
+                    }
+                }
+            }
+            _ => unimplemented!()
+        }
     }
 }
 
@@ -78,14 +106,11 @@ impl IntoIterator for V {
         match self {
             N(n) => {
                 match n.type_of() {
-                    NT::RI => VI {
-                        iter: IterEnum::RI(n.to_ri(),false),
-                        unit: None,
-                    },
+                    NT::RI => VI::RI(n.to_ri(),true),
                     _ => unimplemented!(),
                 }
             }
-
+            R(r) => VI::R(r),
             _ => unimplemented!(),
         }
     }

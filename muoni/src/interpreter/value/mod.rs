@@ -245,7 +245,7 @@ impl C {
     }
 }
 
-pub enum IterEnum {
+pub enum VI {
     RI(RI,bool),
     RF(RF,bool),
     RB(RB,bool),
@@ -270,14 +270,8 @@ pub enum IterEnum {
     S(String,bool),
     B(bool,bool),
     F(Box<F>,bool),
-    R()
+    R(R)
 }
-
-pub struct ValueIterator {
-    iter: IterEnum,
-    unit: Option<D>,
-}
-pub type VI = ValueIterator;
 
 #[derive(Clone)]
 pub struct Function {
@@ -289,24 +283,36 @@ pub struct Function {
 
 pub type F = Function;
 
+#[derive(Clone)]
 pub struct R {
-    s: Box<V>,
-    b: Box<V>,
-    e: Box<V>,
+    pub s: Box<Numeric>,
+    pub b: Box<Numeric>,
+    pub e: Box<Numeric>,
 }
 
 impl R {
-    fn new(s: V, b: V, e: V) -> R {
+    pub fn new(s: V, b: V, e: V) -> R {
         match (s,b,e) {
-            (N(n1), N(n2), N(n3)) => {
-                let t1 = n1.type_of();
-                let t3 = n3.type_of();
-                match t1 {
-                    NT::RIM | NT::RFM | NT::CIM | NT::CFM => {
-                        match t3 {
-                            NT::RIM
-                        }
+            (V::N(n1), V::N(n2), V::N(n3)) => {
+                let t = n1.type_of() | n2.type_of() | n3.type_of();
+                if (t & OCTONION) != 0 {
+                    panic!("Ranges only use real scalars");
+                }
+                if (t & MATRIX) != 0 {
+                    panic!("ranges only use real scalars");
+                }
+                if (t & DIMENSIONAL) != 0 {
+                    let u1 = n1.get_unit();
+                    let u2 = n2.get_unit();
+                    let u3 = n3.get_unit();
+                    if !(u1.equal(&u2) && u2.equal(&u3)) {
+                        panic!("units in range must match");
                     }
+                }
+                R {
+                    s: n1,
+                    b: n2,
+                    e: n3
                 }
             }
             _ => unimplemented!(),

@@ -38,14 +38,13 @@ pub enum Cardinality {
     Wild,
 }
 
-fn range_type(t1: NT, t2: NT) -> NT {
-    match t1 {
-        NT::RI => {
-            match t2 {
-                NT::RI | NT::RF | NT::RB | NT::CI | NT::CF | NT::CB => t2,
-                _ => panic!("range bounds incompatible.")
-            }
-        }
-        NT
-    }
-}
+//fn range_type(t1: NT, t2: NT) -> NT {
+    //match t1 {
+        //NT::RI => {
+            //match t2 {
+                //NT::RI | NT::RF | NT::RB | NT::CI | NT::CF | NT::CB => t2,
+                //_ => panic!("range bounds incompatible.")
+            //}
+        //}
+    //}
+//}
