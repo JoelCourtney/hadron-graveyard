@@ -1,0 +1,15 @@
+[package]
+name = "muon"
+version = "0.1.0"
+authors = ["joel"]
+
+[dependencies]
+regex = "1"
+lazy_static = "1.0"
+nalgebra = "0.16.0"
+num-bigint = "0.2.0"
+num-complex = "0.2.0"
+num-traits = "0.2.5"
+num-integer = "0.1"
+time = "0.1"
+cpuprofiler = "0.0.3"
