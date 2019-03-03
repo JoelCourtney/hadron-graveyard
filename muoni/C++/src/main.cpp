@@ -1,16 +1,14 @@
 #include <iostream>
-#include "interpreter/Interpreter.h"
-#include "error/Error.h"
-#include "interpreter/value/Value.h"
+#include "Values/Value.h"
+#include "Values/NumericValue.h"
+#include "Values/ValueFactory.h"
+#include "Values/bigint.h"
+#include <complex>
+#include <Eigen/Dense>
 
 int main() {
-	int v = ValueType::SRI;
-	SRI i;
-	i.v = 5;
-	Value* asdf = &i;
-	SRF f(4.5);
-	Value* zxcv = &f;
-	Value* r = zxcv->add(asdf);
-	std::cout << reinterpret_cast<SRF*>(r)->v << std::endl;
-	delete r;
-};
+    bigint b; b.read("1234");
+    std::cout << ValueFactory::from(b) << std::endl;
+
+    return 0;
+}
