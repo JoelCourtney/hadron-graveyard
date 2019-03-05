@@ -13,11 +13,15 @@ using namespace Eigen;
 class IntMatrixValue : public MatrixValue {
     MatrixXi m;
 
+    friend class Type;
+
 public:
-    IntMatrixValue(MatrixXi);
+    explicit IntMatrixValue(MatrixXi);
     ~IntMatrixValue() override = default;
 
     std::string toString() const override;
+
+    Type* getType() const override;
 
     void increment() override;
     void decrement() override;

@@ -11,11 +11,15 @@
 class ComplexIntValue : public ScalarValue {
     std::complex<int> c;
 
+    friend class Type;
+
 public:
-    ComplexIntValue(int,int);
+    ComplexIntValue(std::complex<int>);
     ~ComplexIntValue() override = default;
 
     std::string toString() const override;
+
+    Type* getType() const override;
 
     void increment() override;
     void decrement() override;

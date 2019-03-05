@@ -5,17 +5,21 @@
 #ifndef C_BIGINTVALUE_H
 #define C_BIGINTVALUE_H
 
-#include "bigint.h"
+#include "BigInt.h"
 #include "ScalarValue.h"
 
 class BigIntValue : public ScalarValue {
-    bigint b;
+    BigInt b;
+
+    friend class Type;
 
 public:
-    BigIntValue(bigint);
+    explicit BigIntValue(BigInt);
     ~BigIntValue() override = default;
 
     std::string toString() const override;
+
+    Type* getType() const override;
 
     void increment() override;
     void decrement() override;
@@ -23,6 +27,8 @@ public:
     void conjugate() override;
 
     ScalarValue* magnitude() override;
+
+
 };
 
 #endif //C_BIGINTVALUE_H

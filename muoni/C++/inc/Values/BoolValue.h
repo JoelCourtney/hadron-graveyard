@@ -10,11 +10,15 @@
 class BoolValue : public Value {
     bool b;
 
+    friend class Type;
+
 public:
-    BoolValue(bool);
+    explicit BoolValue(bool);
     ~BoolValue() override = default;
 
     std::string toString() const override;
+
+    Type* getType() const override;
 };
 
 #endif //C_BOOLVALUE_H

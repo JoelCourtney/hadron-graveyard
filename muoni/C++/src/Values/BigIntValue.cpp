@@ -4,11 +4,16 @@
 
 #include "Values/ValueFactory.h"
 #include "Values/BigIntValue.h"
+#include "Types/IntType.h"
 
-BigIntValue::BigIntValue(bigint b) : b(b) {}
+BigIntValue::BigIntValue(BigInt b) : b(b) {}
 
 std::string BigIntValue::toString() const {
     return b.toString();
+}
+
+Type* BigIntValue::getType() const {
+    return IntType::getInstance();
 }
 
 void BigIntValue::increment() {

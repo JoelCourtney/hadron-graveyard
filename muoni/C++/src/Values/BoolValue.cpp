@@ -3,6 +3,7 @@
 //
 
 #include "Values/BoolValue.h"
+#include "Types/IntType.h"
 
 BoolValue::BoolValue(bool b) : b(b) {}
 
@@ -11,4 +12,8 @@ std::string BoolValue::toString() const {
         return "true";
     else
         return "false";
+}
+
+Type* BoolValue::getType() const {
+    return IntType::getInstance();
 }

@@ -24,9 +24,9 @@ public:
     static StringValue* from(std::string);
     static IntValue* from(int);
     static FloatValue* from(double);
-    static BigIntValue* from(bigint);
-    static ComplexIntValue* from(int,int);
-    static ComplexFloatValue* from(double,double);
+    static BigIntValue* from(BigInt);
+    static ComplexIntValue* from(std::complex<int>);
+    static ComplexFloatValue* from(std::complex<double>);
     static IntMatrixValue* from(MatrixXi);
     static FloatMatrixValue* from(MatrixXd);
 };

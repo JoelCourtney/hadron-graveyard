@@ -10,11 +10,15 @@
 class StringValue : public Value {
     std::string s;
 
+    friend class Type;
+
 public:
-    StringValue(std::string);
+    explicit StringValue(std::string);
     ~StringValue() override = default;
 
     std::string toString() const override;
+
+    Type* getType() const override;
 };
 
 #endif //C_STRINGVALUE_H

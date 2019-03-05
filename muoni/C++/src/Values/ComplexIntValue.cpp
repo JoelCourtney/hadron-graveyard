@@ -4,8 +4,9 @@
 
 #include "Values/ComplexIntValue.h"
 #include "Values/ValueFactory.h"
+#include "Types/IntType.h"
 
-ComplexIntValue::ComplexIntValue(int r, int i) : c(r,i) {}
+ComplexIntValue::ComplexIntValue(std::complex<int> c) : c(c) {}
 
 std::string ComplexIntValue::toString() const {
     int r = c.real();
@@ -15,6 +16,10 @@ std::string ComplexIntValue::toString() const {
     } else {
         return std::to_string(r) + "-" + std::to_string(i) + "i";
     }
+}
+
+Type* ComplexIntValue::getType() const {
+    return IntType::getInstance();
 }
 
 void ComplexIntValue::increment() {

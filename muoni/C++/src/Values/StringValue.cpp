@@ -3,9 +3,14 @@
 //
 
 #include "Values/StringValue.h"
+#include "Types/IntType.h"
 
 StringValue::StringValue(std::string s) : s(s) {}
 
 std::string StringValue::toString() const {
     return s;
+}
+
+Type* StringValue::getType() const {
+    return IntType::getInstance();
 }

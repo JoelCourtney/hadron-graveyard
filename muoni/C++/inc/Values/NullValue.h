@@ -13,6 +13,8 @@ public:
     ~NullValue() override = default;
 
     std::string toString() const override;
+
+    Type* getType() const override;
 };
 
 #endif //C_NULLVALUE_H

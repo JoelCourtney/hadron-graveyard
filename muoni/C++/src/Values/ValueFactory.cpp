@@ -24,16 +24,16 @@ FloatValue* ValueFactory::from(double d) {
     return new FloatValue(d);
 }
 
-BigIntValue* ValueFactory::from(bigint b) {
+BigIntValue* ValueFactory::from(BigInt b) {
     return new BigIntValue(b);
 }
 
-ComplexIntValue* ValueFactory::from(int r, int i) {
-    return new ComplexIntValue(r,i);
+ComplexIntValue* ValueFactory::from(std::complex<int> c) {
+    return new ComplexIntValue(c);
 }
 
-ComplexFloatValue* ValueFactory::from(double r, double i) {
-    return new ComplexFloatValue(r,i);
+ComplexFloatValue* ValueFactory::from(std::complex<double> c) {
+    return new ComplexFloatValue(c);
 }
 
 IntMatrixValue* ValueFactory::from(MatrixXi m) {

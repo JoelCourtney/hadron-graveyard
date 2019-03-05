@@ -4,6 +4,7 @@
 
 #include "Values/FloatMatrixValue.h"
 #include "Values/ValueFactory.h"
+#include "Types/IntType.h"
 
 FloatMatrixValue::FloatMatrixValue(MatrixXd m) : m(m) {}
 
@@ -11,6 +12,10 @@ std::string FloatMatrixValue::toString() const {
     std::stringstream ss;
     ss << m;
     return ss.str();
+}
+
+Type* FloatMatrixValue::getType() const {
+    return IntType::getInstance();
 }
 
 void FloatMatrixValue::increment() {

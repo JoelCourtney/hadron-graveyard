@@ -11,11 +11,15 @@
 class ComplexFloatValue : public ScalarValue {
     std::complex<double> c;
 
+    friend class Type;
+
 public:
-    ComplexFloatValue(double,double);
+    ComplexFloatValue(std::complex<double>);
     ~ComplexFloatValue() override = default;
 
     std::string toString() const override;
+
+    Type* getType() const override;
 
     void increment() override;
     void decrement() override;

@@ -3,3 +3,13 @@
 //
 
 #include "Values/Value.h"
+
+std::ostream& operator<<(std::ostream& o, const Value* v) {
+    o << v->toString();
+    return o;
+}
+
+std::ostream& operator<<(std::ostream& o, const Value& v) {
+    o << v.toString();
+    return o;
+}

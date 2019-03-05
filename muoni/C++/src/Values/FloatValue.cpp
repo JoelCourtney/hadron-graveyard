@@ -4,11 +4,16 @@
 
 #include "Values/FloatValue.h"
 #include "Values/ValueFactory.h"
+#include "Types/IntType.h"
 
 FloatValue::FloatValue(double d) : d(d) {}
 
 std::string FloatValue::toString() const {
     return std::to_string(d);
+}
+
+Type* FloatValue::getType() const {
+    return IntType::getInstance();
 }
 
 void FloatValue::increment() {

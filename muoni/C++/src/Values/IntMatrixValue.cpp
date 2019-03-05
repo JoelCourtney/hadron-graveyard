@@ -4,6 +4,7 @@
 
 #include "Values/IntMatrixValue.h"
 #include "Values/ValueFactory.h"
+#include "Types/IntType.h"
 
 IntMatrixValue::IntMatrixValue(MatrixXi m) : m(m) {}
 
@@ -11,6 +12,10 @@ std::string IntMatrixValue::toString() const {
     std::stringstream ss;
     ss << m;
     return ss.str();
+}
+
+Type* IntMatrixValue::getType() const {
+    return IntType::getInstance();
 }
 
 void IntMatrixValue::increment() {

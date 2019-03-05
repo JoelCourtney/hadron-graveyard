@@ -10,11 +10,15 @@
 class IntValue : public ScalarValue {
     int i;
 
+    friend class Type;
+
 public:
-    IntValue(int);
+    explicit IntValue(int);
     ~IntValue() override = default;
 
     std::string toString() const override;
+
+    Type* getType() const override;
 
     void increment() override;
     void decrement() override;

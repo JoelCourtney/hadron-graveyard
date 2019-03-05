@@ -4,11 +4,16 @@
 
 #include "Values/IntValue.h"
 #include "Values/ValueFactory.h"
+#include "Types/IntType.h"
 
 IntValue::IntValue(int i) : i(i) {}
 
 std::string IntValue::toString() const {
     return std::to_string(i);
+}
+
+Type* IntValue::getType() const {
+    return IntType::getInstance();
 }
 
 void IntValue::increment() {

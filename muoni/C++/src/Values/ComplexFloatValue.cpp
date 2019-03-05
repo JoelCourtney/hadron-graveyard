@@ -4,8 +4,9 @@
 
 #include "Values/ComplexFloatValue.h"
 #include "Values/ValueFactory.h"
+#include "Types/IntType.h"
 
-ComplexFloatValue::ComplexFloatValue(double r, double i) : c(r,i) {}
+ComplexFloatValue::ComplexFloatValue(std::complex<double> c) : c(c) {}
 
 std::string ComplexFloatValue::toString() const {
     double r = c.real();
@@ -15,6 +16,10 @@ std::string ComplexFloatValue::toString() const {
     } else {
         return std::to_string(r) + "-" + std::to_string(i) + "i";
     }
+}
+
+Type* ComplexFloatValue::getType() const {
+    return IntType::getInstance();
 }
 
 void ComplexFloatValue::increment() {

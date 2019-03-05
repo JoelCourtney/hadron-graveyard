@@ -13,11 +13,15 @@ using namespace Eigen;
 class FloatMatrixValue : public MatrixValue {
     MatrixXd m;
 
+    friend class Type;
+
 public:
-    FloatMatrixValue(MatrixXd);
+    explicit FloatMatrixValue(MatrixXd);
     ~FloatMatrixValue() override = default;
 
     std::string toString() const override;
+
+    Type* getType() const override;
 
     void increment() override;
     void decrement() override;

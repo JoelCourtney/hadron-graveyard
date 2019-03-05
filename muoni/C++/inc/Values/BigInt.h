@@ -16,23 +16,23 @@ using namespace std;
 const int base = 1000000000;
 const int base_digits = 9;
 
-struct bigint {
+struct BigInt {
     vector<int> a;
     int sign;
 
-    bigint() :
+    BigInt() :
             sign(1) {
     }
 
-    bigint(long long v) {
+    BigInt(long long v) {
         *this = v;
     }
 
-    bigint(const string &s) {
+    BigInt(const string &s) {
         read(s);
     }
 
-    void operator=(const bigint &v) {
+    void operator=(const BigInt &v) {
         sign = v.sign;
         a = v.a;
     }
@@ -45,9 +45,9 @@ struct bigint {
             a.push_back(v % base);
     }
 
-    bigint operator+(const bigint &v) const {
+    BigInt operator+(const BigInt &v) const {
         if (sign == v.sign) {
-            bigint res = v;
+            BigInt res = v;
 
             for (int i = 0, carry = 0; i < (int) max(a.size(), v.a.size()) || carry; ++i) {
                 if (i == (int) res.a.size())
@@ -62,10 +62,10 @@ struct bigint {
         return *this - (-v);
     }
 
-    bigint operator-(const bigint &v) const {
+    BigInt operator-(const BigInt &v) const {
         if (sign == v.sign) {
             if (abs() >= v.abs()) {
-                bigint res = *this;
+                BigInt res = *this;
                 for (int i = 0, carry = 0; i < (int) v.a.size() || carry; ++i) {
                     res.a[i] -= carry + (i < (int) v.a.size() ? v.a[i] : 0);
                     carry = res.a[i] < 0;
@@ -94,17 +94,17 @@ struct bigint {
         trim();
     }
 
-    bigint operator*(int v) const {
-        bigint res = *this;
+    BigInt operator*(int v) const {
+        BigInt res = *this;
         res *= v;
         return res;
     }
 
-    friend pair<bigint, bigint> divmod(const bigint &a1, const bigint &b1) {
+    friend pair<BigInt, BigInt> divmod(const BigInt &a1, const BigInt &b1) {
         int norm = base / (b1.a.back() + 1);
-        bigint a = a1.abs() * norm;
-        bigint b = b1.abs() * norm;
-        bigint q, r;
+        BigInt a = a1.abs() * norm;
+        BigInt b = b1.abs() * norm;
+        BigInt q, r;
         q.a.resize(a.a.size());
 
         for (int i = a.a.size() - 1; i >= 0; i--) {
@@ -126,11 +126,11 @@ struct bigint {
         return make_pair(q, r / norm);
     }
 
-    bigint operator/(const bigint &v) const {
+    BigInt operator/(const BigInt &v) const {
         return divmod(*this, v).first;
     }
 
-    bigint operator%(const bigint &v) const {
+    BigInt operator%(const BigInt &v) const {
         return divmod(*this, v).second;
     }
 
@@ -145,8 +145,8 @@ struct bigint {
         trim();
     }
 
-    bigint operator/(int v) const {
-        bigint res = *this;
+    BigInt operator/(int v) const {
+        BigInt res = *this;
         res /= v;
         return res;
     }
@@ -160,20 +160,20 @@ struct bigint {
         return m * sign;
     }
 
-    void operator+=(const bigint &v) {
+    void operator+=(const BigInt &v) {
         *this = *this + v;
     }
-    void operator-=(const bigint &v) {
+    void operator-=(const BigInt &v) {
         *this = *this - v;
     }
-    void operator*=(const bigint &v) {
+    void operator*=(const BigInt &v) {
         *this = *this * v;
     }
-    void operator/=(const bigint &v) {
+    void operator/=(const BigInt &v) {
         *this = *this / v;
     }
 
-    bool operator<(const bigint &v) const {
+    bool operator<(const BigInt &v) const {
         if (sign != v.sign)
             return sign < v.sign;
         if (a.size() != v.a.size())
@@ -184,19 +184,19 @@ struct bigint {
         return false;
     }
 
-    bool operator>(const bigint &v) const {
+    bool operator>(const BigInt &v) const {
         return v < *this;
     }
-    bool operator<=(const bigint &v) const {
+    bool operator<=(const BigInt &v) const {
         return !(v < *this);
     }
-    bool operator>=(const bigint &v) const {
+    bool operator>=(const BigInt &v) const {
         return !(*this < v);
     }
-    bool operator==(const bigint &v) const {
+    bool operator==(const BigInt &v) const {
         return !(*this < v) && !(v < *this);
     }
-    bool operator!=(const bigint &v) const {
+    bool operator!=(const BigInt &v) const {
         return *this < v || v < *this;
     }
 
@@ -211,14 +211,14 @@ struct bigint {
         return a.empty() || (a.size() == 1 && !a[0]);
     }
 
-    bigint operator-() const {
-        bigint res = *this;
+    BigInt operator-() const {
+        BigInt res = *this;
         res.sign = -sign;
         return res;
     }
 
-    bigint abs() const {
-        bigint res = *this;
+    BigInt abs() const {
+        BigInt res = *this;
         res.sign *= res.sign;
         return res;
     }
@@ -230,10 +230,10 @@ struct bigint {
         return res * sign;
     }
 
-    friend bigint gcd(const bigint &a, const bigint &b) {
+    friend BigInt gcd(const BigInt &a, const BigInt &b) {
         return b.isZero() ? a : gcd(b, a % b);
     }
-    friend bigint lcm(const bigint &a, const bigint &b) {
+    friend BigInt lcm(const BigInt &a, const BigInt &b) {
         return a / gcd(a, b) * b;
     }
 
@@ -255,14 +255,14 @@ struct bigint {
         trim();
     }
 
-    friend istream& operator>>(istream &stream, bigint &v) {
+    friend istream& operator>>(istream &stream, BigInt &v) {
         string s;
         stream >> s;
         v.read(s);
         return stream;
     }
 
-    friend ostream& operator<<(ostream &stream, const bigint &v) {
+    friend ostream& operator<<(ostream &stream, const BigInt &v) {
         if (v.sign == -1)
             stream << '-';
         stream << (v.a.empty() ? 0 : v.a.back());
@@ -335,7 +335,7 @@ struct bigint {
         return res;
     }
 
-    bigint operator*(const bigint &v) const {
+    BigInt operator*(const BigInt &v) const {
         vector<int> a6 = convert_base(this->a, base_digits, 6);
         vector<int> b6 = convert_base(v.a, base_digits, 6);
         vll a(a6.begin(), a6.end());
@@ -347,7 +347,7 @@ struct bigint {
         while (a.size() & (a.size() - 1))
             a.push_back(0), b.push_back(0);
         vll c = karatsubaMultiply(a, b);
-        bigint res;
+        BigInt res;
         res.sign = sign * v.sign;
         for (int i = 0, carry = 0; i < (int) c.size(); i++) {
             long long cur = c[i] + carry;

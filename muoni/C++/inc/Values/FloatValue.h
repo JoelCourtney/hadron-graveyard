@@ -10,11 +10,15 @@
 class FloatValue : public ScalarValue {
     double d;
 
+    friend class Type;
+
 public:
-    FloatValue(double);
+    explicit FloatValue(double);
     ~FloatValue() override = default;
 
     std::string toString() const override;
+
+    Type* getType() const override;
 
     void increment() override;
     void decrement() override;
