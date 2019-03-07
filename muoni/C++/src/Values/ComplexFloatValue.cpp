@@ -6,7 +6,7 @@
 #include "Values/ValueFactory.h"
 #include "Types/IntType.h"
 
-ComplexFloatValue::ComplexFloatValue(std::complex<double> c) : c(c) {}
+ComplexFloatValue::ComplexFloatValue(std::complex<double> c) : c(std::move(c)) {}
 
 std::string ComplexFloatValue::toString() const {
     double r = c.real();

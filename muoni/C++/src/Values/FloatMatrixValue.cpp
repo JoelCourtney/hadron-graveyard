@@ -6,7 +6,7 @@
 #include "Values/ValueFactory.h"
 #include "Types/IntType.h"
 
-FloatMatrixValue::FloatMatrixValue(MatrixXd m) : m(m) {}
+FloatMatrixValue::FloatMatrixValue(MatrixXd m) : m(std::move(m)) {}
 
 std::string FloatMatrixValue::toString() const {
     std::stringstream ss;

@@ -5,7 +5,7 @@
 #include "Values/StringValue.h"
 #include "Types/IntType.h"
 
-StringValue::StringValue(std::string s) : s(s) {}
+StringValue::StringValue(std::string& s) : s(std::move(s)) {}
 
 std::string StringValue::toString() const {
     return s;

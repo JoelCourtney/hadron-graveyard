@@ -13,7 +13,7 @@ class StringValue : public Value {
     friend class Type;
 
 public:
-    explicit StringValue(std::string);
+    explicit StringValue(std::string&);
     ~StringValue() override = default;
 
     std::string toString() const override;

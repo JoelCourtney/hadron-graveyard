@@ -6,7 +6,7 @@
 #include "Values/ValueFactory.h"
 #include "Types/IntType.h"
 
-ComplexIntValue::ComplexIntValue(std::complex<int> c) : c(c) {}
+ComplexIntValue::ComplexIntValue(std::complex<int> c) : c(std::move(c)) {}
 
 std::string ComplexIntValue::toString() const {
     int r = c.real();

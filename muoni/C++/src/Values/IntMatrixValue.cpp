@@ -6,7 +6,7 @@
 #include "Values/ValueFactory.h"
 #include "Types/IntType.h"
 
-IntMatrixValue::IntMatrixValue(MatrixXi m) : m(m) {}
+IntMatrixValue::IntMatrixValue(MatrixXi m) : m(std::move(m)) {}
 
 std::string IntMatrixValue::toString() const {
     std::stringstream ss;
