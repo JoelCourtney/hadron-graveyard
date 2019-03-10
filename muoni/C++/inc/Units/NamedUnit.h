@@ -13,7 +13,7 @@ protected:
 
 public:
     explicit NamedUnit(const Dimension*,std::string);
-    virtual ~NamedUnit() = default;
+    ~NamedUnit() override = default;
 
     std::vector<UnitComponent> toComponents() const override;
 

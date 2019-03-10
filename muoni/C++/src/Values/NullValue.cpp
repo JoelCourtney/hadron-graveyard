@@ -5,7 +5,7 @@
 #include "Values/NullValue.h"
 #include "Types/NullType.h"
 
-NullValue::NullValue() {}
+NullValue::NullValue() = default;
 
 std::string NullValue::toString() const {
     return "null";

@@ -31,7 +31,7 @@ public:
     static void reduce(std::vector<UnitComponent>&);
     static Unit* multiply(const Unit*, const Unit*);
     static Unit* divide(const Unit*, const Unit*);
-    static double convert(const Unit* from, const Unit* to);
+    static double convert(const Unit*, const Unit*);
 };
 
 #endif //C_UNIT_H

@@ -14,7 +14,7 @@ class ComplexIntValue : public ScalarValue {
     friend class Type;
 
 public:
-    ComplexIntValue(std::complex<int>);
+    explicit ComplexIntValue(std::complex<int>);
     ~ComplexIntValue() override = default;
 
     std::string toString() const override;

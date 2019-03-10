@@ -13,7 +13,7 @@ protected:
 
 public:
     explicit NamedDimension(std::string);
-    virtual ~NamedDimension() = default;
+    ~NamedDimension() override = default;
 
     std::vector<DimensionalComponent> toComponents() const override;
 

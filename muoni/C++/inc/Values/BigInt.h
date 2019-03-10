@@ -8,7 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 #include <unordered_map>
 using namespace std;
@@ -25,24 +25,28 @@ struct BigInt {
     }
 
     BigInt(long long v) {
+        sign = 0;
         *this = v;
     }
 
     BigInt(const string &s) {
+        sign = 0;
         read(s);
     }
 
-    void operator=(const BigInt &v) {
+    BigInt& operator=(const BigInt &v) {
         sign = v.sign;
         a = v.a;
+        return *this;
     }
 
-    void operator=(long long v) {
+    BigInt& operator=(long long v) {
         sign = 1;
         if (v < 0)
             sign = -1, v = -v;
         for (; v > 0; v = v / base)
             a.push_back(v % base);
+        return *this;
     }
 
     BigInt operator+(const BigInt &v) const {
@@ -279,8 +283,17 @@ struct BigInt {
         vector<int> res;
         long long cur = 0;
         int cur_digits = 0;
-        for (int i = 0; i < (int) a.size(); i++) {
-            cur += a[i] * p[cur_digits];
+//        for (int i = 0; i < (int) a.size(); i++) {
+//            cur += a[i] * p[cur_digits];
+//            cur_digits += old_digits;
+//            while (cur_digits >= new_digits) {
+//                res.push_back(int(cur % p[new_digits]));
+//                cur /= p[new_digits];
+//                cur_digits -= new_digits;
+//            }
+//        }
+        for (auto e : a) {
+            cur += e * p[cur_digits];
             cur_digits += old_digits;
             while (cur_digits >= new_digits) {
                 res.push_back(int(cur % p[new_digits]));

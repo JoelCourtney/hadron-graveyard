@@ -10,7 +10,7 @@
 
 class MatrixValue : public NumericValue {
 public:
-    virtual ~MatrixValue() = default;
+    ~MatrixValue() override = default;
     virtual ScalarValue* determinant() = 0;
     virtual void invert() = 0;
 };

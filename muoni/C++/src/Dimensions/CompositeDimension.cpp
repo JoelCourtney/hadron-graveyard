@@ -4,7 +4,7 @@
 
 #include "Dimensions/CompositeDimension.h"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 CompositeDimension::CompositeDimension(std::vector<DimensionalComponent> c) : components(std::move(c)) {
     reduce(components);

@@ -4,7 +4,7 @@
 
 #include "Dimensions/UnityDimension.h"
 
-UnityDimension::UnityDimension(std::string s) : BaseDimension(s) {}
+UnityDimension::UnityDimension(std::string s) : BaseDimension(std::move(s)) {}
 
 std::vector<DimensionalComponent> UnityDimension::toMultiplicationComponents() const {
     std::vector<DimensionalComponent> v;

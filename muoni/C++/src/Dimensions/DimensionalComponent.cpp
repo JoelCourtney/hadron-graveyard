@@ -3,7 +3,7 @@
 //
 
 #include "Dimensions/DimensionalComponent.h"
-#include <math.h>
+#include <cmath>
 #include "Dimensions/BaseDimension.h"
 
 DimensionalComponent::DimensionalComponent(const NamedDimension* b, double e) : base(b), exponent(e) {}

@@ -14,7 +14,7 @@ class ComplexFloatValue : public ScalarValue {
     friend class Type;
 
 public:
-    ComplexFloatValue(std::complex<double>);
+    explicit ComplexFloatValue(std::complex<double>);
     ~ComplexFloatValue() override = default;
 
     std::string toString() const override;

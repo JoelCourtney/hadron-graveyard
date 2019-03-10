@@ -9,7 +9,7 @@
 
 class NumericValue : public Value {
 public:
-    virtual ~NumericValue() = default;
+    ~NumericValue() override = default;
 
     virtual void increment() = 0;
     virtual void decrement() = 0;

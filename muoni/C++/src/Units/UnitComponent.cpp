@@ -3,7 +3,7 @@
 //
 
 #include "Units/UnitComponent.h"
-#include <math.h>
+#include <cmath>
 #include "Units/NamedUnit.h"
 
 UnitComponent::UnitComponent(const NamedUnit* b, double e) : base(b), exponent(e) {}

@@ -10,7 +10,7 @@
 class BaseDimension : public NamedDimension {
 public:
     explicit BaseDimension(std::string);
-    virtual ~BaseDimension() override = default;
+    ~BaseDimension() override = default;
 
     std::vector<DimensionalComponent> toBaseComponents() const override;
 

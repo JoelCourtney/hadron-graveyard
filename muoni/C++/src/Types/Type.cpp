@@ -10,7 +10,7 @@ std::string Type::toString(Value* v) const {
     return s;
 }
 
-NullValue* Type::toNullValue(Value* v) const {
+NullValue* Type::toNullValue(Value*) const {
     return ValueFactory::from();
 }
 

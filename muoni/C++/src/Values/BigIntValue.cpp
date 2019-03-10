@@ -6,7 +6,7 @@
 #include "Values/BigIntValue.h"
 #include "Types/IntType.h"
 
-BigIntValue::BigIntValue(BigInt b) : b(std::move(b)) {}
+BigIntValue::BigIntValue(BigInt b) : b(b) {}
 
 std::string BigIntValue::toString() const {
     return b.toString();

@@ -10,7 +10,7 @@
 
 class ScalarValue : public NumericValue {
 public:
-    virtual ~ScalarValue() = default;
+    ~ScalarValue() override = default;
 
     virtual ScalarValue* magnitude() = 0;
 };

@@ -37,9 +37,9 @@ ComplexFloatValue* ValueFactory::from(std::complex<double> c) {
 }
 
 IntMatrixValue* ValueFactory::from(MatrixXi m) {
-    return new IntMatrixValue(m);
+    return new IntMatrixValue(std::move(m));
 }
 
 FloatMatrixValue* ValueFactory::from(MatrixXd m) {
-    return new FloatMatrixValue(m);
+    return new FloatMatrixValue(std::move(m));
 }
