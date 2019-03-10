@@ -5,18 +5,15 @@
 #ifndef C_DERIVEDDIMENSION_H
 #define C_DERIVEDDIMENSION_H
 
-#include "BaseDimension.h"
+#include "NamedDimension.h"
 
-class DerivedDimension : public Dimension {
-    std::string name;
+class DerivedDimension : public NamedDimension {
     std::vector<DimensionalComponent> components;
 
 public:
     explicit DerivedDimension(std::string,std::vector<DimensionalComponent>);
     ~DerivedDimension() override = default;
 
-    std::string toString() const override;
-    std::vector<DimensionalComponent> toComponents() const override;
     std::vector<DimensionalComponent> toBaseComponents() const override;
 
     bool isBase() const override;

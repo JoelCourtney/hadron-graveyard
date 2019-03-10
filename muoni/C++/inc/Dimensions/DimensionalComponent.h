@@ -7,18 +7,17 @@
 
 #include <string>
 
-class Dimension;
+class NamedDimension;
 
 struct DimensionalComponent {
-    const Dimension* base;
-    double multiplicity;
+    const NamedDimension* base;
+    double exponent;
 
-    DimensionalComponent(const Dimension*,double);
+    DimensionalComponent(const NamedDimension*,double);
 
     std::string toString() const;
-    bool isOne() const;
+    bool isUnity() const;
 
-    static DimensionalComponent multiply(DimensionalComponent,DimensionalComponent);
     static bool areEquivalent(DimensionalComponent,DimensionalComponent);
 };
 

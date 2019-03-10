@@ -5,7 +5,7 @@
 #ifndef C_COMPOSITEDIMENSION_H
 #define C_COMPOSITEDIMENSION_H
 
-#include "BaseDimension.h"
+#include "NamedDimension.h"
 
 class CompositeDimension : public Dimension {
     std::vector<DimensionalComponent> components;

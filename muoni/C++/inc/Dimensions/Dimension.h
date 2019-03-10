@@ -19,12 +19,16 @@ public:
     virtual std::string toString() const = 0;
     virtual std::vector<DimensionalComponent> toComponents() const = 0;
     virtual std::vector<DimensionalComponent> toBaseComponents() const = 0;
+    virtual std::vector<DimensionalComponent> toMultiplicationComponents() const;
 
     virtual bool isBase() const = 0;
     virtual bool isNamed() const = 0;
+    virtual bool isUnity() const;
 
-    static bool areEquivalent(Dimension*,Dimension*);
-    static std::vector<DimensionalComponent> reduce(std::vector<DimensionalComponent>);
+    static bool areEquivalent(const Dimension*, const Dimension*);
+    static void reduce(std::vector<DimensionalComponent>&);
+    static Dimension* multiply(const Dimension*, const Dimension*);
+    static Dimension* divide(const Dimension*, const Dimension*);
 };
 
 #endif //C_DIMENSION_H

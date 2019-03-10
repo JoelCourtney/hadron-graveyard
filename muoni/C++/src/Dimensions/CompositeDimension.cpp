@@ -3,13 +3,15 @@
 //
 
 #include "Dimensions/CompositeDimension.h"
+#include <iostream>
 #include <math.h>
 
-CompositeDimension::CompositeDimension(std::vector<DimensionalComponent> c)
-    : components(std::move(reduce(std::move(c)))) {}
+CompositeDimension::CompositeDimension(std::vector<DimensionalComponent> c) : components(std::move(c)) {
+    reduce(components);
+}
 
 std::string CompositeDimension::toString() const {
-    std::string result = "";
+    std::string result;
     for (DimensionalComponent component : components) {
         result += component.toString() + " ";
     }
@@ -27,11 +29,12 @@ std::vector<DimensionalComponent> CompositeDimension::toBaseComponents() const {
         const Dimension* d = c.base;
         std::vector<DimensionalComponent> subComponents = d->toBaseComponents();
         for (DimensionalComponent& c2 : subComponents) {
-            c2.multiplicity *= c.multiplicity;
+            c2.exponent *= c.exponent;
         }
-        std::copy (subComponents.begin(), subComponents.end(), std::back_inserter(v));
+        std::copy(subComponents.begin(), subComponents.end(), std::back_inserter(v));
     }
-    return reduce(v);
+    reduce(v);
+    return v;
 }
 
 bool CompositeDimension::isBase() const {

@@ -4,17 +4,7 @@
 
 #include "Dimensions/BaseDimension.h"
 
-BaseDimension::BaseDimension(std::string s) : name(std::move(s)) {}
-
-std::string BaseDimension::toString() const {
-    return name;
-}
-
-std::vector<DimensionalComponent> BaseDimension::toComponents() const {
-    std::vector<DimensionalComponent> v;
-    v.emplace_back(this,1.);
-    return v;
-}
+BaseDimension::BaseDimension(std::string s) : NamedDimension(std::move(s)) {}
 
 std::vector<DimensionalComponent> BaseDimension::toBaseComponents() const {
     return toComponents();

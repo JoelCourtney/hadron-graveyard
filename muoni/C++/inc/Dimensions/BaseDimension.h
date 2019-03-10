@@ -5,17 +5,13 @@
 #ifndef C_BASEDIMENSION_H
 #define C_BASEDIMENSION_H
 
-#include "Dimension.h"
+#include "NamedDimension.h"
 
-class BaseDimension : public Dimension {
-    std::string name;
-
+class BaseDimension : public NamedDimension {
 public:
     explicit BaseDimension(std::string);
-    ~BaseDimension() override = default;
+    virtual ~BaseDimension() override = default;
 
-    std::string toString() const override;
-    std::vector<DimensionalComponent> toComponents() const override;
     std::vector<DimensionalComponent> toBaseComponents() const override;
 
     bool isBase() const override;

@@ -13,31 +13,55 @@
 #include "Dimensions/CompositeDimension.h"
 #include "Dimensions/DimensionalComponent.h"
 #include "Dimensions/DerivedDimension.h"
+#include "Dimensions/UnityDimension.h"
+#include "Units/BaseUnit.h"
+#include "Units/Unit.h"
+#include "Units/DerivedUnit.h"
+#include "Units/UnityBaseUnit.h"
+#include "Units/UnityDerivedUnit.h"
 
 void doStuffs() {
-    BaseDimension distance("Distance"), time("Time");
-    std::cout << distance.toString() << std::endl;
-    std::cout << time.toString() << std::endl;
-    std::vector<DimensionalComponent> v;
-    v.emplace_back(&distance,1);
-    v.emplace_back(&time,-2);
-    CompositeDimension accel(v);
-    std::cout << accel.toString() << std::endl;
-    DerivedDimension otherAccel("Acceleration",v);
-    std::cout << otherAccel.toString() << std::endl;
-    std::cout << Dimension::areEquivalent(&accel,&otherAccel) << std::endl;
-    BaseDimension mass("Mass");
-    v.emplace_back(&mass,1);
-    DerivedDimension force("Force",v);
-    std::cout << force.toString() << std::endl;
-    std::cout << accel.toString() << std::endl;
-    CompositeDimension otherForce(v);
-    std::cout << otherForce.toString() << std::endl;
+    BaseDimension distance("Distance");
+    BaseDimension time("Time");
+    UnityDimension angle("Angle");
+
+    BaseUnit meter(&distance,"m");
+    BaseUnit second(&time,"s");
+    UnityBaseUnit radian(&angle,"rad");
+    Unit* mps = Unit::divide(&meter,&second);
+    std::cout << meter.toString() << std::endl;
+    std::cout << second.toString() << std::endl;
+    std::cout << mps->toString() << std::endl;
+
+    std::vector<UnitComponent> v;
+    v.emplace_back(&meter,1);
+
+    DerivedUnit millimeter(&distance,"mm",v,0.001);
+    std::cout << millimeter.toString() << std::endl;
+    Unit* mmps = Unit::divide(&millimeter,&second);
+    std::cout << mmps->toString() << std::endl;
+
+    std::cout << Unit::areEquivalent(mmps,mps) << std::endl;
+
     v.clear();
-    v.emplace_back(&otherAccel,1);
-    v.emplace_back(&mass,1);
-    CompositeDimension thirdForce(v);
-    std::cout << std::endl << std::endl << thirdForce.toString() << std::endl;
+    v.emplace_back(&radian,1);
+    UnityDerivedUnit degree(&angle,"deg",v,3.14159265/180);
+
+    double d = 10;
+    d *= Unit::convert(mps,mmps);
+    std::cout << d << std::endl;
+
+    std::cout << radian.toString() << std::endl;
+    double a = 3.14159265 / 4;
+    a *= Unit::convert(&radian,&degree);
+    std::cout << a << std::endl;
+
+    Unit* asdf = Unit::multiply(&meter,&radian);
+    std::cout << asdf->toString() << std::endl;
+    std::cout << asdf->getDimension()->toString() << std::endl;
+
+    delete mps;
+    delete mmps;
 }
 
 int main() {
