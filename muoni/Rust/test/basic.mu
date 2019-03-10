@@ -116,8 +116,15 @@ dimension Time [
 	hr = 60*min
 ]
 
+dimensionless Angle [
+	rad,
+	deg = `pi`*rad/180
+]
+
 val d = 6[m]
 print d
 
 val v = d / 4[min]
 print v
+
+fn sin(val a~[[Angle]]) => math.sin(a@[rad])

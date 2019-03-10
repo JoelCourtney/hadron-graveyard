@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="colt">
+    <CLASSES />
+    <JAVADOC>
+      <root url="file:///opt/colt/doc/api" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="file:///opt/colt/src" />
+    </SOURCES>
+  </library>
+</component>
