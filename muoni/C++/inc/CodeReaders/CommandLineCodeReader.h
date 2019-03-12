@@ -8,7 +8,11 @@
 #include "CodeReader.h"
 
 class CommandLineCodeReader : public CodeReader {
+public:
+    explicit CommandLineCodeReader(std::string);
+    ~CommandLineCodeReader() override = default;
 
+    bool readLine() override;
 };
 
 #endif //C_COMMANDLINECODEREADER_H

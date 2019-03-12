@@ -8,7 +8,8 @@
 #include "Values/IntValue.h"
 
 class Operation {
-
+public:
+    virtual std::string toString() const = 0;
 };
 
 #endif //C_OPERATION_H

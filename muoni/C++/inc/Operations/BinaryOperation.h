@@ -8,9 +8,9 @@
 #include "Operation.h"
 #include "Values/Value.h"
 
-class BinaryOperation : Operation {
+class BinaryOperation : public Operation {
 public:
-    virtual Value* operate(Value*,Value*) const = 0;
+//    virtual Value* operate(Value*,Value*) const = 0;
 };
 
 #endif //C_BINARYOPERATION_H
