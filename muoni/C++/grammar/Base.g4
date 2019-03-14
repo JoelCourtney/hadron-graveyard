@@ -1,12 +1,146 @@
-grammar Base;
+lexer grammar Base;
 
-ID : [a-z]+;
+VAL : 'val';
 
-literal : INT_LITERAL | FLOAT_LITERAL | SCIENTIFIC_FLOAT_LITERAL | STRING_LITERAL | BOOL_LITERAL | NULL_LITERAL;
+VAR : 'var';
+
+DROP : 'drop';
+
+FN : 'fn';
+
+IF : 'if';
+
+ELSEIF : 'elseif';
+
+ELSE : 'else';
+
+FOR : 'for';
+
+AS : 'as';
+
+AT : 'at';
+
+WHILE : 'while';
+
+LOOP : 'loop';
+
+DIMENSION : 'dimension';
+
+UNITY : 'unity';
+
+STRUCT : 'struct';
+
+CLASS : 'class';
+
+ENUM : 'enum';
+
+PRINT : 'print';
+
+OR : 'or';
+NOR : 'nor';
+XOR : 'xor';
+
+AND : 'and';
+NAND : 'nand';
+
+IS : 'is';
+ISNT : 'isnt';
+
+MOD : 'mod';
+
+TO : 'to';
+
+NOT : 'not';
+
+SCIENTIFIC_FLOAT_LITERAL
+    : FLOAT_LITERAL 'e' SIGN? INT_LITERAL
+    | INT_LITERAL 'e' SIGN? INT_LITERAL;
+
+IMAGINARY_SCIENTIFIC_FLOAT_LITERAL
+    : FLOAT_LITERAL 'ie' SIGN? INT_LITERAL
+    | INT_LITERAL 'ie' SIGN? INT_LITERAL;
+
+fragment SIGN : ('+' | '-');
+fragment E : ('E' | 'e');
+
+FLOAT_LITERAL
+    : [0-9]+ '.' [0-9]*
+    | [0-9]* '.' [0-9]+;
+
+IMAGINARY_FLOAT_LITERAL : FLOAT_LITERAL 'i';
 
 INT_LITERAL : [0-9]+;
-SCIENTIFIC_FLOAT_LITERAL : FLOAT_LITERAL 'e' INT_LITERAL | INT_LITERAL 'e' INT_LITERAL;
-FLOAT_LITERAL : ([0-9]+ '.' [0-9]*) | ([0-9]* '.' [0-9]+);
+
+IMAGINARY_INT_LITERAL : INT_LITERAL 'i';
+
 STRING_LITERAL : '"' .*? '"';
-BOOL_LITERAL : 'true' | 'false';
+
+BOOL_LITERAL
+    : 'true'
+    | 'false';
+
 NULL_LITERAL : 'null';
+
+VOID_LITERAL : 'void';
+
+NAME : [_a-zA-Z][_a-zA-Z0-9]*;
+
+EQUAL : '=';
+
+NEWLINE : (INLINE_COMMENT? '\r'? '\n' | INLINE_COMMENT? '\r')+;
+SEMICOLON : ';'+;
+
+COLON : ':';
+
+COMMA : ',';
+
+OPAREN : '(';
+CPAREN : ')';
+
+OBRACKET : '[';
+CBRACKET : ']';
+
+OBRACE : '{';
+CBRACE : '}';
+
+UNDERSCORE : '_';
+
+DASH : '-';
+TILDE : '~';
+
+PLUS : '+';
+
+OHAIRPIN : '<';
+CHAIRPIN : '>';
+OHAIRPINEQUAL : '<=';
+CHAIRPINEQUAL : '>=';
+
+BANG : '!';
+
+BACKTICK : '`'; // escape greek
+
+AT_SYMBOL : '@'; // Strip units
+
+HASH : '#'; // size operator
+
+DOLLAR : '$'; // shape operator
+
+PERCENT : '%';
+
+AMPERSAND : '&';
+
+DOT : '.';
+
+STAR : '*';
+DOTSTAR : '.*';
+
+SLASH : '/';
+DOTSLASH : './';
+
+CARROT : '^';
+DOTCARROT : '.^';
+
+fragment INLINE_COMMENT : '//' ~[\n\r]*;
+BLOCK_COMMENT : '/*' .*? '*/' -> skip;
+
+WHITESPACE : ' ' -> skip;

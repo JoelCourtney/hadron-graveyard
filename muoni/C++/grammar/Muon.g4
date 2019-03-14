@@ -1,3 +1,6 @@
 grammar Muon;
 
-import Control;
+import Structure;
+
+file : (control (NEWLINE | SEMICOLON | EOF))*;
+
