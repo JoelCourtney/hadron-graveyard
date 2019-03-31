@@ -211,23 +211,23 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitLvalue(MuonParser::LvalueContext *ctx) override {
+  virtual antlrcpp::Any visitNameLValue(MuonParser::NameLValueContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitMatrixDecomposition(MuonParser::MatrixDecompositionContext *ctx) override {
+  virtual antlrcpp::Any visitMatrixDecompositionLValue(MuonParser::MatrixDecompositionLValueContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitListDecomposition(MuonParser::ListDecompositionContext *ctx) override {
+  virtual antlrcpp::Any visitListDecompositionLValue(MuonParser::ListDecompositionLValueContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSubset(MuonParser::SubsetContext *ctx) override {
+  virtual antlrcpp::Any visitSubsetLValue(MuonParser::SubsetLValueContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitDiscard(MuonParser::DiscardContext *ctx) override {
+  virtual antlrcpp::Any visitDiscardLValue(MuonParser::DiscardLValueContext *ctx) override {
     return visitChildren(ctx);
   }
 

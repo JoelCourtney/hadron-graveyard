@@ -35,8 +35,7 @@ public:
     RuleList = 9, RuleScope = 10, RuleRArgList = 11, RuleType = 12, RuleUnit = 13, 
     RuleDimension = 14, RuleTypeRValue = 15, RuleTypeMultiplyOperation = 16, 
     RuleTypePowerOperation = 17, RuleTypeAtom = 18, RuleTypeLiteral = 19, 
-    RuleLvalue = 20, RuleMatrixDecomposition = 21, RuleListDecomposition = 22, 
-    RuleSubset = 23, RuleDiscard = 24, RuleLArgList = 25
+    RuleLvalue = 20, RuleLArgList = 21
   };
 
   MuonParser(antlr4::TokenStream *input);
@@ -70,10 +69,6 @@ public:
   class TypeAtomContext;
   class TypeLiteralContext;
   class LvalueContext;
-  class MatrixDecompositionContext;
-  class ListDecompositionContext;
-  class SubsetContext;
-  class DiscardContext;
   class LArgListContext; 
 
   class  FileContext : public antlr4::ParserRuleContext {
@@ -781,23 +776,34 @@ public:
   class  LvalueContext : public antlr4::ParserRuleContext {
   public:
     LvalueContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *NAME();
-    MatrixDecompositionContext *matrixDecomposition();
-    ListDecompositionContext *listDecomposition();
-    SubsetContext *subset();
-    DiscardContext *discard();
+   
+    LvalueContext() : antlr4::ParserRuleContext() { }
+    void copyFrom(LvalueContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+    virtual size_t getRuleIndex() const override;
+
    
   };
 
-  LvalueContext* lvalue();
-
-  class  MatrixDecompositionContext : public antlr4::ParserRuleContext {
+  class  ListDecompositionLValueContext : public LvalueContext {
   public:
-    MatrixDecompositionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
+    ListDecompositionLValueContext(LvalueContext *ctx);
+
+    antlr4::tree::TerminalNode *OBRACKET();
+    antlr4::tree::TerminalNode *CBRACKET();
+    antlr4::tree::TerminalNode *NEWLINE();
+    std::vector<LvalueContext *> lvalue();
+    LvalueContext* lvalue(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  MatrixDecompositionLValueContext : public LvalueContext {
+  public:
+    MatrixDecompositionLValueContext(LvalueContext *ctx);
+
     antlr4::tree::TerminalNode *OPAREN();
     antlr4::tree::TerminalNode *CPAREN();
     std::vector<antlr4::tree::TerminalNode *> NEWLINE();
@@ -808,55 +814,35 @@ public:
     antlr4::tree::TerminalNode* COMMA(size_t i);
     std::vector<antlr4::tree::TerminalNode *> SEMICOLON();
     antlr4::tree::TerminalNode* SEMICOLON(size_t i);
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
   };
 
-  MatrixDecompositionContext* matrixDecomposition();
-
-  class  ListDecompositionContext : public antlr4::ParserRuleContext {
+  class  DiscardLValueContext : public LvalueContext {
   public:
-    ListDecompositionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *OBRACKET();
-    antlr4::tree::TerminalNode *CBRACKET();
-    antlr4::tree::TerminalNode *NEWLINE();
-    std::vector<LvalueContext *> lvalue();
-    LvalueContext* lvalue(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> COMMA();
-    antlr4::tree::TerminalNode* COMMA(size_t i);
+    DiscardLValueContext(LvalueContext *ctx);
 
+    antlr4::tree::TerminalNode *UNDERSCORE();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
   };
 
-  ListDecompositionContext* listDecomposition();
-
-  class  SubsetContext : public antlr4::ParserRuleContext {
+  class  SubsetLValueContext : public LvalueContext {
   public:
-    SubsetContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
+    SubsetLValueContext(LvalueContext *ctx);
+
     antlr4::tree::TerminalNode *NAME();
     LArgListContext *lArgList();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
   };
 
-  SubsetContext* subset();
-
-  class  DiscardContext : public antlr4::ParserRuleContext {
+  class  NameLValueContext : public LvalueContext {
   public:
-    DiscardContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *UNDERSCORE();
+    NameLValueContext(LvalueContext *ctx);
 
+    antlr4::tree::TerminalNode *NAME();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
   };
 
-  DiscardContext* discard();
+  LvalueContext* lvalue();
 
   class  LArgListContext : public antlr4::ParserRuleContext {
   public:

@@ -11,6 +11,10 @@ std::string NullValue::toString() const {
     return "null";
 }
 
+bool NullValue::isNull() const {
+    return true;
+}
+
 Type* NullValue::getType() const {
     return NullType::getInstance();
 }

@@ -4,6 +4,10 @@
 
 #include "Values/Value.h"
 
+bool Value::isNull() const {
+    return false;
+}
+
 std::ostream& operator<<(std::ostream& o, const Value* v) {
     o << v->toString();
     return o;

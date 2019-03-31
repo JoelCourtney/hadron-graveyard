@@ -13,6 +13,7 @@ public:
     ~NullValue() override = default;
 
     std::string toString() const override;
+    bool isNull() const override;
 
     Type* getType() const override;
 };

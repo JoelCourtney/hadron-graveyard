@@ -11,14 +11,16 @@
 #include "Units/Unit.h"
 
 class Scope {
-    std::unordered_map<std::string,Value*> values;
-    std::unordered_map<std::string,Value*> variables;
-    std::unordered_map<std::string,Dimension*> dimensions;
-    std::unordered_map<std::string,Unit*> units;
-
 public:
     Scope() = default;
-    virtual ~Scope();
+    virtual ~Scope() = default;
+
+    virtual Scope* defer() const = 0;
+
+    virtual Value* getVarl(const std::string&) const = 0;
+    virtual bool assignVarl(const std::string&, Value*) = 0;
+    virtual bool containsVarl(const std::string&) const = 0;
+    virtual bool declareVarl(const std::string&, bool) = 0;
 };
 
 #endif //C_SCOPE_H

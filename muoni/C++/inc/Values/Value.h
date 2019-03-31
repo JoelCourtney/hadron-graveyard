@@ -17,6 +17,8 @@ public:
 
     virtual Type* getType() const = 0;
 
+    virtual bool isNull() const;
+
     friend std::ostream& operator<<(std::ostream& o, const Value* v);
     friend std::ostream& operator<<(std::ostream& o, const Value& v);
 };

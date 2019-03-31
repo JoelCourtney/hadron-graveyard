@@ -117,15 +117,15 @@ public:
 
     virtual antlrcpp::Any visitTypeLiteral(MuonParser::TypeLiteralContext *context) = 0;
 
-    virtual antlrcpp::Any visitLvalue(MuonParser::LvalueContext *context) = 0;
+    virtual antlrcpp::Any visitNameLValue(MuonParser::NameLValueContext *context) = 0;
 
-    virtual antlrcpp::Any visitMatrixDecomposition(MuonParser::MatrixDecompositionContext *context) = 0;
+    virtual antlrcpp::Any visitMatrixDecompositionLValue(MuonParser::MatrixDecompositionLValueContext *context) = 0;
 
-    virtual antlrcpp::Any visitListDecomposition(MuonParser::ListDecompositionContext *context) = 0;
+    virtual antlrcpp::Any visitListDecompositionLValue(MuonParser::ListDecompositionLValueContext *context) = 0;
 
-    virtual antlrcpp::Any visitSubset(MuonParser::SubsetContext *context) = 0;
+    virtual antlrcpp::Any visitSubsetLValue(MuonParser::SubsetLValueContext *context) = 0;
 
-    virtual antlrcpp::Any visitDiscard(MuonParser::DiscardContext *context) = 0;
+    virtual antlrcpp::Any visitDiscardLValue(MuonParser::DiscardLValueContext *context) = 0;
 
     virtual antlrcpp::Any visitLArgList(MuonParser::LArgListContext *context) = 0;
 

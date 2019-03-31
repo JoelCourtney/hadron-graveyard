@@ -19,7 +19,7 @@ void doStuffs(int argc, char* argv[]) {
 
         antlr4::tree::ParseTree* tree = parser.file();
 
-//        std::cout << "parse tree: " << tree->toStringTree(&parser) << std::endl;
+        std::cout << "parse tree: " << tree->toStringTree(&parser) << std::endl;
 
         MuonInterpreter muon;
         muon.visit(tree);
