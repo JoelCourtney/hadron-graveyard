@@ -6,6 +6,8 @@
 
 #include "Values/ValueFactory.h"
 #include "Environment/ExplicitScope.h"
+#include "Errors/CannotDeferError.h"
+#include "Errors/VarlNotFoundError.h"
 
 Environment::~Environment() {
     while(!stack.empty()) {
@@ -21,7 +23,11 @@ Value* Environment::getVarl(const std::string& name) const {
     Scope* s = stack.top();
     Value* v = s->getVarl(name);
     while (!v) {
-        s = s->defer();
+        try {
+            s = s->defer();
+        } catch (const CannotDeferError& e) {
+            throw VarlNotFoundError(name);
+        }
         v = s->getVarl(name);
     }
     return v;

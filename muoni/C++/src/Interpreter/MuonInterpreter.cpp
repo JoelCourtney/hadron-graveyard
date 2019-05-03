@@ -8,6 +8,7 @@
 #include "Values/ValueFactory.h"
 #include <complex>
 #include "Environment/FileScope.h"
+#include "Errors/VarlNotFoundError.h"
 
 Any MuonInterpreter::visitFile(MuonParser::FileContext* ctx) {
     env.push(new FileScope());
@@ -47,12 +48,16 @@ Any MuonInterpreter::visitDeclareAssign(MuonParser::DeclareAssignContext* ctx) {
 }
 
 Any MuonInterpreter::visitPrint(MuonParser::PrintContext* ctx) {
-    std::cout << visit(ctx->rvalue()).as<Value*>()->toString() << std::endl;
+    try {
+        std::cout << visit(ctx->rvalue()).as<Value*>()->toString() << std::endl;
+    } catch (const VarlNotFoundError& e) {
+        std::cout << "not found" << std::endl;
+    }
     return 0;
 }
 
 Any MuonInterpreter::visitNameAtom(MuonParser::NameAtomContext* ctx) {
-    return env.getVarl(ctx->getText());
+        return env.getVarl(ctx->getText());
 }
 
 Any MuonInterpreter::visitFloatLiteral(MuonParser::FloatLiteralContext* ctx) {

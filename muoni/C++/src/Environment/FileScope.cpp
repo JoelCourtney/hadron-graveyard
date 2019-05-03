@@ -3,8 +3,8 @@
 //
 
 #include "Environment/FileScope.h"
+#include "Errors/CannotDeferError.h"
 
 Scope* FileScope::defer() const {
-    std::cout << "Cannot defer." << std::endl;
-    exit(10);
+    throw CannotDeferError();
 }

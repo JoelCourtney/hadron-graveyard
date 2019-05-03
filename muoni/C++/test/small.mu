@@ -1,2 +1,2 @@
 val jkl = 54
-print jkl
+print jk

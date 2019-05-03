@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="C__"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="muon">
+				<Option output="/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/muon" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/joelcourtney/repos/muon/muoni/C++/inc"/>
+					<Add directory="/Users/joelcourtney/repos/muon/muoni/C++/inc/Grammar"/>
+					<Add directory="/usr/local/include/eigen3"/>
+					<Add directory="/usr/local/include/antlr4-runtime"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 muon"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="muon/fast">
+				<Option output="/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/muon" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/joelcourtney/repos/muon/muoni/C++/inc"/>
+					<Add directory="/Users/joelcourtney/repos/muon/muoni/C++/inc/Grammar"/>
+					<Add directory="/usr/local/include/eigen3"/>
+					<Add directory="/usr/local/include/antlr4-runtime"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 muon/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/joelcourtney/repos/muon/muoni/C++/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/CodeReaders/CodeReader.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/CodeReaders/CommandLineCodeReader.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/CodeReaders/FileCodeReader.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Dimensions/BaseDimension.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Dimensions/CompositeDimension.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Dimensions/DerivedDimension.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Dimensions/Dimension.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Dimensions/DimensionalComponent.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Dimensions/NamedDimension.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Dimensions/UnityDimension.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Environment/Environment.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Environment/ExplicitScope.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Environment/FileScope.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Environment/FullScope.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Environment/ImplicitScope.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Environment/Scope.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Errors/CannotDeferError.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Errors/Error.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Errors/RuntimeError.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Errors/SyntaxError.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Errors/TypeError.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Errors/VarlNotFoundError.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Grammar/MuonBaseVisitor.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Grammar/MuonLexer.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Grammar/MuonParser.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Grammar/MuonVisitor.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Interpreter/MuonInterpreter.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Operations/BinaryOperation.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Operations/DimensionalOperation.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Operations/Operation.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Operations/SubtractionOperation.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Operations/UnaryOperation.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Types/BoolType.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Types/IntType.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Types/NullType.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Types/Type.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Units/BaseUnit.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Units/CompositeUnit.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Units/Conversion.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Units/DerivedUnit.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Units/NamedUnit.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Units/Unit.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Units/UnitComponent.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Units/UnityBaseUnit.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Units/UnityDerivedUnit.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/BigInt.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/BigIntValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/BoolValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/ComplexFloatValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/ComplexIntValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/FloatMatrixValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/FloatValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/IntMatrixValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/IntValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/MatrixValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/NullValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/NumericValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/ScalarValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/StringValue.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/Value.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/inc/Values/ValueFactory.h">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/CodeReaders/CodeReader.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/CodeReaders/CommandLineCodeReader.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/CodeReaders/FileCodeReader.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Dimensions/BaseDimension.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Dimensions/CompositeDimension.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Dimensions/DerivedDimension.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Dimensions/Dimension.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Dimensions/DimensionalComponent.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Dimensions/NamedDimension.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Dimensions/UnityDimension.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Environment/Environment.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Environment/ExplicitScope.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Environment/FileScope.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Environment/FullScope.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Environment/Scope.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Errors/VarlNotFoundError.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Grammar/MuonBaseVisitor.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Grammar/MuonLexer.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Grammar/MuonParser.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Grammar/MuonVisitor.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Interpreter/MuonInterpreter.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Operations/SubtractionOperation.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Types/BoolType.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Types/IntType.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Types/NullType.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Types/Type.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Units/BaseUnit.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Units/CompositeUnit.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Units/DerivedUnit.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Units/NamedUnit.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Units/Unit.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Units/UnitComponent.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Units/UnityBaseUnit.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Units/UnityDerivedUnit.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/BigIntValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/BoolValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/ComplexFloatValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/ComplexIntValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/FloatMatrixValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/FloatValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/IntMatrixValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/IntValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/MatrixValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/NullValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/NumericValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/ScalarValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/StringValue.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/Value.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/Values/ValueFactory.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/src/main.cpp">
+			<Option target="muon"/>
+		</Unit>
+		<Unit filename="/Users/joelcourtney/repos/muon/muoni/C++/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
