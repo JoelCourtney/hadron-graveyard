@@ -16,7 +16,7 @@ struct UnitComponent {
     explicit UnitComponent(const NamedUnit*,double);
 
     std::string toString() const;
-    bool isUnity() const;
+    bool isOne() const;
 
     static UnitComponent multiply(UnitComponent,UnitComponent);
     static bool areEquivalent(UnitComponent,UnitComponent);

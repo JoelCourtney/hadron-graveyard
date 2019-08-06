@@ -20,7 +20,7 @@ std::string UnitComponent::toString() const {
     }
 }
 
-bool UnitComponent::isUnity() const {
+bool UnitComponent::isOne() const {
     return exponent == 0.;
 }
 

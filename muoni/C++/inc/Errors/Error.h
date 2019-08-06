@@ -15,7 +15,9 @@ class Error : public std::exception {
     std::vector<size_t> offendingCharacters;
 
 public:
-    virtual void say() const;
+    ~Error() override = default;
+    
+    virtual const char* what() const noexcept override;
 };
 
 #endif //C_ERROR_H

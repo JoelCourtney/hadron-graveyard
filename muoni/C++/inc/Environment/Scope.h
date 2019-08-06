@@ -6,7 +6,7 @@
 #define C_SCOPE_H
 
 #include <unordered_map>
-#include "Values/Value.h"
+#include "Values/Data.h"
 #include "Dimensions/Dimension.h"
 #include "Units/Unit.h"
 
@@ -17,8 +17,8 @@ public:
 
     virtual Scope* defer() const = 0;
 
-    virtual Value* getVarl(const std::string&) const = 0;
-    virtual bool assignVarl(const std::string&, Value*) = 0;
+    virtual Data* getVarl(const std::string&) const = 0;
+    virtual bool assignVarl(const std::string&, Data*) = 0;
     virtual bool containsVarl(const std::string&) const = 0;
     virtual bool declareVarl(const std::string&, bool) = 0;
 };

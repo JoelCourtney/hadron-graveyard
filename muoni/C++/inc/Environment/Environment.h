@@ -5,7 +5,7 @@
 #ifndef C_ENVIRONMENT_H
 #define C_ENVIRONMENT_H
 
-#include "Values/Value.h"
+#include "Data/Data.h"
 #include <stack>
 
 class Scope;
@@ -17,10 +17,10 @@ public:
     Environment() = default;
     ~Environment();
 
-    void pushAns(const Value*);
+    void pushAns(const Data*);
 
-    Value* getVarl(const std::string&) const;
-    void assignVarl(const std::string&, Value*);
+    Data* getVarl(const std::string&) const;
+    void assignVarl(const std::string&, Data*);
     void declareVarl(const std::string&, bool);
 
     void push(Scope*);

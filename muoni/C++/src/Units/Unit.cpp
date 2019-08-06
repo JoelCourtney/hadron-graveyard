@@ -30,7 +30,7 @@ void Unit::reduce(std::vector<UnitComponent>& v) {
                 v.erase(v.begin() + j--);
             }
         }
-        if (c1.isUnity()) {
+        if (c1.isOne()) {
             v.erase(v.begin() + i--);
         }
     }

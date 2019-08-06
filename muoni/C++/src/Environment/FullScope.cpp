@@ -3,7 +3,7 @@
 //
 
 #include "Environment/FullScope.h"
-#include "Values/ValueFactory.h"
+#include "Values/DataFactory.h"
 
 FullScope::~FullScope() {
     auto it1 = varls.begin();
@@ -23,7 +23,7 @@ FullScope::~FullScope() {
     }
 }
 
-Value* FullScope::getVarl(const std::string& s) const {
+Data* FullScope::getVarl(const std::string& s) const {
     if (varls.count(s)) {
         return varls.at(s);
     }
@@ -34,7 +34,7 @@ bool FullScope::containsVarl(const std::string& s) const {
     return varls.count(s);
 }
 
-bool FullScope::assignVarl(const std::string& s, Value* v) {
+bool FullScope::assignVarl(const std::string& s, Data* v) {
     if (mutability.count(s)) {
         if (mutability.at(s) || varls.at(s) == nullptr) {
             delete varls.at(s);

@@ -8,7 +8,7 @@
 #include "Scope.h"
 
 class FullScope : public Scope {
-    std::unordered_map<std::string,Value*> varls;
+    std::unordered_map<std::string,Data*> varls;
     std::unordered_map<std::string,bool> mutability;
     std::unordered_map<std::string,Dimension*> dimensions;
     std::unordered_map<std::string,Unit*> units;
@@ -17,9 +17,9 @@ public:
     FullScope() = default;
     ~FullScope() override;
 
-    Value* getVarl(const std::string&) const override;
+    Data* getVarl(const std::string&) const override;
     bool containsVarl(const std::string&) const override;
-    bool assignVarl(const std::string&,Value*) override;
+    bool assignVarl(const std::string&,Data*) override;
     bool declareVarl(const std::string&,bool) override;
 
     Scope* defer() const override = 0;

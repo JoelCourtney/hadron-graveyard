@@ -4,7 +4,7 @@
 
 #include "Environment/Environment.h"
 
-#include "Values/ValueFactory.h"
+#include "Values/DataFactory.h"
 #include "Environment/ExplicitScope.h"
 #include "Errors/CannotDeferError.h"
 #include "Errors/VarlNotFoundError.h"
@@ -16,12 +16,12 @@ Environment::~Environment() {
     }
 }
 
-void Environment::pushAns(const Value* v) {
+void Environment::pushAns(const Data* v) {
 }
 
-Value* Environment::getVarl(const std::string& name) const {
+Data* Environment::getVarl(const std::string& name) const {
     Scope* s = stack.top();
-    Value* v = s->getVarl(name);
+    Data* v = s->getVarl(name);
     while (!v) {
         try {
             s = s->defer();
@@ -33,7 +33,7 @@ Value* Environment::getVarl(const std::string& name) const {
     return v;
 }
 
-void Environment::assignVarl(const std::string& name, Value* v) {
+void Environment::assignVarl(const std::string& name, Data* v) {
     Scope* s = stack.top();
     while(!s->assignVarl(name, v)) {
         s = s->defer();

@@ -9,14 +9,14 @@ rvalue
     | uop=HASH r=rvalue # UnaryOperation
     | uop=NOT r=rvalue # UnaryOperation
     | r=rvalue bop=(AT_SYMBOL | AMPERSAND | TO) t=type # ConvertOperation
-    | r1=rvalue bop=(CARROT | DOTCARROT) r2=rvalue # BinaryOperation
-    | r1=rvalue bop=(STAR | SLASH | DOTSTAR | DOTSLASH) r2=rvalue # BinaryOperation
-    | r1=rvalue bop=(PLUS | DASH) r2=rvalue # BinaryOperation
-    | r1=rvalue bop=(OHAIRPIN | OHAIRPINEQUAL | CHAIRPIN | CHAIRPINEQUAL) r2=rvalue # BinaryOperation
-    | r1=rvalue bop=(IS | ISNT) r2=rvalue # BinaryOperation
-    | r1=rvalue bop=(AND | NAND) r2=rvalue # BinaryOperation
-    | r1=rvalue bop=XOR r2=rvalue # BinaryOperation
-    | r1=rvalue bop=(OR | NOR) r2=rvalue # BinaryOperation
+    | r1=rvalue bop=(CARROT | DOTCARROT) r2=rvalue # ExpOperation
+    | r1=rvalue bop=(STAR | SLASH | DOTSTAR | DOTSLASH) r2=rvalue # MultDivOperation
+    | r1=rvalue bop=(PLUS | DASH) r2=rvalue # AddSubOperation
+    | r1=rvalue bop=(OHAIRPIN | OHAIRPINEQUAL | CHAIRPIN | CHAIRPINEQUAL) r2=rvalue # CompOperation
+    | r1=rvalue bop=(IS | ISNT) r2=rvalue # IsOperation
+    | r1=rvalue bop=(AND | NAND) r2=rvalue # AndOperation
+    | r1=rvalue bop=XOR r2=rvalue # XOrOperation
+    | r1=rvalue bop=(OR | NOR) r2=rvalue # OrOperation
     | a=atom # AtomRValue;
 
 atom

@@ -12,7 +12,7 @@ using namespace antlrcpp;
 
 class MuonInterpreter : public MuonBaseVisitor {
     Environment env;
-    Value* valueToAssign;
+    Data* valueToAssign;
     bool mutabilityToDeclare;
     bool inDeclare = false;
 
@@ -27,6 +27,7 @@ public:
 
     Any visitNameAtom(MuonParser::NameAtomContext*) override;
 
+    // MuonLiterals.cpp
     Any visitFloatLiteral(MuonParser::FloatLiteralContext*) override;
     Any visitImaginaryFloatLiteral(MuonParser::ImaginaryFloatLiteralContext*) override;
     Any visitIntLiteral(MuonParser::IntLiteralContext*) override;
@@ -35,7 +36,11 @@ public:
     Any visitBoolLiteral(MuonParser::BoolLiteralContext*) override;
     Any visitNullLiteral(MuonParser::NullLiteralContext*) override;
 
+    // MuonLValues.cpp
     Any visitNameLValue(MuonParser::NameLValueContext*) override;
+    
+    // MuonBinaryOperations.cpp
+    Any visitAddSubOperation(MuonParser::AddSubOperationContext*) override;
 };
 
 #endif //C_MUONINTERPRETER_H
