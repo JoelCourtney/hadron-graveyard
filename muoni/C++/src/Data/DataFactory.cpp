@@ -36,10 +36,14 @@ ComplexFloat* DataFactory::from(std::complex<double> c) {
     return new ComplexFloat(c);
 }
 
-IntMatrix* DataFactory::from(MatrixXi m) {
+IntMatrix* DataFactory::from(Eigen::MatrixXi m) {
     return new IntMatrix(std::move(m));
 }
 
-FloatMatrix* DataFactory::from(MatrixXd m) {
+FloatMatrix* DataFactory::from(Eigen::MatrixXd m) {
     return new FloatMatrix(std::move(m));
+}
+
+List* DataFactory::from(std::vector<Data*> l) {
+    return new List(l);
 }

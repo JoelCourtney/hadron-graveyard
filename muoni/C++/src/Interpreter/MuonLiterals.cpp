@@ -9,7 +9,11 @@
 #include "Errors/VarlNotFoundError.h"
 
 Any MuonInterpreter::visitFloatLiteral(MuonParser::FloatLiteralContext* ctx) {
-    return (Data*) DataFactory::from(std::stod(ctx->getText()));
+    if (ctx->cache)
+        return ctx->cache->clone();
+    Data* res = (Data*) DataFactory::from(std::stod(ctx->getText()));
+    ctx->cache = res->clone();
+    return res;
 }
 
 Any MuonInterpreter::visitImaginaryFloatLiteral(MuonParser::ImaginaryFloatLiteralContext* ctx) {

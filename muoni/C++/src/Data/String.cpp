@@ -5,7 +5,11 @@
 #include "Data/DataFactory.h"
 #include "Data/String.h"
 
-String::String(std::string& s) : Data(Type::STRING), s(std::move(s)) {}
+String::String(std::string& s) : Primitive(Type::STRING), s(std::move(s)) {}
+
+Data* String::clone() const {
+    return DataFactory::from(s);
+}
 
 std::string String::toString() const {
     return s;
@@ -48,11 +52,16 @@ std::complex<double> String::toComplexFloat() const {
 //    return std::complex<double>(b,0);
 }
 
-Data* String::add(Data* d2) const {
+Data* String::add(Data* d2) {
     Type t2 = d2->getType();
     switch(t2) {
         case Type::NULL_TYPE:
             throw InvalidOperationError();
+        case Type::LIST: {
+            auto l2 = dynamic_cast<List *>(d2);
+            l2->l.insert(l2->l.begin(), this);
+            return l2;
+        }
         default:
             return DataFactory::from(s + d2->toString());
     }

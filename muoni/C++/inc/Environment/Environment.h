@@ -5,7 +5,7 @@
 #ifndef C_ENVIRONMENT_H
 #define C_ENVIRONMENT_H
 
-#include "Data/Data.h"
+#include "Data/Primitive.h"
 #include <stack>
 
 class Scope;
@@ -17,14 +17,16 @@ public:
     Environment() = default;
     ~Environment();
 
-    void pushAns(const Data*);
+    void pushAns(Data*);
 
     Data* getVarl(const std::string&) const;
     void assignVarl(const std::string&, Data*);
     void declareVarl(const std::string&, bool);
 
     void push(Scope*);
-    void pop();
+    Data* pop();
+    
+    Scope* topScope();
 };
 
 #endif //C_ENVIRONMENT_H

@@ -4,4 +4,8 @@
 
 #include "Data/Numeric.h"
 
-Numeric::Numeric(Type t) : Data(t) {}
+Numeric::Numeric(Type t) : Primitive(t) {}
+
+bool Numeric::isNumeric() const {
+    return true;
+}

@@ -25,7 +25,6 @@ public:
     Any visitDeclareAssign(MuonParser::DeclareAssignContext*) override;
     Any visitPrint(MuonParser::PrintContext*) override;
 
-    Any visitNameAtom(MuonParser::NameAtomContext*) override;
 
     // MuonLiterals.cpp
     Any visitFloatLiteral(MuonParser::FloatLiteralContext*) override;
@@ -41,6 +40,17 @@ public:
     
     // MuonBinaryOperations.cpp
     Any visitAddSubOperation(MuonParser::AddSubOperationContext*) override;
+    
+    // MuonAtoms.cpp
+    Any visitNameAtom(MuonParser::NameAtomContext*) override;
+    Any visitMatrix(MuonParser::MatrixContext*) override;
+    Any visitMatrixRow(MuonParser::MatrixRowContext*) override;
+    Any visitList(MuonParser::ListContext*) override;
+    
+    // MuonControls.cpp
+    Any visitScope(MuonParser::ScopeContext*) override;
+    Any visitForLoop(MuonParser::ForLoopContext*) override;
+    Any visitForAsLoop(MuonParser::ForAsLoopContext*) override;
 };
 
 #endif //C_MUONINTERPRETER_H

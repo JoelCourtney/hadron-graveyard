@@ -5,14 +5,16 @@
 #ifndef C_STRINGVALUE_H
 #define C_STRINGVALUE_H
 
-#include "Data.h"
+#include "Primitive.h"
 
-class String : public Data {
+class String : public Primitive {
     std::string s;
 
 public:
     explicit String(std::string&);
     ~String() override = default;
+
+    Data* clone() const override;
 
     std::string toString() const override;
     bool toBool() const override;
@@ -24,7 +26,7 @@ public:
     std::complex<int> toComplexInt() const override;
     std::complex<double> toComplexFloat() const override;
 
-    Data* add(Data*) const override;
+    Data* add(Data*) override;
 };
 
 #endif //C_STRINGVALUE_H

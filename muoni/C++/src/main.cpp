@@ -22,7 +22,7 @@ void doStuffs(int argc, char* argv[]) {
         std::cout << "parse tree: " << tree->toStringTree(&parser) << std::endl;
 
         MuonInterpreter muon;
-        muon.visit(tree);
+            muon.visit(tree);
     }
 }
 

@@ -43,8 +43,12 @@ XOR : 'xor';
 AND : 'and';
 NAND : 'nand';
 
-IS : 'is';
-ISNT : 'isnt';
+IS
+    : 'is'
+    | '==';
+ISNT
+    : 'isnt'
+    | '!=';
 
 MOD : 'mod';
 
@@ -74,7 +78,9 @@ INT_LITERAL : [0-9]+;
 
 IMAGINARY_INT_LITERAL : INT_LITERAL I;
 
-STRING_LITERAL : '"' .*? '"';
+STRING_LITERAL
+    : '"' .*? '"'
+    | '\'' .*? '\'';
 
 BOOL_LITERAL
     : 'true'
@@ -133,13 +139,13 @@ AMPERSAND : '&';
 DOT : '.';
 
 STAR : '*';
-DOTSTAR : '.*';
+MATSTAR : '(*)';
 
 SLASH : '/';
-DOTSLASH : './';
+MATSLASH : '(/)';
 
 CARROT : '^';
-DOTCARROT : '.^';
+MATCARROT : '(^)';
 
 fragment INLINE_COMMENT : '//' ~[\n\r]*;
 BLOCK_COMMENT : '/*' .*? '*/' -> skip;

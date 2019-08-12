@@ -12,6 +12,9 @@ class Scalar : public Numeric {
 public:
     explicit Scalar(Type);
     ~Scalar() override = default;
+    
+    int getRows() const override;
+    int getCols() const override;
 };
 
 #endif //C_SCALARVALUE_H

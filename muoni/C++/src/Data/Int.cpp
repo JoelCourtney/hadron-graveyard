@@ -8,6 +8,10 @@
 
 Int::Int(int i) : Scalar(Type::INT), i(i) {}
 
+Data* Int::clone() const {
+    return DataFactory::from(i);
+}
+
 std::string Int::toString() const {
     return std::to_string(i);
 }
@@ -48,27 +52,35 @@ std::complex<double> Int::toComplexFloat() const {
     return std::complex<double>(i,0);
 }
 
-Data* Int::add(Data* d2) const {
-    Type t2 = d2->getType();
+Data* Int::add(Data* d2) {
+    if (!d2->isPrimitive()) {
+        throw InvalidConversionError();
+    }
+    auto p2 = dynamic_cast<Primitive*>(d2);
+    Type t2 = p2->getType();
     switch(t2) {
         case Type::NULL_TYPE:
             throw InvalidOperationError();
         case Type::STRING:
-            return DataFactory::from(toString() + d2->toString());
+            return DataFactory::from(toString() + p2->toString());
         case Type::BOOL:
         case Type::INT:
-            return DataFactory::from(i + d2->toInt());
+            return DataFactory::from(i + p2->toInt());
         case Type::BIG_INT:
-            return DataFactory::from(toBigInt() + d2->toBigInt());
+            return DataFactory::from(toBigInt() + p2->toBigInt());
         case Type::FLOAT:
-            return DataFactory::from(i + d2->toFloat());
+            return DataFactory::from(i + p2->toFloat());
         case Type::INT_MATRIX:
-            return DataFactory::from((Eigen::MatrixXi) (d2->toIntMatrix().array() + i).matrix());
+            return DataFactory::from((Eigen::MatrixXi) (p2->toIntMatrix().array() + i).matrix());
         case Type::FLOAT_MATRIX:
-            return DataFactory::from((Eigen::MatrixXd) (d2->toFloatMatrix().array() + i).matrix());
+            return DataFactory::from((Eigen::MatrixXd) (p2->toFloatMatrix().array() + i).matrix());
         case Type::COMPLEX_INT:
-            return DataFactory::from(i + d2->toComplexInt());
+            return DataFactory::from(i + p2->toComplexInt());
         case Type::COMPLEX_FLOAT:
-            return DataFactory::from((double) i + d2->toComplexFloat());
+            return DataFactory::from((double) i + p2->toComplexFloat());
+        case Type::LIST:
+            auto l2 = dynamic_cast<List*>(p2);
+            l2->l.insert(l2->l.begin(), this);
+            return l2;
     }
 }

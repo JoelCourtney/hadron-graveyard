@@ -1,5 +1,5 @@
 //
-// Created by Joel Courtney on 2019-03-02.
+// Created by Joel Courtney on 2019-08-11.
 //
 
 #include "Data/Data.h"
@@ -20,6 +20,10 @@ std::ostream& operator<<(std::ostream& o, const Data& v) {
     return o;
 }
 
-Data* Data::add(Data*) const {
-    return nullptr;
+bool Data::isPrimitive() const {
+    return false;
+}
+
+bool Data::isNumeric() const {
+    return false;
 }

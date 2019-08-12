@@ -12,6 +12,9 @@ class Matrix : public Numeric {
 public:
     explicit Matrix(Type);
     ~Matrix() override = default;
+    
+protected:
+    static std::string formatMatrix(const std::string&);
 };
 
 #endif //C_MATRIXVALUE_H

@@ -5,7 +5,7 @@
 #ifndef C_VALUEFACTORY_H
 #define C_VALUEFACTORY_H
 
-#include "Data.h"
+#include "Primitive.h"
 #include "Null.h"
 #include "Bool.h"
 #include "Float.h"
@@ -16,6 +16,7 @@
 #include "BigInt.h"
 #include "IntMatrix.h"
 #include "FloatMatrix.h"
+#include "List.h"
 
 class DataFactory {
 public:
@@ -29,6 +30,7 @@ public:
     static ComplexFloat* from(std::complex<double>);
     static IntMatrix* from(Eigen::MatrixXi);
     static FloatMatrix* from(Eigen::MatrixXd);
+    static List* from(std::vector<Data*>);
 };
 
 #endif //C_VALUEFACTORY_H

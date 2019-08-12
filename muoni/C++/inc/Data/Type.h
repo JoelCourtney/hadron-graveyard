@@ -15,9 +15,8 @@ enum class Type {
     FLOAT,
     COMPLEX_FLOAT,
     INT_MATRIX,
-    COMPLEX_INT_MATRIX,
     FLOAT_MATRIX,
-    COMPLEX_FLOAT_MATRIX
+    LIST
 };
 
 #endif //C___TYPE_H

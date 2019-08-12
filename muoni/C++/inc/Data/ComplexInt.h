@@ -15,6 +15,8 @@ public:
     explicit ComplexInt(std::complex<int>);
     ~ComplexInt() override = default;
 
+    Data* clone() const override;
+
     std::string toString() const override;
     bool toBool() const override;
     int toInt() const override;
@@ -25,7 +27,7 @@ public:
     std::complex<int> toComplexInt() const override;
     std::complex<double> toComplexFloat() const override;
 
-    Data* add(Data*) const override;
+    Data* add(Data*) override;
 };
 
 #endif //C_COMPLEXINTVALUE_H

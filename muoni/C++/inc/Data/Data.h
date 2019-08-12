@@ -1,9 +1,9 @@
 //
-// Created by Joel Courtney on 2019-03-01.
+// Created by Joel Courtney on 2019-08-11.
 //
 
-#ifndef C_VALUE_H
-#define C_VALUE_H
+#ifndef C___DATA_H
+#define C___DATA_H
 
 #include <string>
 #include <iostream>
@@ -18,27 +18,23 @@
 class Data {
 protected:
     Type type;
-    
+
 public:
     explicit Data(Type);
     virtual ~Data() = default;
-    
-    virtual std::string toString() const = 0;
-    virtual bool toBool() const = 0;
-    virtual int toInt() const = 0;
-    virtual BigIntBackend toBigInt() const = 0;
-    virtual double toFloat() const = 0;
-    virtual Eigen::MatrixXi toIntMatrix() const = 0;
-    virtual Eigen::MatrixXd toFloatMatrix() const = 0;
-    virtual std::complex<int> toComplexInt() const = 0;
-    virtual std::complex<double> toComplexFloat() const = 0;
+
+    virtual Data* clone() const = 0;
     
     Type getType() const;
-
+    
+    virtual std::string toString() const = 0;
     friend std::ostream& operator<<(std::ostream& o, const Data* v);
     friend std::ostream& operator<<(std::ostream& o, const Data& v);
-    
-    virtual Data* add(Data*) const;
+
+    virtual Data* add(Data*) = 0;
+
+    virtual bool isPrimitive() const;
+    virtual bool isNumeric() const;
 };
 
-#endif //C_VALUE_H
+#endif //C___DATA_H

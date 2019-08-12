@@ -6,7 +6,7 @@
 #define C_SCOPE_H
 
 #include <unordered_map>
-#include "Values/Data.h"
+#include "Data/Primitive.h"
 #include "Dimensions/Dimension.h"
 #include "Units/Unit.h"
 

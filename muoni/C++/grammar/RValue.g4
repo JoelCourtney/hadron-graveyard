@@ -9,8 +9,8 @@ rvalue
     | uop=HASH r=rvalue # UnaryOperation
     | uop=NOT r=rvalue # UnaryOperation
     | r=rvalue bop=(AT_SYMBOL | AMPERSAND | TO) t=type # ConvertOperation
-    | r1=rvalue bop=(CARROT | DOTCARROT) r2=rvalue # ExpOperation
-    | r1=rvalue bop=(STAR | SLASH | DOTSTAR | DOTSLASH) r2=rvalue # MultDivOperation
+    | r1=rvalue bop=(CARROT | MATCARROT) r2=rvalue # ExpOperation
+    | r1=rvalue bop=(STAR | SLASH | MATSTAR | MATSLASH) r2=rvalue # MultDivOperation
     | r1=rvalue bop=(PLUS | DASH) r2=rvalue # AddSubOperation
     | r1=rvalue bop=(OHAIRPIN | OHAIRPINEQUAL | CHAIRPIN | CHAIRPINEQUAL) r2=rvalue # CompOperation
     | r1=rvalue bop=(IS | ISNT) r2=rvalue # IsOperation
@@ -44,7 +44,8 @@ invoke
     | list list
     | matrix (list | matrix);
 
-matrix : OPAREN (rvalue ((COMMA | NEWLINE | SEMICOLON) rvalue)*)? CPAREN;
+matrix : OPAREN (matrixRow ((NEWLINE | SEMICOLON) matrixRow)*)? CPAREN;
+matrixRow : rvalue (COMMA rvalue)*;
 
 list : OBRACKET (rvalue (COMMA rvalue)*)? CBRACKET;
 

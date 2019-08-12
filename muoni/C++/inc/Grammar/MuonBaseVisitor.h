@@ -91,11 +91,19 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitOrOperation(MuonParser::OrOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitUnaryOperation(MuonParser::UnaryOperationContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitBinaryOperation(MuonParser::BinaryOperationContext *ctx) override {
+  virtual antlrcpp::Any visitAddSubOperation(MuonParser::AddSubOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitCompOperation(MuonParser::CompOperationContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -104,6 +112,26 @@ public:
   }
 
   virtual antlrcpp::Any visitAtomRValue(MuonParser::AtomRValueContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitExpOperation(MuonParser::ExpOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitXOrOperation(MuonParser::XOrOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitIsOperation(MuonParser::IsOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitAndOperation(MuonParser::AndOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitMultDivOperation(MuonParser::MultDivOperationContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -164,6 +192,10 @@ public:
   }
 
   virtual antlrcpp::Any visitMatrix(MuonParser::MatrixContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitMatrixRow(MuonParser::MatrixRowContext *ctx) override {
     return visitChildren(ctx);
   }
 

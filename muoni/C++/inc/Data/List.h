@@ -1,21 +1,21 @@
 //
-// Created by joel on 8/5/19.
+// Created by Joel Courtney on 2019-08-08.
 //
 
-#ifndef C___BIGINT_H
-#define C___BIGINT_H
+#ifndef C_LIST_H
+#define C_LIST_H
 
-#include "Scalar.h"
+#include "Primitive.h"
 
-class BigInt : public Scalar {
-    BigIntBackend b;
-
+class List : public Primitive {
 public:
-    explicit BigInt(const BigIntBackend&);
-    ~BigInt() override = default;
-    
-    Data* clone() const override;
+    std::vector<Data*> l;
 
+    explicit List(std::vector<Data*>);
+    ~List() override;
+
+    Data* clone() const override;
+    
     std::string toString() const override;
     bool toBool() const override;
     int toInt() const override;
@@ -29,4 +29,4 @@ public:
     Data* add(Data*) override;
 };
 
-#endif //C___BIGINT_H
+#endif //C_LIST_H

@@ -12,6 +12,8 @@ class FullScope : public Scope {
     std::unordered_map<std::string,bool> mutability;
     std::unordered_map<std::string,Dimension*> dimensions;
     std::unordered_map<std::string,Unit*> units;
+    
+    std::vector<Data*> ans;
 
 public:
     FullScope() = default;
@@ -23,6 +25,9 @@ public:
     bool declareVarl(const std::string&,bool) override;
 
     Scope* defer() const override = 0;
+    
+    void pushAns(Data*);
+    Data* getTopAns();
 };
 
 #endif //C_FULLSCOPE_H

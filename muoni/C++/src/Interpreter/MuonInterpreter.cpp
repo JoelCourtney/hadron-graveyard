@@ -3,7 +3,7 @@
 //
 
 #include "Interpreter/MuonInterpreter.h"
-#include "Values/DataFactory.h"
+#include "Data/DataFactory.h"
 #include <complex>
 #include "Environment/FileScope.h"
 #include "Errors/VarlNotFoundError.h"
@@ -11,13 +11,16 @@
 Any MuonInterpreter::visitFile(MuonParser::FileContext* ctx) {
     env.push(new FileScope());
     visitChildren(ctx);
-    env.pop();
+    Data* ans = env.pop();
+    if (ans)
+        delete ans;
     return 0;
 }
 
 Any MuonInterpreter::visitRValueStatement(MuonParser::RValueStatementContext* ctx) {
-    auto v = visit(ctx->rvalue());
-    env.pushAns(v);
+    auto v = visit(ctx->rvalue()).as<Data*>();
+    if (v)
+        env.pushAns(v);
     return 0;
 }
 
@@ -46,16 +49,6 @@ Any MuonInterpreter::visitDeclareAssign(MuonParser::DeclareAssignContext* ctx) {
 }
 
 Any MuonInterpreter::visitPrint(MuonParser::PrintContext* ctx) {
-    try {
-        std::cout << visit(ctx->rvalue()).as<Data*>()->toString() << std::endl;
-    } catch (const VarlNotFoundError& e) {
-        std::cout << "not found" << std::endl;
-    }
+    std::cout << visit(ctx->rvalue()).as<Data*>()->toString() << std::endl;
     return 0;
 }
-
-Any MuonInterpreter::visitNameAtom(MuonParser::NameAtomContext* ctx) {
-        return env.getVarl(ctx->getText());
-}
-
-

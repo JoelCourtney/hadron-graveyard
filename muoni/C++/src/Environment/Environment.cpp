@@ -4,7 +4,7 @@
 
 #include "Environment/Environment.h"
 
-#include "Values/DataFactory.h"
+#include "Data/DataFactory.h"
 #include "Environment/ExplicitScope.h"
 #include "Errors/CannotDeferError.h"
 #include "Errors/VarlNotFoundError.h"
@@ -16,7 +16,11 @@ Environment::~Environment() {
     }
 }
 
-void Environment::pushAns(const Data* v) {
+void Environment::pushAns(Data* v) {
+    auto fullTop = dynamic_cast<FullScope*>(stack.top());
+    if (fullTop) {
+        fullTop->pushAns(v);
+    }
 }
 
 Data* Environment::getVarl(const std::string& name) const {
@@ -51,7 +55,21 @@ void Environment::push(Scope* s) {
     stack.push(s);
 }
 
-void Environment::pop() {
-    delete stack.top();
-    stack.pop();
+Data* Environment::pop() {
+    auto top = stack.top();
+    auto fullTop = dynamic_cast<FullScope*>(top);
+    if (fullTop != nullptr) {
+        Data* res = fullTop->getTopAns();
+        delete fullTop;
+        stack.pop();
+        return res;
+    } else {
+        delete top;
+        stack.pop();
+        return nullptr;
+    }
+}
+
+Scope* Environment::topScope() {
+    return stack.top();
 }

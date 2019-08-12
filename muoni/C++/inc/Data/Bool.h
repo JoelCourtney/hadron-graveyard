@@ -5,14 +5,16 @@
 #ifndef C_BOOLVALUE_H
 #define C_BOOLVALUE_H
 
-#include "Data.h"
+#include "Scalar.h"
 
-class Bool : public Data {
+class Bool : public Scalar {
     bool b;
 
 public:
     explicit Bool(bool);
     ~Bool() override = default;
+
+    Data* clone() const override;
 
     std::string toString() const override;
     bool toBool() const override;
@@ -24,7 +26,7 @@ public:
     std::complex<int> toComplexInt() const override;
     std::complex<double> toComplexFloat() const override;
     
-    Data* add(Data*) const override;
+    Data* add(Data*) override;
 };
 
 #endif //C_BOOLVALUE_H

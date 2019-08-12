@@ -57,13 +57,27 @@ public:
 
     virtual antlrcpp::Any visitUnitDeclaration(MuonParser::UnitDeclarationContext *context) = 0;
 
+    virtual antlrcpp::Any visitOrOperation(MuonParser::OrOperationContext *context) = 0;
+
     virtual antlrcpp::Any visitUnaryOperation(MuonParser::UnaryOperationContext *context) = 0;
 
-    virtual antlrcpp::Any visitBinaryOperation(MuonParser::BinaryOperationContext *context) = 0;
+    virtual antlrcpp::Any visitAddSubOperation(MuonParser::AddSubOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitCompOperation(MuonParser::CompOperationContext *context) = 0;
 
     virtual antlrcpp::Any visitConvertOperation(MuonParser::ConvertOperationContext *context) = 0;
 
     virtual antlrcpp::Any visitAtomRValue(MuonParser::AtomRValueContext *context) = 0;
+
+    virtual antlrcpp::Any visitExpOperation(MuonParser::ExpOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitXOrOperation(MuonParser::XOrOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitIsOperation(MuonParser::IsOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitAndOperation(MuonParser::AndOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitMultDivOperation(MuonParser::MultDivOperationContext *context) = 0;
 
     virtual antlrcpp::Any visitLiteralAtom(MuonParser::LiteralAtomContext *context) = 0;
 
@@ -94,6 +108,8 @@ public:
     virtual antlrcpp::Any visitInvoke(MuonParser::InvokeContext *context) = 0;
 
     virtual antlrcpp::Any visitMatrix(MuonParser::MatrixContext *context) = 0;
+
+    virtual antlrcpp::Any visitMatrixRow(MuonParser::MatrixRowContext *context) = 0;
 
     virtual antlrcpp::Any visitList(MuonParser::ListContext *context) = 0;
 

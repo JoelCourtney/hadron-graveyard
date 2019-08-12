@@ -3,8 +3,13 @@
 //
 
 #include "Data/Null.h"
+#include "Data/DataFactory.h"
 
-Null::Null() : Data(Type::NULL_TYPE) {}
+Null::Null() : Primitive(Type::NULL_TYPE) {}
+
+Data* Null::clone() const {
+    return DataFactory::from();
+}
 
 std::string Null::toString() const {
     return "null";
@@ -42,6 +47,6 @@ std::complex<double> Null::toComplexFloat() const {
     throw InvalidConversionError();
 }
 
-Data* Null::add(Data* d2) const {
+Data* Null::add(Data* d2) {
     throw InvalidOperationError();
 }

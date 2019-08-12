@@ -2,8 +2,9 @@
 // Created by Joel Courtney on 2019-03-16.
 //
 
+#include "Errors/CannotAssignError.h"
 #include "Environment/FullScope.h"
-#include "Values/DataFactory.h"
+#include "Data/DataFactory.h"
 
 FullScope::~FullScope() {
     auto it1 = varls.begin();
@@ -21,11 +22,14 @@ FullScope::~FullScope() {
         delete it4->second;
         it4++;
     }
+    for (int i = 1; i < ans.size(); i++) {
+        delete ans.at(i-1);
+    }
 }
 
 Data* FullScope::getVarl(const std::string& s) const {
     if (varls.count(s)) {
-        return varls.at(s);
+        return varls.at(s)->clone();
     }
     return nullptr;
 }
@@ -41,8 +45,7 @@ bool FullScope::assignVarl(const std::string& s, Data* v) {
             varls.at(s) = v;
             return true;
         } else {
-            std::cout << s << " is constant" << std::endl;
-            exit(-1);
+            throw CannotAssignError();
         }
     } else {
         return false;
@@ -59,4 +62,15 @@ bool FullScope::declareVarl(const std::string& s, bool m) {
         mutability[s] = m;
     }
     return true;
+}
+
+void FullScope::pushAns(Data* d) {
+    ans.push_back(d);
+}
+
+Data* FullScope::getTopAns() {
+    if (ans.size())
+        return ans.back();
+    else
+        return nullptr;
 }

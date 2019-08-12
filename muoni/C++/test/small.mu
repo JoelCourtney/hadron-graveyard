@@ -1,2 +1,4 @@
-val jkl = 54 - 43
-print jkl
+val a = [1, 2]
+for a as v {
+    print v
+}

@@ -8,7 +8,13 @@
 #include "Scope.h"
 
 class ImplicitScope : public Scope {
+    std::unordered_map<std::string,Data*> vars;
 
+public:
+    explicit ImplicitScope();
+    ~ImplicitScope() override;
+    
+    
 };
 
 #endif //C_IMPLICITSCOPE_H

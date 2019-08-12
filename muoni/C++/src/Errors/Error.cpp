@@ -5,6 +5,6 @@
 #include "Errors/Error.h"
 #include <iostream>
 
-const char* Error::what() const {
+const char* Error::what() const noexcept {
     return "I am a big fancy error";
 }

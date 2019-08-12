@@ -5,12 +5,17 @@
 #ifndef C_NUMERICVALUE_H
 #define C_NUMERICVALUE_H
 
-#include "Data.h"
+#include "Primitive.h"
 
-class Numeric : public Data {
+class Numeric : public Primitive {
 public:
     explicit Numeric(Type);
     ~Numeric() override = default;
+    
+    bool isNumeric() const override;
+    
+    virtual int getRows() const = 0;
+    virtual int getCols() const = 0;
 };
 
 #endif //C_NUMERICVALUE_H

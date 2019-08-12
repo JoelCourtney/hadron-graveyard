@@ -7,11 +7,11 @@ control
     | IF rvalue (NEWLINE | SEMICOLON) statement ((NEWLINE | SEMICOLON) ELSEIF rvalue (NEWLINE | SEMICOLON) statement)* ((NEWLINE | SEMICOLON) ELSE statement)? # IfSeries
     | LOOP (NEWLINE | SEMICOLON) statement # Loop
     | WHILE rvalue (NEWLINE | SEMICOLON) statement # WhileLoop
-    | FOR rvalue (NEWLINE | SEMICOLON) statement # ForLoop
-    | FOR rvalue AS lvalue (NEWLINE | SEMICOLON) statement # ForAsLoop
-    | FOR rvalue AT lvalue (NEWLINE | SEMICOLON) statement # ForAtLoop
-    | FOR rvalue AS as=lvalue AT at=lvalue (NEWLINE | SEMICOLON) statement # ForAsAtLoop
-    | FOR rvalue AT at=lvalue AS as=lvalue (NEWLINE | SEMICOLON) statement # ForAsAtLoop;
+    | FOR rvalue (NEWLINE | SEMICOLON)? statement # ForLoop
+    | FOR rvalue AS lvalue (NEWLINE | SEMICOLON)? statement # ForAsLoop
+    | FOR rvalue AT lvalue (NEWLINE | SEMICOLON)? statement # ForAtLoop
+    | FOR rvalue AS as=lvalue AT at=lvalue (NEWLINE | SEMICOLON)? statement # ForAsAtLoop
+    | FOR rvalue AT at=lvalue AS as=lvalue (NEWLINE | SEMICOLON)? statement # ForAsAtLoop;
 
 statement
     : rvalue # RValueStatement

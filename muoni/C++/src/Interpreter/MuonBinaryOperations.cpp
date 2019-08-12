@@ -3,8 +3,7 @@
 //
 
 #include "Interpreter/MuonInterpreter.h"
-#include "Values/DataFactory.h"
-#include "Operations/SubtractionOperation.h"
+#include "Data/DataFactory.h"
 
 Any MuonInterpreter::visitAddSubOperation(MuonParser::AddSubOperationContext* ctx) {
     Data* v1 = visit(ctx->r1);
@@ -13,7 +12,6 @@ Any MuonInterpreter::visitAddSubOperation(MuonParser::AddSubOperationContext* ct
     switch (bopText[0]) {
         case '+':
             return v1->add(v2);
-        case '-':
-            return v1->subtract(v2);
     }
+    return (Data*) DataFactory::from(-5);
 }

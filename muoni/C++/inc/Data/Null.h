@@ -5,12 +5,14 @@
 #ifndef C_NULLVALUE_H
 #define C_NULLVALUE_H
 
-#include "Data.h"
+#include "Primitive.h"
 
-class Null : public Data {
+class Null : public Primitive {
 public:
     Null();
     ~Null() override = default;
+
+    Data* clone() const override;
 
     std::string toString() const override;
     bool toBool() const override;
@@ -22,7 +24,7 @@ public:
     std::complex<int> toComplexInt() const override;
     std::complex<double> toComplexFloat() const override;
     
-    Data* add(Data*) const override;
+    Data* add(Data*) override;
 };
 
 #endif //C_NULLVALUE_H

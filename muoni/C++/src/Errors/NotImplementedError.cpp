@@ -4,6 +4,6 @@
 
 #include "Errors/NotImplementedError.h"
 
-const char* NotImplementedError::what() const {
+const char* NotImplementedError::what() const noexcept {
     return "Not implemented";
 }
