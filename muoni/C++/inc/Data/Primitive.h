@@ -12,7 +12,6 @@ public:
     explicit Primitive(Type);
     ~Primitive() override = default;
     
-    virtual bool toBool() const = 0;
     virtual int toInt() const = 0;
     virtual BigIntBackend toBigInt() const = 0;
     virtual double toFloat() const = 0;

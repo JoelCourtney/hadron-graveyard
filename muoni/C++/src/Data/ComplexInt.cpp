@@ -66,13 +66,17 @@ std::complex<double> ComplexInt::toComplexFloat() const {
     return std::complex<double>(c.real(),c.imag());
 }
 
+Data* ComplexInt::negate() {
+    c = -c;
+    return this;
+}
+
 Data* ComplexInt::add(Data* d2) {
     if (!d2->isPrimitive()) {
         throw InvalidConversionError();
     }
-    auto p2 = dynamic_cast<Primitive*>(d2);
-    Type t2 = p2->getType();
-    switch(t2) {
+    auto p2 = reinterpret_cast<Primitive*>(d2);
+    switch(p2->type) {
         case Type::NULL_TYPE:
             throw InvalidOperationError();
         case Type::STRING:
@@ -94,5 +98,33 @@ Data* ComplexInt::add(Data* d2) {
             auto l2 = dynamic_cast<List*>(p2);
             l2->l.insert(l2->l.begin(), this);
             return l2;
+    }
+}
+
+Data* ComplexInt::subtract(Data* d2) {
+    if (!d2->isPrimitive()) {
+        throw InvalidConversionError();
+    }
+    auto p2 = reinterpret_cast<Primitive*>(d2);
+    switch(p2->type) {
+        case Type::NULL_TYPE:
+            throw InvalidOperationError();
+        case Type::STRING:
+            return DataFactory::from(c - p2->toComplexInt());
+        case Type::BOOL:
+        case Type::INT:
+        case Type::BIG_INT:
+            return DataFactory::from(c - p2->toInt());
+        case Type::FLOAT:
+            return DataFactory::from(toComplexFloat() - p2->toFloat());
+        case Type::INT_MATRIX:
+        case Type::FLOAT_MATRIX:
+            throw NotImplementedError();
+        case Type::COMPLEX_INT:
+            return DataFactory::from(c - p2->toComplexInt());
+        case Type::COMPLEX_FLOAT:
+            return DataFactory::from(toComplexFloat() - p2->toComplexFloat());
+        case Type::LIST:
+            throw InvalidOperationError();
     }
 }

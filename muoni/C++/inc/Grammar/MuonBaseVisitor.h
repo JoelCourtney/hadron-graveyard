@@ -91,11 +91,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitOrOperation(MuonParser::OrOperationContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitUnaryOperation(MuonParser::UnaryOperationContext *ctx) override {
+  virtual antlrcpp::Any visitShapeOperation(MuonParser::ShapeOperationContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -107,14 +103,6 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitConvertOperation(MuonParser::ConvertOperationContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitAtomRValue(MuonParser::AtomRValueContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
   virtual antlrcpp::Any visitExpOperation(MuonParser::ExpOperationContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -123,11 +111,39 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitIsOperation(MuonParser::IsOperationContext *ctx) override {
+  virtual antlrcpp::Any visitNotOperation(MuonParser::NotOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitNegateOperation(MuonParser::NegateOperationContext *ctx) override {
     return visitChildren(ctx);
   }
 
   virtual antlrcpp::Any visitAndOperation(MuonParser::AndOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitOrOperation(MuonParser::OrOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitNoOperation(MuonParser::NoOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitConvertOperation(MuonParser::ConvertOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitAtomRValue(MuonParser::AtomRValueContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitIsOperation(MuonParser::IsOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitSizeOperation(MuonParser::SizeOperationContext *ctx) override {
     return visitChildren(ctx);
   }
 

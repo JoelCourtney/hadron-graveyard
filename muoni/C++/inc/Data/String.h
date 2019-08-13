@@ -26,7 +26,12 @@ public:
     std::complex<int> toComplexInt() const override;
     std::complex<double> toComplexFloat() const override;
 
+    Data* negate() override;
+
     Data* add(Data*) override;
+    Data* subtract(Data*) override;
+    
+    Data* toNumeric() const;
 };
 
 #endif //C_STRINGVALUE_H

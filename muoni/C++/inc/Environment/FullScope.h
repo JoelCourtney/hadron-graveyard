@@ -26,8 +26,8 @@ public:
 
     Scope* defer() const override = 0;
     
-    void pushAns(Data*);
-    Data* getTopAns();
+    bool pushAns(Data*) override;
+    Data* getTopAns() override;
 };
 
 #endif //C_FULLSCOPE_H

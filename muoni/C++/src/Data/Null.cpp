@@ -47,6 +47,14 @@ std::complex<double> Null::toComplexFloat() const {
     throw InvalidConversionError();
 }
 
-Data* Null::add(Data* d2) {
+Data* Null::negate() {
+    throw InvalidOperationError();
+}
+
+Data* Null::add(Data*) {
+    throw InvalidOperationError();
+}
+
+Data* Null::subtract(Data*) {
     throw InvalidOperationError();
 }

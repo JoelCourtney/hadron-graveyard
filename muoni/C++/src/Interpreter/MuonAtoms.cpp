@@ -32,7 +32,7 @@ Any MuonInterpreter::visitMatrix(MuonParser::MatrixContext* ctx) {
                     throw InvalidOperationError();
                 }
                 height += elem->getRows();
-                Type newType = elem->getType();
+                Type newType = elem->type;
                 switch (type) {
                     case Type::INT_MATRIX:
                         switch (newType) {
@@ -117,7 +117,7 @@ Any MuonInterpreter::visitMatrixRow(MuonParser::MatrixRowContext* ctx) {
             } else if (height != num->getRows()) {
                 throw InvalidOperationError();
             }
-            Type newType = num->getType();
+            Type newType = num->type;
             switch (type) {
                 case Type::NULL_TYPE:
                     type = newType;

@@ -12,7 +12,7 @@
 
 class  MuonParser : public antlr4::Parser {
 public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
   enum {
     VAL = 1, VAR = 2, DROP = 3, FN = 4, IF = 5, ELSEIF = 6, ELSE = 7, FOR = 8, 
     AS = 9, AT = 10, WHILE = 11, LOOP = 12, DIMENSION = 13, UNITY = 14, 
@@ -76,7 +76,7 @@ Data* cache = nullptr;
 
   class  FileContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     FileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<ControlContext *> control();
@@ -96,7 +96,7 @@ Data* cache = nullptr;
 
   class  ControlContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ControlContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     ControlContext() : antlr4::ParserRuleContext() { }
@@ -110,7 +110,7 @@ Data* cache = nullptr;
 
   class  LoopContext : public ControlContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     LoopContext(ControlContext *ctx);
 
     antlr4::tree::TerminalNode *LOOP();
@@ -122,7 +122,7 @@ Data* cache = nullptr;
 
   class  StatementControlContext : public ControlContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     StatementControlContext(ControlContext *ctx);
 
     StatementContext *statement();
@@ -131,14 +131,15 @@ Data* cache = nullptr;
 
   class  ForAtLoopContext : public ControlContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ForAtLoopContext(ControlContext *ctx);
 
+    MuonParser::LvalueContext *at = nullptr;
     antlr4::tree::TerminalNode *FOR();
     RvalueContext *rvalue();
     antlr4::tree::TerminalNode *AT();
-    LvalueContext *lvalue();
     StatementContext *statement();
+    LvalueContext *lvalue();
     antlr4::tree::TerminalNode *NEWLINE();
     antlr4::tree::TerminalNode *SEMICOLON();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -146,7 +147,7 @@ Data* cache = nullptr;
 
   class  ForLoopContext : public ControlContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ForLoopContext(ControlContext *ctx);
 
     antlr4::tree::TerminalNode *FOR();
@@ -159,7 +160,7 @@ Data* cache = nullptr;
 
   class  ForAsAtLoopContext : public ControlContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ForAsAtLoopContext(ControlContext *ctx);
 
     MuonParser::LvalueContext *as = nullptr;
@@ -178,7 +179,7 @@ Data* cache = nullptr;
 
   class  IfSeriesContext : public ControlContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     IfSeriesContext(ControlContext *ctx);
 
     antlr4::tree::TerminalNode *IF();
@@ -186,19 +187,19 @@ Data* cache = nullptr;
     RvalueContext* rvalue(size_t i);
     std::vector<StatementContext *> statement();
     StatementContext* statement(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> ELSEIF();
+    antlr4::tree::TerminalNode* ELSEIF(size_t i);
+    antlr4::tree::TerminalNode *ELSE();
     std::vector<antlr4::tree::TerminalNode *> NEWLINE();
     antlr4::tree::TerminalNode* NEWLINE(size_t i);
     std::vector<antlr4::tree::TerminalNode *> SEMICOLON();
     antlr4::tree::TerminalNode* SEMICOLON(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> ELSEIF();
-    antlr4::tree::TerminalNode* ELSEIF(size_t i);
-    antlr4::tree::TerminalNode *ELSE();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   class  WhileLoopContext : public ControlContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     WhileLoopContext(ControlContext *ctx);
 
     antlr4::tree::TerminalNode *WHILE();
@@ -211,14 +212,15 @@ Data* cache = nullptr;
 
   class  ForAsLoopContext : public ControlContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ForAsLoopContext(ControlContext *ctx);
 
+    MuonParser::LvalueContext *as = nullptr;
     antlr4::tree::TerminalNode *FOR();
     RvalueContext *rvalue();
     antlr4::tree::TerminalNode *AS();
-    LvalueContext *lvalue();
     StatementContext *statement();
+    LvalueContext *lvalue();
     antlr4::tree::TerminalNode *NEWLINE();
     antlr4::tree::TerminalNode *SEMICOLON();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -228,7 +230,7 @@ Data* cache = nullptr;
 
   class  StatementContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     StatementContext() : antlr4::ParserRuleContext() { }
@@ -242,7 +244,7 @@ Data* cache = nullptr;
 
   class  PrintContext : public StatementContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     PrintContext(StatementContext *ctx);
 
     antlr4::tree::TerminalNode *PRINT();
@@ -252,7 +254,7 @@ Data* cache = nullptr;
 
   class  FunctionDeclareContext : public StatementContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     FunctionDeclareContext(StatementContext *ctx);
 
     antlr4::tree::TerminalNode *FN();
@@ -266,7 +268,7 @@ Data* cache = nullptr;
 
   class  DropNameContext : public StatementContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     DropNameContext(StatementContext *ctx);
 
     antlr4::tree::TerminalNode *DROP();
@@ -276,7 +278,7 @@ Data* cache = nullptr;
 
   class  DeclareAssignContext : public StatementContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     DeclareAssignContext(StatementContext *ctx);
 
     LvalueContext *lvalue();
@@ -289,7 +291,7 @@ Data* cache = nullptr;
 
   class  BreakSnakeContext : public StatementContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     BreakSnakeContext(StatementContext *ctx);
 
     antlr4::tree::TerminalNode *OHAIRPIN();
@@ -306,7 +308,7 @@ Data* cache = nullptr;
 
   class  DeclareDimensionContext : public StatementContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     DeclareDimensionContext(StatementContext *ctx);
 
     antlr4::tree::TerminalNode *DIMENSION();
@@ -325,7 +327,7 @@ Data* cache = nullptr;
 
   class  RValueStatementContext : public StatementContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     RValueStatementContext(StatementContext *ctx);
 
     RvalueContext *rvalue();
@@ -334,7 +336,7 @@ Data* cache = nullptr;
 
   class  AssignContext : public StatementContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     AssignContext(StatementContext *ctx);
 
     LvalueContext *lvalue();
@@ -345,7 +347,7 @@ Data* cache = nullptr;
 
   class  DeclareContext : public StatementContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     DeclareContext(StatementContext *ctx);
 
     LvalueContext *lvalue();
@@ -358,7 +360,7 @@ Data* cache = nullptr;
 
   class  UnitDeclarationContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     UnitDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *NAME();
@@ -373,7 +375,7 @@ Data* cache = nullptr;
 
   class  RvalueContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     RvalueContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     RvalueContext() : antlr4::ParserRuleContext() { }
@@ -385,40 +387,21 @@ Data* cache = nullptr;
    
   };
 
-  class  OrOperationContext : public RvalueContext {
+  class  ShapeOperationContext : public RvalueContext {
   public:
-Data* cache = nullptr;
-    OrOperationContext(RvalueContext *ctx);
-
-    MuonParser::RvalueContext *r1 = nullptr;
-    antlr4::Token *bop = nullptr;
-    MuonParser::RvalueContext *r2 = nullptr;
-    std::vector<RvalueContext *> rvalue();
-    RvalueContext* rvalue(size_t i);
-    antlr4::tree::TerminalNode *OR();
-    antlr4::tree::TerminalNode *NOR();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  UnaryOperationContext : public RvalueContext {
-  public:
-Data* cache = nullptr;
-    UnaryOperationContext(RvalueContext *ctx);
+antlrcpp::Any cache = nullptr;
+    ShapeOperationContext(RvalueContext *ctx);
 
     antlr4::Token *uop = nullptr;
     MuonParser::RvalueContext *r = nullptr;
-    antlr4::tree::TerminalNode *PLUS();
-    RvalueContext *rvalue();
-    antlr4::tree::TerminalNode *DASH();
     antlr4::tree::TerminalNode *DOLLAR();
-    antlr4::tree::TerminalNode *HASH();
-    antlr4::tree::TerminalNode *NOT();
+    RvalueContext *rvalue();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   class  AddSubOperationContext : public RvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     AddSubOperationContext(RvalueContext *ctx);
 
     MuonParser::RvalueContext *r1 = nullptr;
@@ -433,7 +416,7 @@ Data* cache = nullptr;
 
   class  CompOperationContext : public RvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     CompOperationContext(RvalueContext *ctx);
 
     MuonParser::RvalueContext *r1 = nullptr;
@@ -448,9 +431,104 @@ Data* cache = nullptr;
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
+  class  ExpOperationContext : public RvalueContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    ExpOperationContext(RvalueContext *ctx);
+
+    MuonParser::RvalueContext *r1 = nullptr;
+    antlr4::Token *bop = nullptr;
+    MuonParser::RvalueContext *r2 = nullptr;
+    std::vector<RvalueContext *> rvalue();
+    RvalueContext* rvalue(size_t i);
+    antlr4::tree::TerminalNode *CARROT();
+    antlr4::tree::TerminalNode *MATCARROT();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  XOrOperationContext : public RvalueContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    XOrOperationContext(RvalueContext *ctx);
+
+    MuonParser::RvalueContext *r1 = nullptr;
+    antlr4::Token *bop = nullptr;
+    MuonParser::RvalueContext *r2 = nullptr;
+    std::vector<RvalueContext *> rvalue();
+    RvalueContext* rvalue(size_t i);
+    antlr4::tree::TerminalNode *XOR();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  NotOperationContext : public RvalueContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    NotOperationContext(RvalueContext *ctx);
+
+    antlr4::Token *uop = nullptr;
+    MuonParser::RvalueContext *r = nullptr;
+    antlr4::tree::TerminalNode *NOT();
+    RvalueContext *rvalue();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  NegateOperationContext : public RvalueContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    NegateOperationContext(RvalueContext *ctx);
+
+    antlr4::Token *uop = nullptr;
+    MuonParser::RvalueContext *r = nullptr;
+    antlr4::tree::TerminalNode *DASH();
+    RvalueContext *rvalue();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  AndOperationContext : public RvalueContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    AndOperationContext(RvalueContext *ctx);
+
+    MuonParser::RvalueContext *r1 = nullptr;
+    antlr4::Token *bop = nullptr;
+    MuonParser::RvalueContext *r2 = nullptr;
+    std::vector<RvalueContext *> rvalue();
+    RvalueContext* rvalue(size_t i);
+    antlr4::tree::TerminalNode *AND();
+    antlr4::tree::TerminalNode *NAND();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  OrOperationContext : public RvalueContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    OrOperationContext(RvalueContext *ctx);
+
+    MuonParser::RvalueContext *r1 = nullptr;
+    antlr4::Token *bop = nullptr;
+    MuonParser::RvalueContext *r2 = nullptr;
+    std::vector<RvalueContext *> rvalue();
+    RvalueContext* rvalue(size_t i);
+    antlr4::tree::TerminalNode *OR();
+    antlr4::tree::TerminalNode *NOR();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  NoOperationContext : public RvalueContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    NoOperationContext(RvalueContext *ctx);
+
+    antlr4::Token *uop = nullptr;
+    MuonParser::RvalueContext *r = nullptr;
+    antlr4::tree::TerminalNode *PLUS();
+    RvalueContext *rvalue();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   class  ConvertOperationContext : public RvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ConvertOperationContext(RvalueContext *ctx);
 
     MuonParser::RvalueContext *r = nullptr;
@@ -466,7 +544,7 @@ Data* cache = nullptr;
 
   class  AtomRValueContext : public RvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     AtomRValueContext(RvalueContext *ctx);
 
     MuonParser::AtomContext *a = nullptr;
@@ -474,38 +552,9 @@ Data* cache = nullptr;
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  ExpOperationContext : public RvalueContext {
-  public:
-Data* cache = nullptr;
-    ExpOperationContext(RvalueContext *ctx);
-
-    MuonParser::RvalueContext *r1 = nullptr;
-    antlr4::Token *bop = nullptr;
-    MuonParser::RvalueContext *r2 = nullptr;
-    std::vector<RvalueContext *> rvalue();
-    RvalueContext* rvalue(size_t i);
-    antlr4::tree::TerminalNode *CARROT();
-    antlr4::tree::TerminalNode *MATCARROT();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  XOrOperationContext : public RvalueContext {
-  public:
-Data* cache = nullptr;
-    XOrOperationContext(RvalueContext *ctx);
-
-    MuonParser::RvalueContext *r1 = nullptr;
-    antlr4::Token *bop = nullptr;
-    MuonParser::RvalueContext *r2 = nullptr;
-    std::vector<RvalueContext *> rvalue();
-    RvalueContext* rvalue(size_t i);
-    antlr4::tree::TerminalNode *XOR();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
   class  IsOperationContext : public RvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     IsOperationContext(RvalueContext *ctx);
 
     MuonParser::RvalueContext *r1 = nullptr;
@@ -518,24 +567,21 @@ Data* cache = nullptr;
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  AndOperationContext : public RvalueContext {
+  class  SizeOperationContext : public RvalueContext {
   public:
-Data* cache = nullptr;
-    AndOperationContext(RvalueContext *ctx);
+antlrcpp::Any cache = nullptr;
+    SizeOperationContext(RvalueContext *ctx);
 
-    MuonParser::RvalueContext *r1 = nullptr;
-    antlr4::Token *bop = nullptr;
-    MuonParser::RvalueContext *r2 = nullptr;
-    std::vector<RvalueContext *> rvalue();
-    RvalueContext* rvalue(size_t i);
-    antlr4::tree::TerminalNode *AND();
-    antlr4::tree::TerminalNode *NAND();
+    antlr4::Token *uop = nullptr;
+    MuonParser::RvalueContext *r = nullptr;
+    antlr4::tree::TerminalNode *HASH();
+    RvalueContext *rvalue();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   class  MultDivOperationContext : public RvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     MultDivOperationContext(RvalueContext *ctx);
 
     MuonParser::RvalueContext *r1 = nullptr;
@@ -554,7 +600,7 @@ Data* cache = nullptr;
   RvalueContext* rvalue(int precedence);
   class  AtomContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     AtomContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     AtomContext() : antlr4::ParserRuleContext() { }
@@ -568,7 +614,7 @@ Data* cache = nullptr;
 
   class  ScopeAtomContext : public AtomContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ScopeAtomContext(AtomContext *ctx);
 
     ScopeContext *scope();
@@ -577,7 +623,7 @@ Data* cache = nullptr;
 
   class  InvokeAtomContext : public AtomContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     InvokeAtomContext(AtomContext *ctx);
 
     InvokeContext *invoke();
@@ -586,7 +632,7 @@ Data* cache = nullptr;
 
   class  MatrixAtomContext : public AtomContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     MatrixAtomContext(AtomContext *ctx);
 
     MatrixContext *matrix();
@@ -595,7 +641,7 @@ Data* cache = nullptr;
 
   class  ListAtomContext : public AtomContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ListAtomContext(AtomContext *ctx);
 
     ListContext *list();
@@ -604,7 +650,7 @@ Data* cache = nullptr;
 
   class  NameAtomContext : public AtomContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     NameAtomContext(AtomContext *ctx);
 
     antlr4::tree::TerminalNode *NAME();
@@ -613,7 +659,7 @@ Data* cache = nullptr;
 
   class  LiteralAtomContext : public AtomContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     LiteralAtomContext(AtomContext *ctx);
 
     LiteralContext *literal();
@@ -624,7 +670,7 @@ Data* cache = nullptr;
 
   class  LiteralContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     LiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     LiteralContext() : antlr4::ParserRuleContext() { }
@@ -638,7 +684,7 @@ Data* cache = nullptr;
 
   class  StringLiteralContext : public LiteralContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     StringLiteralContext(LiteralContext *ctx);
 
     antlr4::tree::TerminalNode *STRING_LITERAL();
@@ -647,7 +693,7 @@ Data* cache = nullptr;
 
   class  BoolLiteralContext : public LiteralContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     BoolLiteralContext(LiteralContext *ctx);
 
     antlr4::tree::TerminalNode *BOOL_LITERAL();
@@ -656,7 +702,7 @@ Data* cache = nullptr;
 
   class  FloatLiteralContext : public LiteralContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     FloatLiteralContext(LiteralContext *ctx);
 
     antlr4::tree::TerminalNode *SCIENTIFIC_FLOAT_LITERAL();
@@ -666,7 +712,7 @@ Data* cache = nullptr;
 
   class  ImaginaryIntLiteralContext : public LiteralContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ImaginaryIntLiteralContext(LiteralContext *ctx);
 
     antlr4::tree::TerminalNode *IMAGINARY_INT_LITERAL();
@@ -675,7 +721,7 @@ Data* cache = nullptr;
 
   class  ImaginaryFloatLiteralContext : public LiteralContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ImaginaryFloatLiteralContext(LiteralContext *ctx);
 
     antlr4::tree::TerminalNode *IMAGINARY_SCIENTIFIC_FLOAT_LITERAL();
@@ -685,7 +731,7 @@ Data* cache = nullptr;
 
   class  IntLiteralContext : public LiteralContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     IntLiteralContext(LiteralContext *ctx);
 
     antlr4::tree::TerminalNode *INT_LITERAL();
@@ -694,7 +740,7 @@ Data* cache = nullptr;
 
   class  NullLiteralContext : public LiteralContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     NullLiteralContext(LiteralContext *ctx);
 
     antlr4::tree::TerminalNode *NULL_LITERAL();
@@ -705,7 +751,7 @@ Data* cache = nullptr;
 
   class  InvokeContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     InvokeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *NAME();
@@ -723,7 +769,7 @@ Data* cache = nullptr;
   InvokeContext* invoke(int precedence);
   class  MatrixContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     MatrixContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *OPAREN();
@@ -743,7 +789,7 @@ Data* cache = nullptr;
 
   class  MatrixRowContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     MatrixRowContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<RvalueContext *> rvalue();
@@ -759,7 +805,7 @@ Data* cache = nullptr;
 
   class  ListContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *OBRACKET();
@@ -777,7 +823,7 @@ Data* cache = nullptr;
 
   class  ScopeContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ScopeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *OBRACE();
@@ -797,7 +843,7 @@ Data* cache = nullptr;
 
   class  RArgListContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     RArgListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *OPAREN();
@@ -815,7 +861,7 @@ Data* cache = nullptr;
 
   class  TypeContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     UnitContext *unit();
@@ -829,7 +875,7 @@ Data* cache = nullptr;
 
   class  UnitContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     UnitContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *OBRACKET();
@@ -844,7 +890,7 @@ Data* cache = nullptr;
 
   class  DimensionContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     DimensionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<antlr4::tree::TerminalNode *> OBRACKET();
@@ -861,7 +907,7 @@ Data* cache = nullptr;
 
   class  TypeRValueContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     TypeRValueContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     TypeMultiplyOperationContext *typeMultiplyOperation();
@@ -874,7 +920,7 @@ Data* cache = nullptr;
 
   class  TypeMultiplyOperationContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     TypeMultiplyOperationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     TypePowerOperationContext *typePowerOperation();
@@ -890,7 +936,7 @@ Data* cache = nullptr;
 
   class  TypePowerOperationContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     TypePowerOperationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     TypeAtomContext *typeAtom();
@@ -905,7 +951,7 @@ Data* cache = nullptr;
 
   class  TypeAtomContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     TypeAtomContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     TypeLiteralContext *typeLiteral();
@@ -922,7 +968,7 @@ Data* cache = nullptr;
 
   class  TypeLiteralContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     TypeLiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *SCIENTIFIC_FLOAT_LITERAL();
@@ -937,7 +983,7 @@ Data* cache = nullptr;
 
   class  LvalueContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     LvalueContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     LvalueContext() : antlr4::ParserRuleContext() { }
@@ -951,7 +997,7 @@ Data* cache = nullptr;
 
   class  ListDecompositionLValueContext : public LvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     ListDecompositionLValueContext(LvalueContext *ctx);
 
     antlr4::tree::TerminalNode *OBRACKET();
@@ -966,7 +1012,7 @@ Data* cache = nullptr;
 
   class  MatrixDecompositionLValueContext : public LvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     MatrixDecompositionLValueContext(LvalueContext *ctx);
 
     antlr4::tree::TerminalNode *OPAREN();
@@ -984,7 +1030,7 @@ Data* cache = nullptr;
 
   class  DiscardLValueContext : public LvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     DiscardLValueContext(LvalueContext *ctx);
 
     antlr4::tree::TerminalNode *UNDERSCORE();
@@ -993,7 +1039,7 @@ Data* cache = nullptr;
 
   class  SubsetLValueContext : public LvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     SubsetLValueContext(LvalueContext *ctx);
 
     antlr4::tree::TerminalNode *NAME();
@@ -1003,7 +1049,7 @@ Data* cache = nullptr;
 
   class  NameLValueContext : public LvalueContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     NameLValueContext(LvalueContext *ctx);
 
     antlr4::tree::TerminalNode *NAME();
@@ -1014,7 +1060,7 @@ Data* cache = nullptr;
 
   class  LArgListContext : public antlr4::ParserRuleContext {
   public:
-Data* cache = nullptr;
+antlrcpp::Any cache = nullptr;
     LArgListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *OPAREN();

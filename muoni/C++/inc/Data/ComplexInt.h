@@ -27,7 +27,10 @@ public:
     std::complex<int> toComplexInt() const override;
     std::complex<double> toComplexFloat() const override;
 
+    Data* negate() override;
+
     Data* add(Data*) override;
+    Data* subtract(Data*) override;
 };
 
 #endif //C_COMPLEXINTVALUE_H

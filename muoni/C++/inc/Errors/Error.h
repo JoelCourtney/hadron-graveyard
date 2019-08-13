@@ -11,7 +11,7 @@
 
 class Error : public std::exception {
     std::string offendingLine;
-    size_t offendingLineNumber;
+//    size_t offendingLineNumber;
     std::vector<size_t> offendingCharacters;
 
 public:

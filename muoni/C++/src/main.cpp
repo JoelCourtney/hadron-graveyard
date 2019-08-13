@@ -7,7 +7,7 @@
 #include "Grammar/MuonParser.h"
 #include "Interpreter/MuonInterpreter.h"
 
-void doStuffs(int argc, char* argv[]) {
+void doStuffs(int , char* []) {
     std::ifstream stream("../test/small.mu");
     if (stream.is_open()) {
         antlr4::ANTLRInputStream input(stream);

@@ -10,7 +10,7 @@
 
 Any MuonInterpreter::visitFloatLiteral(MuonParser::FloatLiteralContext* ctx) {
     if (ctx->cache)
-        return ctx->cache->clone();
+        return ctx->cache.as<Data*>()->clone();
     Data* res = (Data*) DataFactory::from(std::stod(ctx->getText()));
     ctx->cache = res->clone();
     return res;

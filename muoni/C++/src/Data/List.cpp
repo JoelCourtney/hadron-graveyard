@@ -29,7 +29,7 @@ std::string List::toString() const {
 }
 
 bool List::toBool() const {
-    throw InvalidConversionError();
+    return !l.empty();
 }
 
 int List::toInt() const {
@@ -62,18 +62,26 @@ std::complex<double> List::toComplexFloat() const {
 
 Data* List::clone() const {
     std::vector<Data*> res(l.size());
-    for (int i = 0; i < l.size(); i++) {
+    for (unsigned long i = 0; i < l.size(); i++) {
         res[i] = l[i]->clone();
     }
     return DataFactory::from(res);
 }
 
+Data* List::negate() {
+    throw InvalidOperationError();
+}
+
 Data* List::add(Data* d2) {
-    if (d2->getType() == Type::LIST) {
+    if (d2->type == Type::LIST) {
         auto c2 = reinterpret_cast<List*>(d2);
         l.insert( l.end(), c2->l.begin(), c2->l.end() );
     } else {
         l.push_back(d2);
     }
     return this;
+}
+
+Data* List::subtract(Data*) {
+    throw InvalidOperationError();
 }

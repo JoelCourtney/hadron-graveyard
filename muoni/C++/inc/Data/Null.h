@@ -23,8 +23,11 @@ public:
     Eigen::MatrixXd toFloatMatrix() const override;
     std::complex<int> toComplexInt() const override;
     std::complex<double> toComplexFloat() const override;
-    
+
+    Data* negate() override;
+
     Data* add(Data*) override;
+    Data* subtract(Data*) override;
 };
 
 #endif //C_NULLVALUE_H

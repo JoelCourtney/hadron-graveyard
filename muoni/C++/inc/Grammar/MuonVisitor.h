@@ -57,25 +57,33 @@ public:
 
     virtual antlrcpp::Any visitUnitDeclaration(MuonParser::UnitDeclarationContext *context) = 0;
 
-    virtual antlrcpp::Any visitOrOperation(MuonParser::OrOperationContext *context) = 0;
-
-    virtual antlrcpp::Any visitUnaryOperation(MuonParser::UnaryOperationContext *context) = 0;
+    virtual antlrcpp::Any visitShapeOperation(MuonParser::ShapeOperationContext *context) = 0;
 
     virtual antlrcpp::Any visitAddSubOperation(MuonParser::AddSubOperationContext *context) = 0;
 
     virtual antlrcpp::Any visitCompOperation(MuonParser::CompOperationContext *context) = 0;
 
-    virtual antlrcpp::Any visitConvertOperation(MuonParser::ConvertOperationContext *context) = 0;
-
-    virtual antlrcpp::Any visitAtomRValue(MuonParser::AtomRValueContext *context) = 0;
-
     virtual antlrcpp::Any visitExpOperation(MuonParser::ExpOperationContext *context) = 0;
 
     virtual antlrcpp::Any visitXOrOperation(MuonParser::XOrOperationContext *context) = 0;
 
-    virtual antlrcpp::Any visitIsOperation(MuonParser::IsOperationContext *context) = 0;
+    virtual antlrcpp::Any visitNotOperation(MuonParser::NotOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitNegateOperation(MuonParser::NegateOperationContext *context) = 0;
 
     virtual antlrcpp::Any visitAndOperation(MuonParser::AndOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitOrOperation(MuonParser::OrOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitNoOperation(MuonParser::NoOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitConvertOperation(MuonParser::ConvertOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitAtomRValue(MuonParser::AtomRValueContext *context) = 0;
+
+    virtual antlrcpp::Any visitIsOperation(MuonParser::IsOperationContext *context) = 0;
+
+    virtual antlrcpp::Any visitSizeOperation(MuonParser::SizeOperationContext *context) = 0;
 
     virtual antlrcpp::Any visitMultDivOperation(MuonParser::MultDivOperationContext *context) = 0;
 

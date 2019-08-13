@@ -16,22 +16,23 @@
 #include "Errors/NotImplementedError.h"
 
 class Data {
-protected:
-    Type type;
-
 public:
+    const Type type;
+    
     explicit Data(Type);
     virtual ~Data() = default;
 
     virtual Data* clone() const = 0;
     
-    Type getType() const;
-    
     virtual std::string toString() const = 0;
+    virtual bool toBool() const = 0;
     friend std::ostream& operator<<(std::ostream& o, const Data* v);
     friend std::ostream& operator<<(std::ostream& o, const Data& v);
+    
+    virtual Data* negate() = 0;
 
     virtual Data* add(Data*) = 0;
+    virtual Data* subtract(Data*) = 0;
 
     virtual bool isPrimitive() const;
     virtual bool isNumeric() const;

@@ -2,6 +2,7 @@
 // Created by Joel Courtney on 2019-03-13.
 //
 
+#include <Environment/ImplicitScope.h>
 #include "Environment/Environment.h"
 
 #include "Data/DataFactory.h"
@@ -17,9 +18,9 @@ Environment::~Environment() {
 }
 
 void Environment::pushAns(Data* v) {
-    auto fullTop = dynamic_cast<FullScope*>(stack.top());
-    if (fullTop) {
-        fullTop->pushAns(v);
+    Scope* s = stack.top();
+    while (!s->pushAns(v)) {
+        s = s->defer();
     }
 }
 
@@ -53,6 +54,18 @@ void Environment::declareVarl(const std::string& name, bool mut) {
 
 void Environment::push(Scope* s) {
     stack.push(s);
+}
+
+ExplicitScope* Environment::pushDefaultExplicitScope() {
+    auto res = new ExplicitScope(stack.top());
+    stack.push(res);
+    return res;
+}
+
+ImplicitScope* Environment::pushDefaultImplicitScope() {
+    auto res = new ImplicitScope(stack.top());
+    stack.push(res);
+    return res;
 }
 
 Data* Environment::pop() {

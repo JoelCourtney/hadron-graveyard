@@ -38,6 +38,9 @@ public:
     // MuonLValues.cpp
     Any visitNameLValue(MuonParser::NameLValueContext*) override;
     
+    // MuonUnaryOperations.cpp
+    Any visitNegateOperation(MuonParser::NegateOperationContext*) override;
+    
     // MuonBinaryOperations.cpp
     Any visitAddSubOperation(MuonParser::AddSubOperationContext*) override;
     
@@ -49,8 +52,11 @@ public:
     
     // MuonControls.cpp
     Any visitScope(MuonParser::ScopeContext*) override;
+    Any visitLoop(MuonParser::LoopContext*) override;
+    Any visitWhileLoop(MuonParser::WhileLoopContext*) override;
     Any visitForLoop(MuonParser::ForLoopContext*) override;
     Any visitForAsLoop(MuonParser::ForAsLoopContext*) override;
+    Any visitForAtLoop(MuonParser::ForAtLoopContext*) override;
 };
 
 #endif //C_MUONINTERPRETER_H

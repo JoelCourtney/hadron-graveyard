@@ -12,6 +12,9 @@ Any MuonInterpreter::visitAddSubOperation(MuonParser::AddSubOperationContext* ct
     switch (bopText[0]) {
         case '+':
             return v1->add(v2);
+        case '-':
+            return v1->subtract(v2);
+        default:
+            throw NotImplementedError();
     }
-    return (Data*) DataFactory::from(-5);
 }

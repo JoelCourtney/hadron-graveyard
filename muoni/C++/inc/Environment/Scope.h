@@ -21,6 +21,9 @@ public:
     virtual bool assignVarl(const std::string&, Data*) = 0;
     virtual bool containsVarl(const std::string&) const = 0;
     virtual bool declareVarl(const std::string&, bool) = 0;
+    
+    virtual bool pushAns(Data*) = 0;
+    virtual Data* getTopAns() = 0;
 };
 
 #endif //C_SCOPE_H

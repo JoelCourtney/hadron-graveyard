@@ -52,9 +52,12 @@ std::complex<double> String::toComplexFloat() const {
 //    return std::complex<double>(b,0);
 }
 
+Data* String::negate() {
+    throw InvalidOperationError();
+}
+
 Data* String::add(Data* d2) {
-    Type t2 = d2->getType();
-    switch(t2) {
+    switch(d2->type) {
         case Type::NULL_TYPE:
             throw InvalidOperationError();
         case Type::LIST: {
@@ -65,4 +68,25 @@ Data* String::add(Data* d2) {
         default:
             return DataFactory::from(s + d2->toString());
     }
+}
+
+Data* String::subtract(Data* d2) {
+    if (!d2->isPrimitive()) {
+        throw InvalidOperationError();
+    }
+    auto p2 = reinterpret_cast<Primitive*>(d2);
+    switch (p2->type) {
+        case Type::NULL_TYPE:
+        case Type::LIST:
+            throw InvalidOperationError();
+        case Type::STRING:
+            return toNumeric()->subtract(reinterpret_cast<String*>(p2)->toNumeric());
+        default:
+            return toNumeric()->subtract(p2);
+    }
+}
+
+Data* String::toNumeric() const {
+    // will call eval
+    return nullptr;
 }

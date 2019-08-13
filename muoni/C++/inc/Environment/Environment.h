@@ -9,6 +9,8 @@
 #include <stack>
 
 class Scope;
+class ExplicitScope;
+class ImplicitScope;
 
 class Environment {
     std::stack<Scope*> stack;
@@ -24,6 +26,8 @@ public:
     void declareVarl(const std::string&, bool);
 
     void push(Scope*);
+    ExplicitScope* pushDefaultExplicitScope();
+    ImplicitScope* pushDefaultImplicitScope();
     Data* pop();
     
     Scope* topScope();

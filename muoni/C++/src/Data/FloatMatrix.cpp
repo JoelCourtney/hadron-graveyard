@@ -49,13 +49,17 @@ std::complex<double> FloatMatrix::toComplexFloat() const {
     return std::complex<double>(toFloat(),0);
 }
 
+Data* FloatMatrix::negate() {
+    m = -m;
+    return this;
+}
+
 Data* FloatMatrix::add(Data* d2) {
     if (!d2->isPrimitive()) {
         throw InvalidConversionError();
     }
-    auto p2 = dynamic_cast<Primitive*>(d2);
-    Type t2 = p2->getType();
-    switch(t2) {
+    auto p2 = reinterpret_cast<Primitive*>(d2);
+    switch(p2->type) {
         case Type::NULL_TYPE:
             throw InvalidOperationError();
         case Type::STRING:
@@ -75,6 +79,32 @@ Data* FloatMatrix::add(Data* d2) {
             auto l2 = dynamic_cast<List*>(p2);
             l2->l.insert(l2->l.begin(), this);
             return l2;
+    }
+}
+
+Data* FloatMatrix::subtract(Data* d2) {
+    if (!d2->isPrimitive()) {
+        throw InvalidConversionError();
+    }
+    auto p2 = reinterpret_cast<Primitive*>(d2);
+    switch(p2->type) {
+        case Type::NULL_TYPE:
+            throw InvalidOperationError();
+        case Type::STRING:
+            return DataFactory::from((Eigen::MatrixXd) (m - p2->toFloatMatrix()));
+        case Type::BOOL:
+        case Type::INT:
+        case Type::BIG_INT:
+        case Type::FLOAT:
+            return DataFactory::from((Eigen::MatrixXd) (m.array() - p2->toFloat()).matrix());
+        case Type::INT_MATRIX:
+        case Type::FLOAT_MATRIX:
+            return DataFactory::from((Eigen::MatrixXd) (m - p2->toFloatMatrix()));
+        case Type::COMPLEX_INT:
+        case Type::COMPLEX_FLOAT:
+            throw NotImplementedError();
+        case Type::LIST:
+            throw InvalidOperationError();
     }
 }
 

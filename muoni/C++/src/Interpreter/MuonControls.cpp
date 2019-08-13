@@ -5,6 +5,7 @@
 #include <Data/List.h>
 #include <Environment/ExplicitScope.h>
 #include <Environment/ImplicitScope.h>
+#include <Data/DataFactory.h>
 #include "Interpreter/MuonInterpreter.h"
 
 Any MuonInterpreter::visitScope(MuonParser::ScopeContext* ctx) {
@@ -15,29 +16,75 @@ Any MuonInterpreter::visitScope(MuonParser::ScopeContext* ctx) {
     return env.pop();
 }
 
+Any MuonInterpreter::visitLoop(MuonParser::LoopContext* ctx) {
+    while (true) {
+        visit(ctx->statement());
+    }
+    return 0;
+}
+
+Any MuonInterpreter::visitWhileLoop(MuonParser::WhileLoopContext* ctx) {
+    while (visit(ctx->rvalue()).as<Data*>()->toBool()) {
+        visit(ctx->statement());
+    }
+    return 0;
+}
+
 Any MuonInterpreter::visitForLoop(MuonParser::ForLoopContext *ctx) {
     Data* over = visit(ctx->rvalue());
-    switch (over->getType()) {
+    switch (over->type) {
         case Type::LIST: {
             int size = reinterpret_cast<List*>(over)->l.size();
             for (int i = 0; i < size; i++) {
                 visit(ctx->statement());
             }
         }
+        default:
+            throw NotImplementedError();
     }
     return 0;
 }
 
 Any MuonInterpreter::visitForAsLoop(MuonParser::ForAsLoopContext *ctx) {
-    env.push(new ImplicitScope(env.topScope()));
+    ImplicitScope* scope = env.pushDefaultImplicitScope();
     Data* over = visit(ctx->rvalue());
-    switch (over->getType()) {
+    switch (over->type) {
         case Type::LIST: {
-            int size = reinterpret_cast<List*>(over)->l.size();
-            for (int i = 0; i < size; i++) {
+            auto list = reinterpret_cast<List*>(over)->l;
+            inDeclare = true;
+            for (auto item : list) {
+                valueToAssign = item;
+                visit(ctx->as);
+                inDeclare = false;
+                scope->lock();
                 visit(ctx->statement());
             }
         }
+        default:
+            throw NotImplementedError();
     }
+    env.pop();
+    return 0;
+}
+
+Any MuonInterpreter::visitForAtLoop(MuonParser::ForAtLoopContext *ctx) {
+    ImplicitScope* scope = env.pushDefaultImplicitScope();
+    Data* over = visit(ctx->rvalue());
+    switch (over->type) {
+        case Type::LIST: {
+            int size = reinterpret_cast<List*>(over)->l.size();
+            inDeclare = true;
+            for (int i = 0; i < size; i++) {
+                valueToAssign = DataFactory::from(i);
+                visit(ctx->at);
+                inDeclare = false;
+                scope->lock();
+                visit(ctx->statement());
+            }
+        }
+        default:
+            throw NotImplementedError();
+    }
+    env.pop();
     return 0;
 }

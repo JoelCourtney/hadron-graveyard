@@ -3,11 +3,11 @@ grammar RValue;
 import Base, Type;
 
 rvalue
-    : uop=PLUS r=rvalue # UnaryOperation
-    | uop=DASH r=rvalue # UnaryOperation
-    | uop=DOLLAR r=rvalue # UnaryOperation
-    | uop=HASH r=rvalue # UnaryOperation
-    | uop=NOT r=rvalue # UnaryOperation
+    : uop=PLUS r=rvalue # NoOperation
+    | uop=DASH r=rvalue # NegateOperation
+    | uop=DOLLAR r=rvalue # ShapeOperation
+    | uop=HASH r=rvalue # SizeOperation
+    | uop=NOT r=rvalue # NotOperation
     | r=rvalue bop=(AT_SYMBOL | AMPERSAND | TO) t=type # ConvertOperation
     | r1=rvalue bop=(CARROT | MATCARROT) r2=rvalue # ExpOperation
     | r1=rvalue bop=(STAR | SLASH | MATSTAR | MATSLASH) r2=rvalue # MultDivOperation

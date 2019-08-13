@@ -6,10 +6,6 @@
 
 Data::Data(Type t) : type(t) {}
 
-Type Data::getType() const {
-    return type;
-}
-
 std::ostream& operator<<(std::ostream& o, const Data* v) {
     o << v->toString();
     return o;

@@ -22,7 +22,7 @@ FullScope::~FullScope() {
         delete it4->second;
         it4++;
     }
-    for (int i = 1; i < ans.size(); i++) {
+    for (unsigned long i = 1; i < ans.size(); i++) {
         delete ans.at(i-1);
     }
 }
@@ -64,8 +64,9 @@ bool FullScope::declareVarl(const std::string& s, bool m) {
     return true;
 }
 
-void FullScope::pushAns(Data* d) {
+bool FullScope::pushAns(Data* d) {
     ans.push_back(d);
+    return true;
 }
 
 Data* FullScope::getTopAns() {
