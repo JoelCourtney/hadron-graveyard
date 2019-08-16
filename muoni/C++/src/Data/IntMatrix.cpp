@@ -19,7 +19,7 @@ std::string IntMatrix::toString() const {
 }
 
 bool IntMatrix::toBool() const {
-    return m.isZero();
+    return !m.isZero();
 }
 
 int IntMatrix::toInt() const {
