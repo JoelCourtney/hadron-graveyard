@@ -35,9 +35,9 @@ antlrcpp::Any cache = nullptr;
     RuleFile = 0, RuleControl = 1, RuleStatement = 2, RuleUnitDeclaration = 3, 
     RuleRvalue = 4, RuleAtom = 5, RuleLiteral = 6, RuleInvoke = 7, RuleMatrix = 8, 
     RuleMatrixRow = 9, RuleList = 10, RuleScope = 11, RuleRArgList = 12, 
-    RuleType = 13, RuleUnit = 14, RuleDimension = 15, RuleTypeRValue = 16, 
-    RuleTypeMultiplyOperation = 17, RuleTypePowerOperation = 18, RuleTypeAtom = 19, 
-    RuleTypeLiteral = 20, RuleLvalue = 21, RuleLArgList = 22
+    RuleRange = 13, RuleType = 14, RuleUnit = 15, RuleDimension = 16, RuleTypeRValue = 17, 
+    RuleTypeMultiplyOperation = 18, RuleTypePowerOperation = 19, RuleTypeAtom = 20, 
+    RuleTypeLiteral = 21, RuleLvalue = 22, RuleLArgList = 23
   };
 
   MuonParser(antlr4::TokenStream *input);
@@ -63,6 +63,7 @@ antlrcpp::Any cache = nullptr;
   class ListContext;
   class ScopeContext;
   class RArgListContext;
+  class RangeContext;
   class TypeContext;
   class UnitContext;
   class DimensionContext;
@@ -621,6 +622,15 @@ antlrcpp::Any cache = nullptr;
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
+  class  RangeAtomContext : public AtomContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    RangeAtomContext(AtomContext *ctx);
+
+    RangeContext *range();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   class  InvokeAtomContext : public AtomContext {
   public:
 antlrcpp::Any cache = nullptr;
@@ -858,6 +868,57 @@ antlrcpp::Any cache = nullptr;
   };
 
   RArgListContext* rArgList();
+
+  class  RangeContext : public antlr4::ParserRuleContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    RangeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    RangeContext() : antlr4::ParserRuleContext() { }
+    void copyFrom(RangeContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  DoubleRangeContext : public RangeContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    DoubleRangeContext(RangeContext *ctx);
+
+    antlr4::Token *d1 = nullptr;
+    antlr4::Token *d2 = nullptr;
+    std::vector<RvalueContext *> rvalue();
+    RvalueContext* rvalue(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COLON();
+    antlr4::tree::TerminalNode* COLON(size_t i);
+    antlr4::tree::TerminalNode *OBRACKET();
+    antlr4::tree::TerminalNode *OPAREN();
+    antlr4::tree::TerminalNode *CBRACKET();
+    antlr4::tree::TerminalNode *CPAREN();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  SingleRangeContext : public RangeContext {
+  public:
+antlrcpp::Any cache = nullptr;
+    SingleRangeContext(RangeContext *ctx);
+
+    antlr4::Token *d1 = nullptr;
+    antlr4::Token *d2 = nullptr;
+    std::vector<RvalueContext *> rvalue();
+    RvalueContext* rvalue(size_t i);
+    antlr4::tree::TerminalNode *COLON();
+    antlr4::tree::TerminalNode *OBRACKET();
+    antlr4::tree::TerminalNode *OPAREN();
+    antlr4::tree::TerminalNode *CBRACKET();
+    antlr4::tree::TerminalNode *CPAREN();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  RangeContext* range();
 
   class  TypeContext : public antlr4::ParserRuleContext {
   public:

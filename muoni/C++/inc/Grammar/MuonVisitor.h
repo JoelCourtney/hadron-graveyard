@@ -99,6 +99,8 @@ public:
 
     virtual antlrcpp::Any visitScopeAtom(MuonParser::ScopeAtomContext *context) = 0;
 
+    virtual antlrcpp::Any visitRangeAtom(MuonParser::RangeAtomContext *context) = 0;
+
     virtual antlrcpp::Any visitFloatLiteral(MuonParser::FloatLiteralContext *context) = 0;
 
     virtual antlrcpp::Any visitImaginaryFloatLiteral(MuonParser::ImaginaryFloatLiteralContext *context) = 0;
@@ -124,6 +126,10 @@ public:
     virtual antlrcpp::Any visitScope(MuonParser::ScopeContext *context) = 0;
 
     virtual antlrcpp::Any visitRArgList(MuonParser::RArgListContext *context) = 0;
+
+    virtual antlrcpp::Any visitSingleRange(MuonParser::SingleRangeContext *context) = 0;
+
+    virtual antlrcpp::Any visitDoubleRange(MuonParser::DoubleRangeContext *context) = 0;
 
     virtual antlrcpp::Any visitType(MuonParser::TypeContext *context) = 0;
 

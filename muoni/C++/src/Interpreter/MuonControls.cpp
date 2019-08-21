@@ -38,7 +38,7 @@ Any MuonInterpreter::visitForLoop(MuonParser::ForLoopContext *ctx) {
             for (int i = 0; i < size; i++) {
                 visit(ctx->statement());
             }
-        }
+        } break;
         default:
             throw NotImplementedError();
     }
@@ -59,7 +59,7 @@ Any MuonInterpreter::visitForAsLoop(MuonParser::ForAsLoopContext *ctx) {
                 scope->lock();
                 visit(ctx->statement());
             }
-        }
+        } break;
         default:
             throw NotImplementedError();
     }
@@ -81,7 +81,7 @@ Any MuonInterpreter::visitForAtLoop(MuonParser::ForAtLoopContext *ctx) {
                 scope->lock();
                 visit(ctx->statement());
             }
-        }
+        } break;
         default:
             throw NotImplementedError();
     }

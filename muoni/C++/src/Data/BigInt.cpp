@@ -100,7 +100,7 @@ Data* BigInt::subtract(Data* d2) {
             return DataFactory::from(b - toBigInt());
         case Type::BOOL:
         case Type::INT:
-            (b - p2->toInt());
+            return DataFactory::from(b - p2->toInt());
         case Type::BIG_INT:
             return DataFactory::from(b - p2->toBigInt());
         case Type::FLOAT:

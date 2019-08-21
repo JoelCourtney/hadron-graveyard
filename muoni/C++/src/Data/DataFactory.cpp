@@ -47,3 +47,11 @@ FloatMatrix* DataFactory::from(Eigen::MatrixXd m) {
 List* DataFactory::from(std::vector<Data*> l) {
     return new List(l);
 }
+
+Range* DataFactory::from(bool li, Data* f, Data* l, bool ri) {
+    return new Range(li, f, l, ri);
+}
+
+Range* DataFactory::from(bool li, Data* f, Data* s, Data* l, bool ri) {
+    return new Range(li, f, s, l, ri);
+}

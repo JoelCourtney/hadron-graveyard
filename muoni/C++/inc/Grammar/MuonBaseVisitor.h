@@ -175,6 +175,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitRangeAtom(MuonParser::RangeAtomContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitFloatLiteral(MuonParser::FloatLiteralContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -224,6 +228,14 @@ public:
   }
 
   virtual antlrcpp::Any visitRArgList(MuonParser::RArgListContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitSingleRange(MuonParser::SingleRangeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitDoubleRange(MuonParser::DoubleRangeContext *ctx) override {
     return visitChildren(ctx);
   }
 

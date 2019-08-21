@@ -17,6 +17,7 @@
 #include "IntMatrix.h"
 #include "FloatMatrix.h"
 #include "List.h"
+#include "Range.h"
 
 class DataFactory {
 public:
@@ -31,6 +32,8 @@ public:
     static IntMatrix* from(Eigen::MatrixXi);
     static FloatMatrix* from(Eigen::MatrixXd);
     static List* from(std::vector<Data*>);
+    static Range* from(bool,Data*,Data*,bool);
+    static Range* from(bool,Data*,Data*,Data*,bool);
 };
 
 #endif //C_VALUEFACTORY_H

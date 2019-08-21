@@ -25,7 +25,8 @@ atom
     | invoke # InvokeAtom
     | matrix # MatrixAtom
     | list # ListAtom
-    | scope # ScopeAtom;
+    | scope # ScopeAtom
+    | range # RangeAtom;
 
 literal
     : SCIENTIFIC_FLOAT_LITERAL # FloatLiteral
@@ -52,3 +53,7 @@ list : OBRACKET (rvalue (COMMA rvalue)*)? CBRACKET;
 scope : OBRACE (NEWLINE | SEMICOLON)? (control ((NEWLINE | SEMICOLON) control)*)? (NEWLINE | SEMICOLON)? CBRACE;
 
 rArgList : OPAREN (rvalue (COMMA rvalue)*)? CPAREN;
+
+range
+    : d1=(OBRACKET | OPAREN) rvalue COLON rvalue d2=(CBRACKET | CPAREN) # SingleRange
+    | d1=(OBRACKET | OPAREN) rvalue COLON rvalue COLON rvalue d2=(CBRACKET | CPAREN) # DoubleRange;

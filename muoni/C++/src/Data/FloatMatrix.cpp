@@ -75,10 +75,13 @@ Data* FloatMatrix::add(Data* d2) {
         case Type::COMPLEX_INT:
         case Type::COMPLEX_FLOAT:
             throw NotImplementedError();
-        case Type::LIST:
-            auto l2 = dynamic_cast<List*>(p2);
+        case Type::LIST: {
+            auto l2 = dynamic_cast<List *>(p2);
             l2->l.insert(l2->l.begin(), this);
             return l2;
+        } break;
+        default:
+            throw NotImplementedError();
     }
 }
 
@@ -105,6 +108,8 @@ Data* FloatMatrix::subtract(Data* d2) {
             throw NotImplementedError();
         case Type::LIST:
             throw InvalidOperationError();
+        default:
+            throw NotImplementedError();
     }
 }
 
