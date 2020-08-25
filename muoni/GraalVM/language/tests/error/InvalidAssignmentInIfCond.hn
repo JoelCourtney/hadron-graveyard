@@ -1,0 +1,9 @@
+fn double(x) {
+  return 2 * x;
+}
+
+fn main() {
+  if (double(2) = 4) {
+    42;
+  }
+}

@@ -1,0 +1,13 @@
+/* The easiest way to generate null: a fn without a return statement implicitly returns null. */
+fn null() {
+}
+
+fn main() {  
+  println(null());  
+  println(null() == null());  
+  println(null() != null());  
+  println(null() == 42);  
+  println(null() != 42);  
+  println(null() == "42");  
+  println(null() != "42");  
+}  

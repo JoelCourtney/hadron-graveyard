@@ -1,0 +1,12 @@
+fn invoke(f) {
+  f("hello");
+}
+
+fn f1() {
+  println("f1");
+}
+
+fn main() {
+  invoke(f1);
+  invoke(foo);  
+}  

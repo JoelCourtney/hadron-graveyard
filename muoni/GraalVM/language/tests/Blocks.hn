@@ -1,0 +1,17 @@
+fn main() {
+	println({2} + {3})
+	x = 3
+	while {
+		println("fencepost")
+		x > 0
+	} {
+		println("fence")
+		x = x - 1
+	}
+	x = 3
+	x = x ^ {
+		y = 10
+		y - 8
+	} - 2
+	println(x)
+}

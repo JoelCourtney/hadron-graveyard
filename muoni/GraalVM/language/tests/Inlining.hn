@@ -1,0 +1,18 @@
+
+fn a() {return 42;}
+fn b() {return a();}
+fn c() {return b();}
+fn d() {return c();}
+fn e() {return c();}
+fn f() {return c();}
+fn g() {return d() + e() + f();}
+
+fn main() {
+    i = 0;
+    result = 0;
+    while (i < 10000) {
+        result = result + g();
+        i = i + 1;
+    }
+    return result;
+}

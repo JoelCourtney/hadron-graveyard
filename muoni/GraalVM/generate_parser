@@ -1,0 +1,4 @@
+#!/bin/bash
+
+[[ -f antlr-4.7.1-complete.jar ]] || curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
+java -cp antlr-4.7.1-complete.jar org.antlr.v4.Tool -package net.joelcourtney.hadron.parser -no-listener language/src/main/java/net/joelcourtney/hadron/parser/Hadron.g4

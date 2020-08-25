@@ -1,0 +1,10 @@
+fn main() {
+    asdf = true;
+    zxcv = false;
+    maybe = asdf or zxcv;
+    maybenot = asdf and zxcv;
+    println(asdf);
+    println(zxcv);
+    println(maybe);
+    println(maybenot);
+}

@@ -1,0 +1,9 @@
+fn main() {
+	a = -5
+	println(a)
+	b = a--3
+	println(b)
+	c = 3
+	-2
+	println(c)
+}

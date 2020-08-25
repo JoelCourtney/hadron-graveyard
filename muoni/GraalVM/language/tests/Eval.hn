@@ -1,0 +1,4 @@
+fn main() {
+  eval("hadron", "fn foo() { return 14 + 2; }");
+  println(foo());
+}

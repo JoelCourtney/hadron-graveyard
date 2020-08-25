@@ -1,0 +1,10 @@
+fn foo() {}
+fn bar() {}
+
+fn main() {
+  foo();
+  if 1 < 2 {
+    bar();
+    return 1;
+  }
+}  

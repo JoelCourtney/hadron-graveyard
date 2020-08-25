@@ -1,0 +1,9 @@
+fn main() {
+	i = 1
+	while (i < 40) {
+		println(i!)
+		i = i + 1
+	}
+	println(3+5!)
+	println(0!)
+}

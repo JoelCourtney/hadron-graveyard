@@ -1,0 +1,120 @@
+fn f1() {
+	print("Hello ")
+		println("World!")
+}
+
+fn f2() {
+	print("Hello ");
+	println("World!")
+}
+
+fn f3() {
+	print("Hello ")
+		println("World!");
+}
+fn f4() {
+	print("Hello ");
+	println("World!");
+}
+fn f5() {print("Hello ")
+	println("World!")
+}
+fn f6() {print("Hello ");println("World!")}
+fn f7() {
+	print("Hello ")
+		println("World!");}
+		fn f8() {
+
+
+			print("Hello ")
+
+
+
+				println("World!")
+
+
+
+
+		}
+
+
+
+fn f9() {print("Hello ");println("World!");}
+fn f10() {
+	a =
+		5 - 
+		3 *
+		67;println(a)
+}
+fn f11() {
+	i = 10
+		while (
+				i>
+				2)
+
+
+		{print(i);i=i-
+			1}
+
+			println("")
+}
+
+fn invocable(n) { 
+	  if (n <= 1) { 
+		    one  
+		        =                  // 5
+		          1; 
+		    return 
+		        one; 
+		  } else { 
+		    // A comment           // 10
+		    while ( 
+		        n > 0 
+		          ) {  
+		      one  
+		          =                // 15
+		            2; 
+		      n = n - 
+		          one * 
+		          one; 
+		    }                     // 20
+		    return 
+		        n * n; 
+		     
+		  } 
+		}                          // 25
+		 
+		fn 
+		   f12() 
+		         { 
+		  return invocable(1) + invocable(2); 
+		} 
+fn main() {
+	f1()
+		f2()
+		f3()
+		f4()
+		f5()
+		f6()
+		f7()
+		f8()
+		f9()
+		f10()
+		f11()
+		println(f12()
+
+
+
+
+		)
+		a = 5>
+
+
+		3+
+
+		15
+		println(a)
+		b
+		= 5
+		println(b)
+}

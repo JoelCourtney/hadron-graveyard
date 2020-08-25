@@ -1,0 +1,1 @@
+Type error at TypeError04.hn line 2 col 3: operation "or" not defined for Boolean false, Number 4

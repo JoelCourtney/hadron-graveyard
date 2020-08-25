@@ -1,0 +1,32 @@
+fn invoke(f) {
+  f("hello");
+}
+
+fn f1() {
+  println("f1");
+}
+
+fn f2() {
+  println("f2");
+}
+
+fn f3() {
+  println("f3");
+}
+
+fn f4() {
+  println("f4");
+}
+
+fn f5() {
+  println("f5");
+}
+
+fn main() {
+  invoke(f1);
+  invoke(f2);
+  invoke(f3);
+  invoke(f4);
+  invoke(f5);
+  invoke(foo);  
+}  

@@ -1,0 +1,16 @@
+fn add(a, b) {
+  return a + b
+}
+
+fn sub(a, b) {
+  return a - b
+}
+
+fn foo(f) {
+  println(f(40, 2))
+}
+
+fn main() {
+  foo(add)
+  foo(sub)
+}  

@@ -1,0 +1,23 @@
+fn main() {
+  t = 10 == 10; // true
+  f = 10 != 10; // false
+  println(left(f) and right(f));
+  println(left(f) and right(t));
+  println(left(t) and right(f));
+  println(left(t) and right(t));
+  println("");
+  println(left(f) or right(f));
+  println(left(f) or right(t));
+  println(left(t) or right(f));
+  println(left(t) or right(t));
+}
+
+fn left(x) {
+  println("left");
+  return x;
+}
+
+fn right(x) {
+  println("right");
+  return x;
+}

@@ -1,0 +1,11 @@
+fn foo() {
+  println(test(40, 2));
+}
+
+fn main() {
+  defineFunction("fn test(a, b) { return a + b; }");
+  foo();
+
+  defineFunction("fn test(a, b) { return a - b; }");
+  foo();
+}  
